@@ -1,12 +1,21 @@
-# /etc/apt/sources.list.d/debian.list for Anonymity Linux Distributions #
+# Generic Makefile for Scripts #
 
-A question of distribution maintenance strategies. The more standard
-way would indeed be populating /etc/apt/sources.list at install or build time
-and leaving /etc/apt/sources.list.d alone. The idea of managing
-/etc/apt/sources.list.d/debian.list for the user is, the anonymity
-distribution maintainers can decide when it is a better "change stable to
-oldstable", "keep wheezy as long as needed to work out [eventual!] issues
-that would break during upgrade to jessie" and such.
+Makes packaging scripts simpler. No more need to manually maintain
+'make install' targets or distribution specific install files such as
+debian/pkg-name.install.
+
+Files in etc/... in root source folder will be installed to /etc/..., files in
+usr/... will be installed to /usr/... and so forth. This should make renaming,
+moving files around, packaging, etc. very simple. Packaging of most packages
+can look very similar.
+
+Provides common make targets such as 'make install'. Very extensible through
+file ./make-helper-overrides.bsh or
+folder ./make-helper-overrides.d. By using overrides, any make target can be
+easily extended using pre or post hooks or replaced.
+
+Contains a minimal Makefile while the heavy lifting is done by a bash script
+make-helper.bsh.
 
 (This package description has been [automatically](https://github.com/Whonix/whonix-developer-meta-files/blob/master/debug-steps/packaging-helper-script) extracted and mirrored from `debian/control`.)
 
