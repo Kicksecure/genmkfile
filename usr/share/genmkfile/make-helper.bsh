@@ -527,6 +527,8 @@ make_undebdist() {
 }
 
 make_test() {
+   ## Automatically run by debhelper. To prevent debhelper from failing,
+   ## implemented a dummy function here.
    true "INFO: $FUNCNAME not implemented"
 }
 
