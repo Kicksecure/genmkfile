@@ -7,7 +7,7 @@
 
 ## This is a copy.
 ## master location:
-## https://github.com/Whonix/genmkfile/blob/master/Makefile
+## https://github.com/Whonix/genmkfile/blob/master/usr/share/genmkfile/Makefile
 
 GENMKFILE_PATH ?= /usr/share/genmkfile
 GENMKFILE_ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))

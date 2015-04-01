@@ -8,7 +8,7 @@
 
 ## This is a copy.
 ## master location:
-## https://github.com/Whonix/Whonix/blob/master/make-helper.bsh
+## https://github.com/Whonix/genmkfile/blob/master/usr/share/genmkfile/make-helper.bsh
 
 make_init() {
    cd "$GENMKFILE_ROOT_DIR"
