@@ -26,9 +26,9 @@ Description: Generic Makefile for Scripts
  can look very similar.
  .
  Provides common make targets such as 'make install'. Very extensible through
- file ./make-helper-overrides.bsh or folder
- ./make-helper-overrides.d. By using overrides, any make target can be easily
- extended using pre or post hooks or replaced.
+ file ./make-helper-overrides.bsh or
+ folder ./make-helper-overrides.d. By using overrides, any make target can be
+ easily extended using pre or post hooks or replaced.
  .
  Contains a minimal Makefile while the heavy lifting is done by a bash script
  make-helper.bsh.
