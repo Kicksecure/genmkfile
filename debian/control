@@ -1,0 +1,34 @@
+## This file is part of Whonix.
+## Copyright (C) 2012 - 2014 Patrick Schleizer <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+Source: genmkfile
+Section: misc
+Priority: optional
+Maintainer: Patrick Schleizer <adrelanos@riseup.net>
+Build-Depends: debhelper (>= 9), faketime
+Homepage: https://github.com/Whonix/genmkfile
+Vcs-Browser: https://github.com/Whonix/genmkfile
+Vcs-Git: https://github.com/Whonix/genmkfile.git
+Standards-Version: 3.9.4
+
+Package: genmkfile
+Architecture: all
+Depends: make, ${misc:Depends}
+Description: Generic Makefile for Scripts
+ Makes packaging scripts simpler. No more need to manually maintain
+ 'make install' targets or distribution specific install files such as
+ debian/pkg-name.install.
+ .
+ Files in etc/... in root source folder will be installed to /etc/..., files in
+ usr/... will be installed to /usr/... and so forth. This should make renaming,
+ moving files around, packaging, etc. very simple. Packaging of most packages
+ can look very similar.
+ .
+ Provides common make targets such as 'make install'. Very extensible through
+ file ./make-helper-overrides.bsh or folder
+ ./make-helper-overrides.d. By using overrides, any make target can be easily
+ extended using pre or post hooks or replaced.
+ .
+ Contains a minimal Makefile while the heavy lifting is done by a bash script
+ make-helper.bsh.
