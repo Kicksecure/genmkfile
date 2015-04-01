@@ -1,0 +1,5 @@
+commit 70a3c06d04b049041ad2f919f52d51524d83c426
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 16:16:35 2015 +0000
+
+    initial implementation and import from https://github.com/Whonix/Whonix/blob/master/Makefile and https://github.com/Whonix/Whonix/blob/master/make-helper.bsh
