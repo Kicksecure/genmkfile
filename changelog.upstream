@@ -1,3 +1,33 @@
+commit a0dd00c02ff191ea1b2adcb8e3f102efc589dcf8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 16:53:31 2015 +0000
+
+    fixed readme
+
+commit 79573cff691712fd21ddf2e3a9f012bd424870b3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 16:38:56 2015 +0000
+
+    comments
+
+commit 6a38b9676dc74d11866a4b77c2bb550a2bd5b055
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 16:35:37 2015 +0000
+
+    comment
+
+commit 4f6824d2fac577fcb14455fbc81a42b7f2f63c6e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 16:24:39 2015 +0000
+
+    fixed lintian warning
+
+commit 3ecafa291f31290f3885300cc2aadc6309211d1b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 16:18:26 2015 +0000
+
+    added changelog.upstream
+
 commit 70a3c06d04b049041ad2f919f52d51524d83c426
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 1 16:16:35 2015 +0000
