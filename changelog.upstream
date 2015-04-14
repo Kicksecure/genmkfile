@@ -1,3 +1,21 @@
+commit 6bce8b0347e609b2b2a894c39b32177c799942c9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 14 11:46:34 2015 +0000
+
+    implemented "make reprepro-add"
+
+commit 96488b686814f794bb3070ac7582ca2ff4ff638b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 14 10:58:12 2015 +0000
+
+    implemented "make git-tag-push"
+
+commit 7f7b7989ad53138597d01ee2ac176af0dc969d1f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 17:13:13 2015 +0000
+
+    bumped changelog version
+
 commit a0dd00c02ff191ea1b2adcb8e3f102efc589dcf8
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 1 16:53:31 2015 +0000
