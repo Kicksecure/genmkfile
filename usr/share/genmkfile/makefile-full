@@ -124,6 +124,9 @@ git-commit-verify:
 git-verify:
 	$(GENMKFILE_PATH)/make-helper.bsh git-verify
 
+git-tag-push:
+	$(GENMKFILE_PATH)/make-helper.bsh git-tag-push
+
 help:
 	$(GENMKFILE_PATH)/make-helper.bsh help
 

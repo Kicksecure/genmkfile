@@ -248,6 +248,12 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
+           git-tag-push)
+               matched="true"
+               make_function_run make_git_tag_push
+               exit 0
+               shift
+               ;;
            --)
                shift
                break
@@ -458,7 +464,9 @@ make git-tag-check
 make git-commit-verify
    Check if current git head is a signed git commit. Only a repository sanity check. Not for security purposes!
 make git-verify
-   Combination of tag-check and commit-verify. Only a repository sanity check. Not for security purposes!"
+   Combination of tag-check and commit-verify. Only a repository sanity check. Not for security purposes!
+make git-tag-push
+   git push repositories (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)"
 }
 
 make_dist() {
@@ -987,6 +995,15 @@ make_git_verify() {
    make_function_run make_git_commit_verify_current
    make_function_run make_git_tag_check
    echo "Ok, current git head is a signed git commit and a signed git tag."
+}
+
+make_git_tag_push() {
+   make_function_run make_git_tag_shared
+   [ -n "$make_git_tag_push_targets" ] || make_git_tag_push_targets="origin"
+   local repository
+   for repository in $make_git_tag_push_targets; do
+      git push "$repository" "$make_pkg_version_with_revision"
+   done
 }
 
 make_source_overrides_file() {
