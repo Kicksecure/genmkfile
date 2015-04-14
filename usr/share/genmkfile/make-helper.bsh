@@ -254,6 +254,12 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
+           reprepro-add)
+               matched="true"
+               make_function_run make_reprepro-add
+               exit 0
+               shift
+               ;;
            --)
                shift
                break
@@ -466,7 +472,10 @@ make git-commit-verify
 make git-verify
    Combination of tag-check and commit-verify. Only a repository sanity check. Not for security purposes!
 make git-tag-push
-   git push repositories (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)"
+   git push repositories (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
+make reprepro-add
+   Add main deb package using reprepro wrapper (Environment variable make_reprepro_wrapper, that default to 'reprepro'.)
+   to repository (Environment variable make_reprepro_codename, that defaults to 'developers'.)."
 }
 
 make_dist() {
@@ -1004,6 +1013,27 @@ make_git_tag_push() {
    for repository in $make_git_tag_push_targets; do
       git push "$repository" "$make_pkg_version_with_revision"
    done
+}
+
+make_reprepro-add() {
+   make_function_run make_get_variables
+   test -f "$make_main_deb_file"
+   local make_main_deb_file_absolute_path
+   make_main_deb_file_absolute_path="$(readlink -f "$make_main_deb_file")"
+   if [ "$make_reprepro_codename" = "" ]; then
+      if [ "$WHONIX_BUILD_APT_CODENAME" = "" ]; then
+         make_reprepro_codename="developers"
+      else
+         make_reprepro_codename="$WHONIX_BUILD_APT_CODENAME"
+      fi
+   fi
+   if [ -x "../whonix-developer-meta-files/debug-steps/reprepro-wrapper" ]; then
+      make_reprepro_wrapper="../whonix-developer-meta-files/debug-steps/reprepro-wrapper"
+   else
+      make_reprepro_wrapper="reprepro"
+   fi
+   $make_reprepro_wrapper \
+      includedeb "$make_reprepro_codename" "$make_main_deb_file_absolute_path"
 }
 
 make_source_overrides_file() {
