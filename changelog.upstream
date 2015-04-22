@@ -1,3 +1,17 @@
+commit 3434d618a1647d115586707881ff320dd79eb48f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 22 16:51:57 2015 +0000
+
+    - if debuild not available, recommend installation of the devscripts package
+    - fix, do not set automatically make_use_gain_root_command to true if fakeroot is not installed
+    - run dpkg-checkbuilddeps before lintian to show better hint if build dependencies are missing
+
+commit b2dee699e562293ad44e1d4d74b1761257add84a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 14 11:48:19 2015 +0000
+
+    bumped changelog version
+
 commit 6bce8b0347e609b2b2a894c39b32177c799942c9
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Apr 14 11:46:34 2015 +0000
