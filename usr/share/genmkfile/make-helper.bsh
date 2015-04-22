@@ -625,10 +625,12 @@ make_deb-pkg_shared() {
    if [ "$make_use_gain_root_command" = "" ]; then
       if [ -x "$PWD/debian/gain-root-command" ]; then
          if command -v faketime >/dev/null 2>&1 ; then
-            true "INFO: make_use_gain_root_command was unset, \
-\"$PWD/debian/gain-root-command\" is executable and faketime is installed. \
+            if command -v fakeroot >/dev/null 2>&1 ; then
+               true "INFO: make_use_gain_root_command was unset, \
+\"$PWD/debian/gain-root-command\" is executable, faketime and fakeroot is installed. \
 Therefore automatically set make_use_gain_root_command=\"true\""
-            make_use_gain_root_command="true"
+               make_use_gain_root_command="true"
+            fi
          fi
       fi
    fi
@@ -638,6 +640,12 @@ Therefore automatically set make_use_gain_root_command=\"true\""
       make_use_gain_root_command_maybe_switch="--rootcmd="
       make_use_gain_root_command_maybe_path="$PWD/debian/gain-root-command"
    fi
+
+   if ! command -v debuild >/dev/null ; then
+      error 'debuild not found. Do you have the "devscripts" package installed?'
+   fi
+
+   dpkg-checkbuilddeps
 
    ## Using --no-lintian, because debuild does not exist with a non-zero exit
    ## code, should lintian find an error. Therefore running lintian afterwards.
