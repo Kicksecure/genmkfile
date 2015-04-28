@@ -49,7 +49,7 @@ endif
 
 ifneq ($(GENMKFILE_INCLUDE_FILE_MAIN),0)
    ifeq (,$(wildcard $(GENMKFILE_INCLUDE_FILE_MAIN)))
-      $(error GENMKFILE_INCLUDE_FILE_MAIN $(GENMKFILE_INCLUDE_FILE_MAIN) does not exist!)
+      $(error GENMKFILE_INCLUDE_FILE_MAIN $(GENMKFILE_INCLUDE_FILE_MAIN) does not exist! Is the build dependency genmkfile installed?)
    else
       include $(GENMKFILE_INCLUDE_FILE_MAIN)
    endif
