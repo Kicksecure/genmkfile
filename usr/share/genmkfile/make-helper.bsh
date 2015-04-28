@@ -298,7 +298,9 @@ make_parse_cmd() {
 
 make_get_variables() {
    local temp dpkg_line
-   command -v dpkg-parsechangelog >/dev/null
+   if ! command -v dpkg-parsechangelog >/dev/null ; then
+      error 'dpkg-parsechangelog not found. Do you have the "build-essential" package installed?'
+   fi
 
    while read -r -d $'\n' dpkg_line; do
       ## Example dpkg_line:
