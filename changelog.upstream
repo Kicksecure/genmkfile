@@ -1,3 +1,56 @@
+commit 4dee29367112db5823d3400f859f272570127868
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 28 21:51:43 2015 +0000
+
+    hint 'dpkg-parsechangelog not found. Do you have the "build-essential" package installed?' if dpkg-parsechangelog is not available
+
+commit d11bf7f126eca797342bbb00ad76f4cd35ba7b67
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 28 21:47:39 2015 +0000
+
+    hint "Is the build dependency genmkfile installed?" if genmkfile is not installed
+
+commit 973b7c137228cbe4817049976ff821ba591106ee
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 28 13:43:10 2015 +0000
+
+    added debian/source/lintian-overrides with debian-watch-may-check-gpg-signature to fix lintian warning - https://phabricator.whonix.org/T277
+
+commit eaff593943842d7879fe430441e65e1b3ff718b1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Apr 27 00:49:24 2015 +0000
+
+    fix
+
+commit 3f5a854c0f54566f0c4e40bb35564e26ffea4163
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 26 23:15:58 2015 +0000
+
+    packaging, bumped Standards-Version from 3.9.4 to 3.9.6 for jessie support
+
+commit e4eda7f828d1bfcf4b6cf58b32ecdc6fb17911b6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Apr 26 22:58:01 2015 +0000
+
+    fix
+
+commit 7b9e6b13d11d98b9623ce9e16b2db02b5a6d6bac
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Apr 24 03:04:12 2015 +0000
+
+    updated genmkfile Makefile to version 1.6 - https://phabricator.whonix.org/T271
+    - `include`ing of makefile-full can now be avoided by setting environment variable GENMKFILE_INCLUDE_FILE_MAIN to 0
+    - improved code to bootstrap genmkfile
+    - new environment variables GENMKFILE_INCLUDE_FILE_PRE and GENMKFILE_INCLUDE_FILE_POST that can be used to `include` make files before and after optionally `include`ing GENMKFILE_INCLUDE_FILE_MAIN
+    - show GENMKFILE_CURRENT in new "make about" target
+    Thanks to @nrgaway for advice with make.
+
+commit 973cca3ff49f49195340d88caa21fac87cc4670a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 22 16:54:03 2015 +0000
+
+    bumped changelog version
+
 commit 3434d618a1647d115586707881ff320dd79eb48f
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 22 16:51:57 2015 +0000
