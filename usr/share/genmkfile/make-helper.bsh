@@ -254,6 +254,12 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
+           git-tag-push-latest)
+               matched="true"
+               make_function_run make_git_tag_push_latest
+               exit 0
+               shift
+               ;;
            reprepro-add)
                matched="true"
                make_function_run make_reprepro-add
@@ -474,7 +480,9 @@ make git-commit-verify
 make git-verify
    Combination of tag-check and commit-verify. Only a repository sanity check. Not for security purposes!
 make git-tag-push
-   git push repositories (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
+   git push latest pkg_version_with_revision from debian/changelog. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
+make git-tag-push-latest
+   git push most recent git tag. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
 make reprepro-add
    Add main deb package using reprepro wrapper (Environment variable make_reprepro_wrapper, that default to 'reprepro'.)
    to repository (Environment variable make_reprepro_codename, that defaults to 'developers'.)."
@@ -938,6 +946,7 @@ make_git_tag_shared() {
       return 0
    fi
    make_function_run make_get_variables
+   [ -n "$make_git_tag_push_targets" ] || make_git_tag_push_targets="origin"
    command -v git >/dev/null
    make_git_tag_shared_done="true"
 }
@@ -1018,10 +1027,19 @@ make_git_verify() {
 
 make_git_tag_push() {
    make_function_run make_git_tag_shared
-   [ -n "$make_git_tag_push_targets" ] || make_git_tag_push_targets="origin"
    local repository
    for repository in $make_git_tag_push_targets; do
       git push "$repository" "$make_pkg_version_with_revision"
+   done
+}
+
+make_git_tag_push_latest() {
+   make_function_run make_git_tag_shared
+   ## Thanks to kilianc - http://stackoverflow.com/a/7979255/2605155
+   make_git_tag_latest="$(git describe --tags $(git rev-list --tags --max-count=1))"
+   local repository
+   for repository in $make_git_tag_push_targets; do
+      git push "$repository" "$make_git_tag_latest"
    done
 }
 
