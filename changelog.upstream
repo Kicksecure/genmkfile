@@ -1,3 +1,15 @@
+commit 472850c285714a080316778296dda4aefd2b06c6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri May 1 13:40:20 2015 +0000
+
+    implemented 'make git-tag-push-latest' - git push most recent git tag. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.) - https://phabricator.whonix.org/T292
+
+commit 78d6ed832e28f4613e12cae2f2f04df09b00b1b9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 30 17:58:59 2015 +0000
+
+    bumped changelog version
+
 commit 4dee29367112db5823d3400f859f272570127868
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Apr 28 21:51:43 2015 +0000
