@@ -127,7 +127,7 @@ git-verify:
 git-tag-push:
 	$(GENMKFILE_PATH)/make-helper.bsh git-tag-push
 
-git-tag-push:
+git-tag-push-latest:
 	$(GENMKFILE_PATH)/make-helper.bsh git-tag-push-latest
 
 reprepro-add:
