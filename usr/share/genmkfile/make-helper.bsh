@@ -620,6 +620,7 @@ make_deb-build-dep() {
          $apt_timeout_opts \
          $apt_verify_opts \
          $apt_unattended_opts \
+         $apt_misc_opts \
          --yes \
          --no-install-recommends \
          install \
