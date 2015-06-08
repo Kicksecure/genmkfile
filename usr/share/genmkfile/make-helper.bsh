@@ -4,7 +4,7 @@
 ## Copyright (C) 2012 - 2014 Patrick Schleizer <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
-## genmkfile - make-helper-bsh - version 1.5
+## genmkfile - make-helper-bsh - version 1.6
 
 ## This is a copy.
 ## master location:
@@ -421,7 +421,7 @@ make undist
 make debdist
    Create debian.tar.gz from source files in \$DISTDIR (default \"..\").
 make undebdist
-   Delete debian.tar.gz from source files in \$DISTDIR (default \"..\").
+   Delete debian.tar.(gz|xz) from source files in \$DISTDIR (default \"..\").
 make manpages
    Create man page from man source folder, which will be stored in debian/tmp-man folder.
 make uch
@@ -520,7 +520,7 @@ make_debdist() {
    ## Deterministic.
    ## TODO: differs from tarballs created by dpkg-source for some reason.
    ##       For diagnose, example:
-   ##       diff <(tar -tvf genmkfile_0.7-1.debian.tar.gz) <(tar -tvf _genmkfile_0.7-1.debian.tar.gz)
+   ##       diff <(tar -tvf genmkfile_*.debian.tar.xz) <(tar -tvf _genmkfile_*.debian.tar.xz)
    find \
       "debian" \
       -not -iwholename '*.git*' \
@@ -779,10 +779,13 @@ make_deb-cleanup() {
    make_function_run make_undist
    make_function_run make_deb-clean
    local to_delete package
+   ## wheezy: debian.tar.gz
+   ## jessie: debian.tar.xz
    for package in $make_package_list; do
       for to_delete in \
          "../${package}_"*-*_*".deb" \
          "../${package}_"*-*".debian.tar.gz" \
+         "../${package}_"*-*".debian.tar.xz" \
          "../${package}_"*-*".dsc" \
          "../${package}_"*-*_*".build" \
          "../${package}_"*-*_*".changes" \
