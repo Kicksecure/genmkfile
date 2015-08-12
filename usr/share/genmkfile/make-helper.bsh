@@ -762,6 +762,7 @@ make_deb-clean() {
          "debian/$package.substvars" \
          "debian/files" \
          "debian/$package.prerm.debhelper" \
+         "debian/$package.preinst.debhelper" \
          "debian/$package.postinst.debhelper" \
          "debian/$package.postrm.debhelper"
       do
