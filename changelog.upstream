@@ -1,3 +1,15 @@
+commit a0988cea090480dccadff664e6f8d55349a9f18a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 12 03:15:32 2015 +0200
+
+    make cleanup now also removes "debian/$package.preinst.debhelper"
+
+commit 72fb2ef9aa19543c22d1da94758a9415737c7952
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jun 8 16:01:08 2015 +0000
+
+    bumped changelog version
+
 commit 4eba38b4a83fd039395c22a1b40c3dec67db2e16
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jun 8 15:58:29 2015 +0000
