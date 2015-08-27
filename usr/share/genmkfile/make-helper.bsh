@@ -749,6 +749,9 @@ make_deb-icup() {
 
 make_deb-clean() {
    make_function_run make_get_variables
+   if [ -d "debian/tmp" ]; then
+      rm --recursive "debian/tmp"
+   fi
    if [ -d "debian/tmp-man" ]; then
       rm --recursive "debian/tmp-man"
    fi
@@ -757,6 +760,9 @@ make_deb-clean() {
    fi
    local to_delete package
    for package in $make_package_list; do
+      if [ -d "debian/$package" ]; then
+         rm --recursive "debian/$package"
+      fi
       for to_delete in \
          "debian/$package.debhelper.log" \
          "debian/$package.substvars" \
@@ -768,9 +774,6 @@ make_deb-clean() {
       do
          if [ -e "$to_delete" ]; then
             rm "$to_delete"
-         fi
-         if [ -d "debian/$package" ]; then
-            rm --recursive "debian/$package"
          fi
       done
    done
