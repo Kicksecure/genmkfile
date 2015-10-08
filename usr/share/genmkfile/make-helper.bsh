@@ -491,6 +491,14 @@ make reprepro-add
 make_dist() {
    make_function_run make_undist
 
+   shopt -s globstar dotglob nullglob
+
+   ## Required to make deterministic.
+   touch --date="Wed Sep 30 16:30:05 UTC 2015" debian
+   touch --date="Wed Sep 30 16:30:05 UTC 2015" ./**
+
+   shopt -u globstar dotglob nullglob
+
    ## Thanks to Andy Balaam who inspired on
    ## http://superuser.com/a/599420/255849
    ## how to prepend a folder name by using tar with --transform.
@@ -520,7 +528,11 @@ make_debdist() {
    ## Deterministic.
    ## TODO: differs from tarballs created by dpkg-source for some reason.
    ##       For diagnose, example:
-   ##       diff <(tar -tvf genmkfile_*.debian.tar.xz) <(tar -tvf _genmkfile_*.debian.tar.xz)
+   ##       diff <(tar -tvf tor-ctrl*.debian.tar.xz) <(tar -tvf tor-ctrl*.debian.tar.xz)
+
+   ## Required to maked deterministic.
+   touch --date="Wed Sep 30 16:30:05 UTC 2015" debian/*
+
    find \
       "debian" \
       -not -iwholename '*.git*' \
