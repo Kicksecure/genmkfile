@@ -284,8 +284,7 @@ make_parse_cmd() {
    ## will remain in the "$@" positional parameters.
 
    if [ ! "$matched" = "true" ]; then
-      echo "ERROR: no valid option chosen!" >&2
-      exit 1
+      make_function_run ${1+"$@"}
    fi
 
    if [ "$deb" = "true" ]; then
