@@ -1120,7 +1120,7 @@ make_function_run() {
    if type -t "${function_name}_hook_pre" >/dev/null ; then
       "${function_name}_hook_pre" ${1+"$@"}
    fi
-   if type -t "${function_name}" >/dev/null ; then
+   if true ; then
       "$function_name" ${1+"$@"}
       function_name_return_code="$?"
       if [ ! "$function_name_return_code" = "0" ]; then
