@@ -842,7 +842,6 @@ make_helper() {
             if [ ! -f "$source_file" ]; then
                continue
             fi
-            pushd "$PWD"
 
             source_file_file_without_pwd="${source_file#$PWD}"
             source_file_dirname="${source_file%/*}"
@@ -850,7 +849,7 @@ make_helper() {
             source_file_basename="${source_file##*/}"
             source_file_file_extension="${source_file_basename##*.}"
             target_dirname="${DESTDIR}${source_file_dirname}"
-            target_filename="${DESTDIR}${source_file_dirname}/${source_file_basename}"
+            target_filename="${DESTDIR}${source_file_file_without_pwd}"
 
             if [ "$make_install_" = "true" ]; then
                if [ ! -d "$target_dirname" ]; then
