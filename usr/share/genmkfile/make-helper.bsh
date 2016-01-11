@@ -832,43 +832,54 @@ make_helper() {
    [ -n "$make_folder_list_for_un_and_install" ] || make_folder_list_for_un_and_install="bin boot dev etc home lib opt sbin srv sys usr var"
    shopt -s globstar dotglob nullglob
    local d source_file file_without_pwd file_with_destdir
+
+
+
+
    for d in $make_folder_list_for_un_and_install; do
       if [ -d "$d" ]; then
          for source_file in "$PWD/$d"/**; do
-            if [ "$make_install_" = "true" ]; then
-               if [ ! -d "$DESTDIR" ]; then
-                  mkdir --parents "$DESTDIR"
-               fi
-               cp -R "$d" "$DESTDIR"
-               break
-            elif [ "$make_installsim_" = "true" ]; then
-               if [ ! -d "$DESTDIR" ]; then
-                  true "INFO: would do: mkdir --parents \"$DESTDIR\""
-               else
-                  true "INFO: No need to run, because folder already exists: mkdir --parents \"$DESTDIR\""
-               fi
-               true "INFO: would do: cp -R \"$d\" \"$DESTDIR\""
-               break
-            fi
             if [ ! -f "$source_file" ]; then
                continue
             fi
-            file_without_pwd="${source_file#$PWD}"
-            file_with_destdir="${DESTDIR}${file_without_pwd}"
-            if [ "$make_uninstallcheck_" = "true" ]; then
-               if [ -f "$file_with_destdir" ]; then
+            pushd "$PWD"
+
+            source_file_file_without_pwd="${source_file#$PWD}"
+            source_file_dirname="${source_file%/*}"
+            source_file_dirname_without_pwd="${source_file_dirname#$PWD}"
+            source_file_basename="${source_file##*/}"
+            source_file_file_extension="${source_file_basename##*.}"
+            target_dirname="${DESTDIR}${source_file_dirname}"
+            target_filename="${DESTDIR}${source_file_dirname}/${source_file_basename}"
+
+            if [ "$make_install_" = "true" ]; then
+               if [ ! -d "$target_dirname" ]; then
+                  mkdir --parents "$target_dirname"
+               fi
+               cp "$source_file" "$source_file_dirname_without_pwd"
+               continue
+            elif [ "$make_installsim_" = "true" ]; then
+               if [ ! -d "$DESTDIR" ]; then
+                  true "INFO: would do: mkdir --parents \"$target_dirname\""
+               else
+                  true "INFO: No need to run, because folder already exists: mkdir --parents \"$target_dirname\""
+               fi
+               true "INFO: would do: cp --parents \"$source_file\" \"$source_file_dirname_without_pwd\""
+               break
+            elif [ "$make_uninstallcheck_" = "true" ]; then
+               if [ -f "$target_filename" ]; then
                   echo "ERROR: file $file_with_destdir still installed." >&2
                   local still_installed="true"
                fi
             elif [ "$make_installcheck_" = "true" ]; then
-               diff "$source_file" "$file_with_destdir"
+               diff "$source_file" "$target_filename"
             elif [ "$make_uninstallsim_" = "true" ]; then
-               if [ -f "$file_with_destdir" ]; then
-                  true "INFO: would do: rm \"$file_with_destdir\""
+               if [ -f "$target_filename" ]; then
+                  true "INFO: would do: rm \"$target_filename\""
                fi
             elif [ "$make_uninstall_" = "true" ]; then
-               if [ -f "$file_with_destdir" ]; then
-                  rm "$file_with_destdir"
+               if [ -f "$target_filename" ]; then
+                  rm "$target_filename"
                fi
             else
                echo "ERROR 2: in $FUNCNAME!" >&2
