@@ -103,11 +103,17 @@ uninstall:
 uninstallsim:
 	$(GENMKFILE_PATH)/make-helper.bsh uninstallsim
 
-deb-chl-bumpup:
-	$(GENMKFILE_PATH)/make-helper.bsh deb-chl-bumpup
+deb-chl-bumpup-manual:
+	$(GENMKFILE_PATH)/make-helper.bsh deb-chl-bumpup-manual
 
-deb-uachl-bumpup:
-	$(GENMKFILE_PATH)/make-helper.bsh deb-uachl-bumpup
+deb-chl-bumpup-major:
+	$(GENMKFILE_PATH)/make-helper.bsh deb-chl-bumpup-major
+
+deb-uachl-bumpup-manual:
+	$(GENMKFILE_PATH)/make-helper.bsh deb-uachl-bumpup-manual
+
+deb-uachl-bumpup-major:
+	$(GENMKFILE_PATH)/make-helper.bsh deb-uachl-bumpup-major
 
 git-tag-sign:
 	$(GENMKFILE_PATH)/make-helper.bsh git-tag-sign

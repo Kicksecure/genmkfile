@@ -206,15 +206,27 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
-           deb-chl-bumpup)
+           deb-chl-bumpup-major)
                matched="true"
-               make_function_run make_deb-chl-bumpup
+               make_function_run make_deb-chl-bumpup-major
                exit 0
                shift
                ;;
-           deb-uachl-bumpup)
+           deb-chl-bumpup-manual)
                matched="true"
-               make_function_run make_deb-uachl-bumpup
+               make_function_run make_deb-chl-bumpup-manual
+               exit 0
+               shift
+               ;;
+           deb-uachl-bumpup-major)
+               matched="true"
+               make_function_run make_deb-uachl-bumpup-major
+               exit 0
+               shift
+               ;;
+           deb-uachl-bumpup-manual)
+               matched="true"
+               make_function_run make_deb-uachl-bumpup-manual
                exit 0
                shift
                ;;
@@ -464,9 +476,13 @@ make uninstall
    Delete all installed files.
 make uninstallsim
    Simulate what make uninstall would do.
-make deb-chl-bumpup
-   Bump upstream version number in debian/changelog.
-make deb-uachl-bumpup
+make deb-chl-bumpup-manual
+   Manual upstream version number in debian/changelog.
+make deb-uachl-bumpup-manual
+   Combination of make uch and make deb-chl-bumpup.
+make deb-chl-bumpup-major
+   Major bump upstream version number in debian/changelog.
+make deb-uachl-bumpup-major
    Combination of make uch and make deb-chl-bumpup.
 make git-tag-sign
    git tag (-s) sign latest pkg_version_with_revision from debian/changelog. Only a repository sanity check. Not for security purposes!
@@ -913,6 +929,16 @@ make_uninstallsim() {
    make_function_run make_helper
 }
 
+make_deb-chl-bumpup-major() {
+   make_bump_type="major"
+   make_function_run make_deb-chl-bumpup
+}
+
+make_deb-chl-bumpup-manual() {
+   make_bump_type="manual"
+   make_function_run make_deb-chl-bumpup
+}
+
 make_deb-chl-bumpup() {
    command -v debchange >/dev/null
 
@@ -932,8 +958,16 @@ make_deb-chl-bumpup() {
 
    local new_upstream_version_without_leading_zero new_upstream_version new_changelog_version new_revision
 
-   new_upstream_version_without_leading_zero="$(bc -l <<< "scale=9 ; $make_pkg_version + 0.1")"
-   new_upstream_version="$(printf '%3.1f\n' "$new_upstream_version_without_leading_zero")"
+   if [ "$make_bump_type" = "major" ]; then
+      new_upstream_version_without_leading_zero="$(bc -l <<< "scale=9 ; $make_pkg_version + 0.1")"
+      new_upstream_version="$(printf '%3.1f\n' "$new_upstream_version_without_leading_zero")"
+   elif [ "$make_bump_type" = "manual" ]; then
+      true "Current version number: $make_pkg_version"
+      true "Please enter new version number!"
+      read new_upstream_version
+   else
+      error "make_bump_type $make_bump_type is neither major nor manual!"
+   fi
 
    new_revision="1"
 
@@ -955,9 +989,14 @@ $new_changelog_version"
       ""
 }
 
-make_deb-uachl-bumpup() {
+make_deb-uachl-bumpup-manual() {
    make_function_run make_uch
-   make_function_run make_deb-chl-bumpup
+   make_function_run make_deb-chl-bumpup-manual
+}
+
+make_deb-uachl-bumpup-major() {
+   make_function_run make_uch
+   make_function_run make_deb-chl-bumpup-major
 }
 
 make_git_tag_shared() {
