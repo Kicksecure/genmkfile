@@ -1,3 +1,25 @@
+commit fed6e9dba72237ff4d5739c3ef0c0b304b7707e7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Apr 8 21:40:00 2016 +0000
+
+    split make deb-chl-bumpup and make deb-uchl-bumpup into different commands
+    
+    for manual (version entering) and major version bumpup
+    
+    for easier maintenance
+    
+    make deb-chl-bumpup-manual
+    make deb-chl-bumpup-major
+    
+    make deb-uchl-bumpup-manual
+    make deb-uchl-bumpup-major
+
+commit 0ce66f53bb8c4fc3e7a7a872a88fe84feee85e9e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 22 23:12:36 2015 +0000
+
+    bumped changelog version
+
 commit bbe8e989a29f1620a71e13b2ed6717ceb09d8825
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Oct 14 18:59:24 2015 +0000
