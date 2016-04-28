@@ -364,6 +364,7 @@ make_get_variables() {
    grep_line="$(grep "Source:" "debian/control")"
    read -r a package _ <<< "$grep_line"
    make_source_package_name="$package"
+   ## Source package name may or may not match binary package name.
    make_package_list="$make_source_package_name"
 
    ## Example: grep_output
