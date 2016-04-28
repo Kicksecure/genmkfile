@@ -372,6 +372,9 @@ make_get_variables() {
 
    while read -r -d $'\n' grep_line; do
       read -r a package _ <<< "$grep_line"
+      temp="${package}_${make_pkg_version}-${make_pkg_revision}_all.deb"
+      temp="../$temp"
+      make_package_debs_files_list="$make_package_debs_files_list $temp"
       if [ "$package" = "$make_source_package_name" ]; then
          continue
       fi
@@ -621,7 +624,7 @@ make_clean() {
 }
 
 make_deb-build-dep() {
-   local make_deb_build_dependencies make_debian_control_file
+   local make_deb_build_dependencies make_debian_control_file package
 
    make_debian_control_file="debian/control"
    test -f "$make_debian_control_file"
@@ -709,8 +712,10 @@ Therefore automatically set make_use_gain_root_command=\"true\""
       fi
    fi
 
-   test -f "$make_main_deb_file"
-   true "INFO: You can find your deb file here: $make_main_deb_file"
+   for package in $make_package_debs_files_list; do
+      test -f "$package"
+      true "INFO: You can find your deb file here: $package"
+   done
 }
 
 make_lintian() {
@@ -746,12 +751,15 @@ make_deb-pkg-source() {
 }
 
 make_deb-install() {
+   local package
    make_function_run make_get_variables
-   if [ ! -f "$make_main_deb_file" ]; then
-      echo "ERROR: File $make_main_deb_file does not exist. Have you run \"make deb-pkg\" already?" >&2
-      exit 1
-   fi
-   sudo dpkg -i "$make_main_deb_file"
+   for package in $make_package_debs_files_list; do
+      if [ ! -f "$package" ]; then
+         echo "ERROR: File $package does not exist. Have you run \"make deb-pkg\" already?" >&2
+         exit 1
+      fi
+      sudo dpkg -i "$package"
+   done
 }
 
 make_deb-remove() {
@@ -1102,24 +1110,27 @@ make_git_tag_push_latest() {
 }
 
 make_reprepro-add() {
+   local package package_absolute_path
    make_function_run make_get_variables
-   test -f "$make_main_deb_file"
-   local make_main_deb_file_absolute_path
-   make_main_deb_file_absolute_path="$(readlink -f "$make_main_deb_file")"
-   if [ "$make_reprepro_codename" = "" ]; then
-      if [ "$WHONIX_BUILD_APT_CODENAME" = "" ]; then
-         make_reprepro_codename="developers"
-      else
-         make_reprepro_codename="$WHONIX_BUILD_APT_CODENAME"
+
+   for package in $make_package_debs_files_list; do
+      test -f "$package"
+      package_absolute_path="$(readlink -f "$package")"
+      if [ "$make_reprepro_codename" = "" ]; then
+         if [ "$WHONIX_BUILD_APT_CODENAME" = "" ]; then
+            make_reprepro_codename="developers"
+         else
+            make_reprepro_codename="$WHONIX_BUILD_APT_CODENAME"
+         fi
       fi
-   fi
-   if [ -x "../whonix-developer-meta-files/debug-steps/reprepro-wrapper" ]; then
-      make_reprepro_wrapper="../whonix-developer-meta-files/debug-steps/reprepro-wrapper"
-   else
-      make_reprepro_wrapper="reprepro"
-   fi
-   $make_reprepro_wrapper \
-      includedeb "$make_reprepro_codename" "$make_main_deb_file_absolute_path"
+      if [ -x "../whonix-developer-meta-files/debug-steps/reprepro-wrapper" ]; then
+         make_reprepro_wrapper="../whonix-developer-meta-files/debug-steps/reprepro-wrapper"
+      else
+         make_reprepro_wrapper="reprepro"
+      fi
+      $make_reprepro_wrapper \
+         includedeb "$make_reprepro_codename" "$package_absolute_path"
+   done
 }
 
 make_source_overrides_file() {
