@@ -1,3 +1,23 @@
+commit e341347225d19b3f80b3ab836b14860705708223
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 28 03:58:41 2016 +0000
+
+    comment
+
+commit e437fcb76470cd5927c8e2236ccda0e75fa4e03e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 28 03:56:11 2016 +0000
+
+    made deb-install and make reprepro-add also work for multiple created packages
+    
+    per source package
+
+commit 9d62569cc26987a0321962934edc713a8d0cd0cd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 14 21:14:48 2016 +0000
+
+    bumped changelog version
+
 commit fed6e9dba72237ff4d5739c3ef0c0b304b7707e7
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Apr 8 21:40:00 2016 +0000
