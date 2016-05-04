@@ -383,6 +383,7 @@ make_get_variables() {
    done < <( grep "Package:" "debian/control" )
 
    true "make_package_list: $make_package_list"
+   true "make_package_debs_files_list: $make_package_debs_files_list"
 
    make_main_deb_file_name="${package}_${make_pkg_version}-${make_pkg_revision}_all.deb"
    make_main_deb_file="../$make_main_deb_file_name"
