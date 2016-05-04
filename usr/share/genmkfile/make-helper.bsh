@@ -366,6 +366,7 @@ make_get_variables() {
    make_source_package_name="$package"
    ## Source package name may or may not match binary package name.
    make_package_list="$make_source_package_name"
+   make_package_debs_files_list=""
 
    ## Example: grep_output
    ## Package: anon-shared-packages-dependencies
