@@ -597,7 +597,7 @@ make_test() {
 make_manpages() {
    shopt -s globstar dotglob nullglob
    local i source_folder filename_without_ronn_file_extension base_name
-   for i in "$PWD/man"/**; do
+   for i in "$PWD/man/"*".ronn"; do
       if [ -d "$i" ]; then
          continue
       fi
