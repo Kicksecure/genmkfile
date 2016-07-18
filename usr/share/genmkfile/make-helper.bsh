@@ -401,14 +401,15 @@ make_get_variables() {
       make_debian_tarball="${make_debian_tarball,,}"
    fi
 
-   make_upstream_tarball_file_name="${make_source_package_name}_${make_pkg_version}.orig.tar.gz"
-   make_upstream_tarball="$DISTDIR/$make_upstream_tarball_file_name"
-   if [ "$make_upstream_tarball_tolower" = "false" ]; then
+   make_upstream_tarball_relative_path_file_name="${make_source_package_name}_${make_pkg_version}.orig.tar.gz"
+   make_upstream_tarball_relative_path="$DISTDIR/$make_upstream_tarball_relative_path_file_name"
+   if [ "$make_upstream_tarball_relative_path_tolower" = "false" ]; then
       true
    else
-      make_upstream_tarball_file_name="${make_upstream_tarball_file_name,,}"
-      make_upstream_tarball="${make_upstream_tarball,,}"
+      make_upstream_tarball_relative_path_file_name="${make_upstream_tarball_relative_path_file_name,,}"
+      make_upstream_tarball_relative_path="${make_upstream_tarball_relative_path,,}"
    fi
+   make_upstream_tarball_real_path="$(realpath "$make_upstream_tarball_relative_path")"
 
    make_upstream_tarball_source_folder_name="${make_source_package_name}-${make_pkg_version}"
 }
@@ -514,6 +515,13 @@ make reprepro-add
 make_dist() {
    make_function_run make_undist
 
+   local temp_folder
+   temp_folder="$(mktemp --directory)"
+
+   cp --recursive ../corridor "$temp_folder/$make_upstream_tarball_source_folder_name"
+
+   pushd "$temp_folder/$make_upstream_tarball_source_folder_name"
+
    shopt -s globstar dotglob nullglob
 
    ## Required to make deterministic.
@@ -522,16 +530,14 @@ make_dist() {
 
    shopt -u globstar dotglob nullglob
 
-   ## Thanks to Andy Balaam who inspired on
-   ## http://superuser.com/a/599420/255849
-   ## how to prepend a folder name by using tar with --transform.
+   ## No longer using --transform because that does not work with symlinks.
+   ## (Important for 'corridor' package.)
 
    find \
       "." \
       -not -iwholename '*.git*' \
       -print0 \
          | tar \
-            --transform "s,^\\.,$make_upstream_tarball_source_folder_name," \
             --null \
             --no-recursion \
             --create \
@@ -540,9 +546,14 @@ make_dist() {
             --numeric-owner \
             -T \
             - \
-               | gzip -9 -n > "$make_upstream_tarball"
+               | gzip -9 -n > "$make_upstream_tarball_real_path"
 
-   ls -la "$make_upstream_tarball"
+   popd
+
+   rm --recursive --force "$temp_folder"
+
+   ls -la "$make_upstream_tarball_real_path"
+   ls -la "$make_upstream_tarball_relative_path"
 }
 
 make_debdist() {
@@ -578,7 +589,7 @@ make_undist() {
    make_function_run make_get_distdir
    make_function_run make_get_variables
 
-   rm --force "$make_upstream_tarball"
+   rm --force "$make_upstream_tarball_relative_path"
 }
 
 make_undebdist() {
@@ -842,8 +853,8 @@ make_deb-cleanup() {
          fi
       done
    done
-   if [ -f "$make_upstream_tarball" ]; then
-      rm "$make_upstream_tarball"
+   if [ -f "$make_upstream_tarball_relative_path" ]; then
+      rm "$make_upstream_tarball_relative_path"
    fi
 }
 
