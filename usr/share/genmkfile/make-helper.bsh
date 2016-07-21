@@ -518,7 +518,7 @@ make_dist() {
    local temp_folder
    temp_folder="$(mktemp --directory)"
 
-   cp --recursive ../corridor "$temp_folder/$make_upstream_tarball_source_folder_name"
+   cp --recursive ../"$make_source_package_name" "$temp_folder/$make_upstream_tarball_source_folder_name"
 
    pushd "$temp_folder/$make_upstream_tarball_source_folder_name"
 
