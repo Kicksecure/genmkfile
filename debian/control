@@ -6,7 +6,7 @@ Source: genmkfile
 Section: misc
 Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@riseup.net>
-Build-Depends: debhelper (>= 9), faketime
+Build-Depends: debhelper (>= 9), faketime, devscripts
 Homepage: https://github.com/Whonix/genmkfile
 Vcs-Browser: https://github.com/Whonix/genmkfile
 Vcs-Git: https://github.com/Whonix/genmkfile.git
@@ -14,7 +14,7 @@ Standards-Version: 3.9.6
 
 Package: genmkfile
 Architecture: all
-Depends: make, ${misc:Depends}
+Depends: debhelper (>= 9), faketime, make, dpkg-dev, devscripts, ${misc:Depends}
 Description: Generic Makefile for Scripts
  Makes packaging scripts simpler. No more need to manually maintain
  'make install' targets or distribution specific install files such as
