@@ -1,3 +1,49 @@
+commit 56a990135d1f83ebb6f4d8b92d641a5fdce1acb1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 21 17:40:46 2016 +0000
+
+    readme
+
+commit 23fb6261ae8d7538db100486d74d8c885c17accc
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 27 15:23:37 2016 +0200
+
+    make-helper.bsh version bump
+
+commit 08fe7d6b97533209e94baac591e8e5e1fa3a5878
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 27 15:21:34 2016 +0200
+
+    add missing Build-Depends: and Depends:
+
+commit 216378750f484ab450f18b8a507889269a1ff212
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jul 21 18:07:07 2016 +0200
+
+    fix
+
+commit 2502787db14820b277787d1d9b1eaafc7b2a7275
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 18 16:18:37 2016 +0000
+
+    support symlinks to be able to package corridor
+    
+    https://github.com/rustybird/corridor/issues/18
+    
+    https://github.com/rustybird/corridor/issues/10
+
+commit 5ac6bf81625ba0bbb29af85e9f38f59724a1e0a8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jul 8 14:16:02 2016 +0000
+
+    process only files in man/ folder that have the .ronn file extension
+
+commit 10d34ac835a2e7035a7fa120b762701a8e7e0ef8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed May 4 22:17:18 2016 +0000
+
+    bumped changelog version
+
 commit e1370e0dc38d85d4f607abc0fe0147d72c8e5e6c
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed May 4 22:17:14 2016 +0000
