@@ -17,7 +17,7 @@ export GENMKFILE_PATH
 export DESTDIR
 
 all:
-	@echo "make all is not required."
+	$(GENMKFILE_PATH)/make-helper.bsh all $(ARGS)
 
 dist:
 	$(GENMKFILE_PATH)/make-helper.bsh dist

@@ -34,6 +34,12 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
+           all)
+               matched="true"
+               make_function_run make_all ${1+"$@"}
+               exit 0
+               shift
+               ;;
            dist)
                matched="true"
                make_function_run make_dist
@@ -512,6 +518,12 @@ make reprepro-add
    to repository (Environment variable make_reprepro_codename, that defaults to 'developers'.)."
 }
 
+make_all() {
+   if [ -f "$PWD/Makefile_orig" ]; then
+      make -f "$PWD/Makefile_orig" all ${1+"$@"}
+   fi
+}
+
 make_dist() {
    make_function_run make_undist
 
@@ -636,6 +648,9 @@ make_uch() {
 }
 
 make_clean() {
+   if [ -f "$PWD/Makefile_orig" ]; then
+      make -f "$PWD/Makefile_orig" clean
+   fi
    make_function_run make_deb-clean
 }
 
@@ -832,6 +847,7 @@ make_deb-clean() {
 
 make_deb-cleanup() {
    make_function_run make_undist
+   make_function_run make_clean
    make_function_run make_deb-clean
    local to_delete package
    ## wheezy: debian.tar.gz
