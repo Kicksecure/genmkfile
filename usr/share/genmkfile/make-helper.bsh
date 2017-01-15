@@ -848,6 +848,9 @@ make_deb-clean() {
    if [ -d "deb_dist" ]; then
       rm --recursive "deb_dist"
    fi
+   if [ -d "debian/.debhelper" ]; then
+      rm --recursive "debian/.debhelper"
+   fi
    local to_delete package
    for package in $make_package_list; do
       if [ -d "debian/$package" ]; then
