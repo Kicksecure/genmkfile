@@ -1,3 +1,41 @@
+commit 37197e4bf56dd2f4e017ef499e68fa6d5b1b5271
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jan 15 14:55:27 2017 +0000
+
+    clean up debian/.debhelper in stretch
+
+commit d61d147a52bac0250a9d06370999058ee9972f96
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jan 15 14:52:36 2017 +0000
+
+    run make_deb-cleanup from make_deb-pkg_shared
+    
+    to prevent stale C build results being used in final package
+
+commit 886f900633ac31025d83f1379807376e2ecc79a2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jan 15 08:35:31 2017 +0100
+
+    packaging, bumped Standards-Version from 3.9.6 to 3.9.8 for jessie support
+
+commit bf6f5a35119b10e622c7bd19a324a8d4ac3cf9a7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jan 15 08:10:51 2017 +0100
+
+    delete buildinfo files during make deb-cleanup for stretch
+
+commit a5f3594a896a3a65490487bdb70b5cd7f7da934b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jan 15 08:08:15 2017 +0100
+
+    make deb-clean: delete debian/debhelper-build-stamp for stretch
+
+commit 435697181b87562386b24bc3304ec26c152cdf3d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 12 02:55:31 2017 +0000
+
+    bumped changelog version
+
 commit 01f4f7e6d47c638ed6162aadfcde559dfd665834
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Jan 4 20:09:37 2017 +0000
