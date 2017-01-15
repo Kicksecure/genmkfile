@@ -715,6 +715,7 @@ make_deb-build-dep() {
 }
 
 make_deb-pkg_shared() {
+   make_function_run make_deb-cleanup
    make_function_run make_dist
 
    if [ "$make_use_gain_root_command" = "" ]; then
