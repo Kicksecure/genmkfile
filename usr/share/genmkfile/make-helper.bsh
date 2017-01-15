@@ -879,6 +879,7 @@ make_deb-cleanup() {
    for package in $make_package_list; do
       for to_delete in \
          "../${package}_"*-*_*".deb" \
+         "../${package}_"*-*_*".buildinfo" \
          "../${package}_"*-*".debian.tar.gz" \
          "../${package}_"*-*".debian.tar.xz" \
          "../${package}_"*-*".dsc" \
