@@ -1,3 +1,19 @@
+commit b919fd8fb05c69c0245bd922ab76bd1f943565d7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 16 12:45:08 2017 +0000
+
+    initial support for using cowbuilder
+    
+    make_use_cowbuilder=true
+    
+    https://phabricator.whonix.org/T52
+
+commit d790c0f86b5044df7ef798e661daa11cdb01c7f8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jan 15 15:30:12 2017 +0000
+
+    bumped changelog version
+
 commit 37197e4bf56dd2f4e017ef499e68fa6d5b1b5271
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jan 15 14:55:27 2017 +0000
