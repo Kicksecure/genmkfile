@@ -321,8 +321,8 @@ make_parse_cmd() {
 
 make_get_variables() {
    ## TODO
-   package_build_result_temp_folder="/home/user/whonix_binary/packages_temp/build_result"
-   package_build_pkg_src_temp_folder="/home/user/whonix_binary/packages_temp/pkg_src"
+   package_build_result_temp_folder="/home/user/whonix_binary/packages_temp"
+   package_build_pkg_src_temp_folder="/home/user/whonix_binary/packages_temp"
 
    local temp dpkg_line
    if ! command -v dpkg-parsechangelog >/dev/null ; then
