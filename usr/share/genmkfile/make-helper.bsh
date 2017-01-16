@@ -1207,21 +1207,27 @@ make_reprepro-add() {
    local package package_absolute_path
    make_function_run make_get_variables
 
+   if [ "$make_reprepro_codename" = "" ]; then
+      if [ "$WHONIX_BUILD_APT_CODENAME" = "" ]; then
+         make_reprepro_codename="developers"
+      else
+         make_reprepro_codename="$WHONIX_BUILD_APT_CODENAME"
+      fi
+   fi
+   if [ -x "../whonix-developer-meta-files/debug-steps/reprepro-wrapper" ]; then
+      make_reprepro_wrapper="../whonix-developer-meta-files/debug-steps/reprepro-wrapper"
+   else
+      make_reprepro_wrapper="reprepro"
+   fi
+
+   test -f "$make_main_dsc_file"
+
+   $make_reprepro_wrapper \
+      includedsc "$make_reprepro_codename" "$make_main_dsc_file"
+
    for package in $make_package_debs_files_list; do
       test -f "$package"
       package_absolute_path="$(readlink -f "$package")"
-      if [ "$make_reprepro_codename" = "" ]; then
-         if [ "$WHONIX_BUILD_APT_CODENAME" = "" ]; then
-            make_reprepro_codename="developers"
-         else
-            make_reprepro_codename="$WHONIX_BUILD_APT_CODENAME"
-         fi
-      fi
-      if [ -x "../whonix-developer-meta-files/debug-steps/reprepro-wrapper" ]; then
-         make_reprepro_wrapper="../whonix-developer-meta-files/debug-steps/reprepro-wrapper"
-      else
-         make_reprepro_wrapper="reprepro"
-      fi
       $make_reprepro_wrapper \
          includedeb "$make_reprepro_codename" "$package_absolute_path"
    done
