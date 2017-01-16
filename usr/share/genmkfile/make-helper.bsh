@@ -757,7 +757,7 @@ make_deb-pkg_shared() {
 
       test -f "$make_main_dsc_file"
 
-      sudo cowbuilder \
+      sudo $COWBUILDER_PREFIX cowbuilder \
          --build "$make_main_dsc_file" \
          --distribution "stretch" \
          --mirror "http://ftp.us.debian.org/debian" \
