@@ -320,10 +320,32 @@ make_parse_cmd() {
 }
 
 make_get_variables() {
+   ## TODO
+   package_build_result_temp_folder="/home/user/whonix_binary/packages_temp/build_result"
+   package_build_pkg_src_temp_folder="/home/user/whonix_binary/packages_temp/pkg_src"
+
    local temp dpkg_line
    if ! command -v dpkg-parsechangelog >/dev/null ; then
       error 'dpkg-parsechangelog not found. Do you have the "build-essential" package installed?'
    fi
+
+   make_debian_control_file_relative_path="debian/control"
+   make_debian_control_file_absolute_path="$(realpath "$make_debian_control_file_relative_path")"
+   test -f "$make_debian_control_file_absolute_path"
+
+   make_debian_changelog_file_relative_path="debian/changelog"
+   make_debian_changelog_file_absolute_path="$(realpath "$make_debian_changelog_file_relative_path")"
+   test -f "$make_debian_changelog_file_absolute_path"
+
+   ## Thanks to Jason Mehring (nrgaway@gmail.com) for the grep, cut, sed, tr magic.
+   make_deb_build_dependencies="$( \
+      grep \
+         "Build-Depends:" "$make_debian_control_file_absolute_path" | \
+            cut -d: -f 2- | \
+               sed -e 's/ *, */\n/g' | \
+                  cut -d'(' -f 1 | \
+                     tr -d " " \
+      )"
 
    while read -r -d $'\n' dpkg_line; do
       ## Example dpkg_line:
@@ -362,9 +384,6 @@ make_get_variables() {
       exit 1
    fi
 
-   ## Sanity test.
-   test -f debian/control
-
    dpkg_print_architecture="$(dpkg --print-architecture)"
 
    ## debian/control:
@@ -376,7 +395,7 @@ make_get_variables() {
    local architecture_keyword architecture_setting architecture_grep
 
    if [ "$architecture" = "" ]; then
-      architecture_grep="$(cat debian/control | grep "Architecture:")"
+      architecture_grep="$(cat "$make_debian_control_file_absolute_path" | grep "Architecture:")"
       read -r architecture_keyword architecture_setting _ <<< "$architecture_grep"
 
       if [ "$architecture_setting" = "" ]; then
@@ -390,7 +409,7 @@ make_get_variables() {
 
    local grep_line a package
 
-   grep_line="$(grep "Source:" "debian/control")"
+   grep_line="$(grep "Source:" "$make_debian_control_file_absolute_path")"
    read -r a package _ <<< "$grep_line"
    make_source_package_name="$package"
    ## Source package name may or may not match binary package name.
@@ -404,13 +423,17 @@ make_get_variables() {
    while read -r -d $'\n' grep_line; do
       read -r a package _ <<< "$grep_line"
       temp="${package}_${make_pkg_version}-${make_pkg_revision}_${architecture}.deb"
-      temp="../$temp"
+      if [ "$make_use_cowbuilder" = "true" ]; then
+         temp="$package_build_result_temp_folder/$temp"
+      else
+         temp="../$temp"
+      fi
       make_package_debs_files_list="$make_package_debs_files_list $temp"
       if [ "$package" = "$make_source_package_name" ]; then
          continue
       fi
       make_package_list="$make_package_list $package"
-   done < <( grep "Package:" "debian/control" )
+   done < <( grep "Package:" "$make_debian_control_file_absolute_path" )
 
    true "make_package_list: $make_package_list"
    true "make_package_debs_files_list: $make_package_debs_files_list"
@@ -419,7 +442,15 @@ make_get_variables() {
    make_main_deb_file="../$make_main_deb_file_name"
 
    make_main_dsc_file_name="${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}.dsc"
-   make_main_dsc_file="../$make_main_dsc_file_name"
+
+   ## TODO: do not hardcode amd64
+   if [ "$make_use_cowbuilder" = "true" ]; then
+      make_main_dsc_file="$package_build_pkg_src_temp_folder/$make_main_dsc_file_name"
+      make_main_changes_file="$package_build_result_temp_folder/${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}_amd64.changes"
+   else
+      make_main_dsc_file="../$make_main_dsc_file_name"
+      make_main_changes_file="../${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}_amd64.changes"
+   fi
 
    make_debian_tarball_file_name="${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}.debian.tar.gz"
    make_debian_tarball="$DISTDIR/$make_debian_tarball_file_name"
@@ -429,6 +460,7 @@ make_get_variables() {
       make_debian_tarball_file_name="${make_debian_tarball_file_name,,}"
       make_debian_tarball="${make_debian_tarball,,}"
    fi
+   make_debian_tarball_absolute_path="$(realpath "$make_debian_tarball")"
 
    make_upstream_tarball_relative_path_file_name="${make_source_package_name}_${make_pkg_version}.orig.tar.gz"
    make_upstream_tarball_relative_path="$DISTDIR/$make_upstream_tarball_relative_path_file_name"
@@ -587,8 +619,8 @@ make_dist() {
 
    rm --recursive --force "$temp_folder"
 
-   ls -la "$make_upstream_tarball_real_path"
-   ls -la "$make_upstream_tarball_relative_path"
+   test -f "$make_upstream_tarball_real_path"
+   test -f "$make_upstream_tarball_relative_path"
 }
 
 make_debdist() {
@@ -615,9 +647,9 @@ make_debdist() {
             --numeric-owner \
             -T \
             - \
-               | gzip -9 -n > "$make_debian_tarball"
+               | gzip -9 -n > "$make_debian_tarball_absolute_path"
 
-   ls -la "$make_debian_tarball"
+   test -f "$make_debian_tarball_absolute_path"
 }
 
 make_undist() {
@@ -631,7 +663,7 @@ make_undebdist() {
    make_function_run make_get_distdir
    make_function_run make_get_variables
 
-   rm --force "$make_debian_tarball"
+   rm --force "$make_debian_tarball_absolute_path"
 }
 
 make_test() {
@@ -678,23 +710,7 @@ make_clean() {
 }
 
 make_deb-build-dep() {
-   local make_deb_build_dependencies make_debian_control_file package
-
-   make_debian_control_file="debian/control"
-   test -f "$make_debian_control_file"
-
-   ## How do I extract the package version from debian/changelog?
-   ## http://askubuntu.com/questions/332771/how-do-i-extract-the-package-version-from-debian-changelog
-
-   ## Thanks to Jason Mehring (nrgaway@gmail.com) for the grep, cut, sed, tr magic.
-   make_deb_build_dependencies="$( \
-      grep \
-         "Build-Depends:" "$make_debian_control_file" | \
-            cut -d: -f 2- | \
-               sed -e 's/ *, */\n/g' | \
-                  cut -d'(' -f 1 | \
-                     tr -d " " \
-      )"
+   make_function_run make_get_variables
 
    local apt_get_exit_code="0"
    $CHROOT \
@@ -715,42 +731,58 @@ make_deb-build-dep() {
 }
 
 make_deb-pkg_shared() {
-   make_function_run make_deb-cleanup
-   make_function_run make_dist
+   if [ "$make_use_cowbuilder" = "true" ]; then
+      make_function_run make_get_variables
 
-   if [ "$make_use_gain_root_command" = "" ]; then
-      if [ -x "$PWD/debian/gain-root-command" ]; then
-         if command -v faketime >/dev/null 2>&1 ; then
-            if command -v fakeroot >/dev/null 2>&1 ; then
-               true "INFO: make_use_gain_root_command was unset, \
-\"$PWD/debian/gain-root-command\" is executable, faketime and fakeroot is installed. \
-Therefore automatically set make_use_gain_root_command=\"true\""
-               make_use_gain_root_command="true"
-            fi
-         fi
+      mkdir -p "$package_build_result_temp_folder"
+      mkdir -p "$package_build_pkg_src_temp_folder"
+
+      DISTDIR="$package_build_pkg_src_temp_folder"
+
+      make_function_run make_deb-cleanup
+      make_function_run make_dist
+      make_function_run make_debdist
+
+      pushd "$package_build_pkg_src_temp_folder"
+
+      ## Creates make_main_dsc_file.
+      dpkg-source \
+         -c"$make_debian_control_file_absolute_path" \
+         -l"$make_debian_changelog_file_absolute_path" \
+         --format="3.0 (custom)" \
+         --target-format="3.0 (quilt)" \
+         -b / \
+         "$make_debian_tarball_absolute_path" \
+         "$make_upstream_tarball_real_path"
+
+      test -f "$make_main_dsc_file"
+
+      sudo cowbuilder \
+         --build "$make_main_dsc_file" \
+         --distribution "stretch" \
+         --mirror "http://ftp.us.debian.org/debian" \
+         --extrapackages "$make_deb_build_dependencies" \
+         --buildresult "$package_build_result_temp_folder"
+
+      popd
+   else
+      make_function_run make_deb-cleanup
+      make_function_run make_dist
+
+      if ! command -v debuild >/dev/null ; then
+         error 'debuild not found. Do you have the "devscripts" package installed?'
       fi
+
+      dpkg-checkbuilddeps
+
+      ## Using --no-lintian, because debuild does not exist with a non-zero exit
+      ## code, should lintian find an error. Therefore running lintian afterwards.
+      debuild \
+         --no-lintian \
+         -sa \
+         $make_debuild_maybe_unsigned_opts \
+         ${1+"$@"}
    fi
-
-   if [ "$make_use_gain_root_command" = "true" ]; then
-      local make_use_gain_root_command_maybe_switch make_use_gain_root_command_maybe_path
-      make_use_gain_root_command_maybe_switch="--rootcmd="
-      make_use_gain_root_command_maybe_path="$PWD/debian/gain-root-command"
-   fi
-
-   if ! command -v debuild >/dev/null ; then
-      error 'debuild not found. Do you have the "devscripts" package installed?'
-   fi
-
-   dpkg-checkbuilddeps
-
-   ## Using --no-lintian, because debuild does not exist with a non-zero exit
-   ## code, should lintian find an error. Therefore running lintian afterwards.
-   debuild \
-      --no-lintian \
-      ${make_use_gain_root_command_maybe_switch}${make_use_gain_root_command_maybe_path} \
-      -sa \
-      $make_debuild_maybe_unsigned_opts \
-      ${1+"$@"}
 
    if [ "$make_use_lintian" = "false" ]; then
       true "INFO: make_use_lintian is set to false, skipping lintian."
@@ -774,11 +806,12 @@ Therefore automatically set make_use_gain_root_command=\"true\""
 }
 
 make_lintian() {
+   test -f "$make_main_changes_file"
    if [ "$DEBUILD_LINTIAN_OPTS" = "" ]; then
       export DEBUILD_LINTIAN_OPTS="--pedantic --info --display-info --fail-on-warnings"
    fi
    local make_lintian_exit_code="0"
-   lintian $DEBUILD_LINTIAN_OPTS || { make_lintian_exit_code="$?" ; true; };
+   lintian $DEBUILD_LINTIAN_OPTS "$make_main_changes_file" || { make_lintian_exit_code="$?" ; true; };
    if [ "$make_lintian_exit_code" = "0" ]; then
       true "INFO: lintian exited 0."
    else
