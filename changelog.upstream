@@ -1,3 +1,29 @@
+commit cf76682b8bc3dc4544c66b82838f0e8ad128175f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 16 17:31:49 2017 +0100
+
+    add $COWBUILDER_PREFIX to allow caching
+
+commit 87d8bfac5841c40d3c958323f2fedb699063268b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 16 16:56:55 2017 +0100
+
+    add cowbuilder support to make reprepro-add
+    
+    https://phabricator.whonix.org/T52
+
+commit 0228b6e57c810979a8e616479e84c886a107c60e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 16 16:08:38 2017 +0100
+
+    debian source and binary packages in same folder
+
+commit 98181e4c6f34fd13250f3006090ca7030c0ff980
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 16 12:51:30 2017 +0000
+
+    bumped changelog version
+
 commit b919fd8fb05c69c0245bd922ab76bd1f943565d7
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jan 16 12:45:08 2017 +0000
