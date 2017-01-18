@@ -589,13 +589,8 @@ make_dist() {
 
    pushd "$temp_folder/$make_upstream_tarball_source_folder_name"
 
-   shopt -s globstar dotglob nullglob
-
    ## Required to make deterministic.
-   touch --date="Wed Sep 30 16:30:05 UTC 2015" debian
-   touch --date="Wed Sep 30 16:30:05 UTC 2015" ./**
-
-   shopt -u globstar dotglob nullglob
+   find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
    ## No longer using --transform because that does not work with symlinks.
    ## (Important for 'corridor' package.)
@@ -631,8 +626,8 @@ make_debdist() {
    ##       For diagnose, example:
    ##       diff <(tar -tvf tor-ctrl*.debian.tar.xz) <(tar -tvf tor-ctrl*.debian.tar.xz)
 
-   ## Required to maked deterministic.
-   touch --date="Wed Sep 30 16:30:05 UTC 2015" debian/*
+   ## Required to make deterministic.
+   find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
    find \
       "debian" \
