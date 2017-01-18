@@ -799,6 +799,10 @@ make_deb-pkg_shared() {
       fi
    fi
 
+   if [ "$make_use_debsign" = "true" ]; then
+      debsign $make_debsign_opts "$make_main_changes_file"
+   fi
+
    for package in $make_package_debs_files_list; do
       test -f "$package"
       true "INFO: You can find your deb file here: $package"
@@ -830,6 +834,7 @@ make_deb-pkg() {
 }
 
 make_deb-pkg-signed() {
+   make_use_debsign="true"
    make_function_run make_deb-pkg_shared $@
 }
 
