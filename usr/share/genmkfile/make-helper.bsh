@@ -632,17 +632,19 @@ make_debdist() {
 
    ## Not using `dpkg-source` since that does not support any other output dir than '../'.
 
-   find debian -print0 \
+   find \
+      debian \
+      -print0 \
          | tar \
             --null \
             --no-recursion \
             --create \
-            --xz \
             --verbose \
             --owner="0" --group="0" \
             --numeric-owner \
             --mode=go=rX,u+rw,a-s \
             --sort=name \
+            --xz \
             --file="$make_debian_tarball_absolute_path" \
             -T \
             -
