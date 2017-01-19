@@ -624,7 +624,7 @@ make_debdist() {
    ## Required to make deterministic.
    find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
-   ## Not using dpkg-source since that does not support any other output dir than ../.
+   ## Not using `dpkg-source` since that does not support any other output dir than '../'.
 
    find debian -print0 \
       | sort -z \
