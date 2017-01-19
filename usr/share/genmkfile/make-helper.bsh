@@ -643,8 +643,8 @@ make_debdist() {
             --numeric-owner \
             --mode=go=rX,u+rw,a-s \
             --sort=name \
-            -T \
             --file="$make_debian_tarball_absolute_path" \
+            -T \
             -
 
    test -f "$make_debian_tarball_absolute_path"
