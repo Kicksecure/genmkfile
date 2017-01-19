@@ -610,6 +610,7 @@ make_dist() {
             --verbose \
             --owner="0" --group="0" \
             --numeric-owner \
+            --mode=go=rX,u+rw,a-s \
             -T \
             - \
                | gzip -9 -n > "$make_upstream_tarball_real_path"
@@ -640,6 +641,7 @@ make_debdist() {
             --verbose \
             --owner="0" --group="0" \
             --numeric-owner \
+            --mode=go=rX,u+rw,a-s \
             --file="$make_debian_tarball_absolute_path" \
             -T \
             -
