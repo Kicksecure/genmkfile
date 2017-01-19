@@ -611,6 +611,7 @@ make_dist() {
             --owner="0" --group="0" \
             --numeric-owner \
             --mode=go=rX,u+rw,a-s \
+            --sort=name \
             -T \
             - \
                | gzip -9 -n > "$make_upstream_tarball_real_path"
@@ -632,7 +633,6 @@ make_debdist() {
    ## Not using `dpkg-source` since that does not support any other output dir than '../'.
 
    find debian -print0 \
-      | sort -z \
          | tar \
             --null \
             --no-recursion \
@@ -642,8 +642,9 @@ make_debdist() {
             --owner="0" --group="0" \
             --numeric-owner \
             --mode=go=rX,u+rw,a-s \
-            --file="$make_debian_tarball_absolute_path" \
+            --sort=name \
             -T \
+            --file="$make_debian_tarball_absolute_path" \
             -
 
    test -f "$make_debian_tarball_absolute_path"
