@@ -1,3 +1,52 @@
+commit 0fe840b4dd3c82b88a2d62550de94d11c3f5731d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 19 09:40:35 2017 +0000
+
+    add --mode=go=rX,u+rw,a-s to tar to avoid non-determinism
+    
+    as suggested by https://wiki.debian.org/ReproducibleBuilds/VaryingPermissionsInTarballs
+
+commit 2915c81f71ee6d775cd0c7a393b52d2c95f2f378
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 19 09:34:11 2017 +0000
+
+    add LC_ALL=C.UTF-8 to environment to avoid non-determinism
+    
+    as suggested by https://wiki.debian.org/ReproducibleBuilds/Howto#Files_in_data.tar_vary_with_the_locale
+
+commit 4cf227d8ad6cfbc1e4d9e51784bf7e49ba882eb8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 19 09:26:47 2017 +0000
+
+    comment
+
+commit 99ae35a14d55a77a2118d3a9ccac222c24521cab
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 19 09:25:56 2017 +0000
+
+    move from gz to xz for debian source tarball
+    (since this is apparently dpkg-source's standard format in stretch)
+    
+    make output of 'make debdist' same as output of dpkg-source -b ./ (deterministic)
+
+commit d0fa541d94174abc19da61632ea8bca493d8c1e2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 18 19:30:17 2017 +0000
+
+    make upstream tarball generation deterministic in case it contains symlinks
+
+commit b9cfe434424acda481c77d8cda55a54810967d7b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 18 15:23:22 2017 +0000
+
+    implement using debsign with make_use_debsign=true
+
+commit f189b5a8066649c5e7c87efb50d4445e824256f4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jan 18 14:31:36 2017 +0000
+
+    bumped changelog version
+
 commit fe728325059fcc491b43a570ef681747614167a1
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Jan 18 11:25:10 2017 +0000
