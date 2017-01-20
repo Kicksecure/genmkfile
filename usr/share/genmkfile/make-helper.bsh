@@ -593,8 +593,7 @@ make_dist() {
 
    pushd "$temp_folder/$make_upstream_tarball_source_folder_name"
 
-   ## Required to make deterministic.
-   find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
+   #find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
    ## No longer using --transform because that does not work with symlinks.
    ## (Important for 'corridor' package.)
@@ -611,6 +610,7 @@ make_dist() {
             --owner=root --group=root --numeric-owner \
             --mode=go=rX,u+rw,a-s \
             --sort=name \
+            --mtime='2015-10-21 00:00Z' \
             -T \
             - \
                | gzip -9 -n > "$make_upstream_tarball_real_path"
@@ -619,6 +619,8 @@ make_dist() {
 
    rm --recursive --force "$temp_folder"
 
+   strip-nondeterminism "$make_upstream_tarball_real_path"
+
    test -f "$make_upstream_tarball_real_path"
    test -f "$make_upstream_tarball_relative_path"
 }
@@ -626,8 +628,7 @@ make_dist() {
 make_debdist() {
    make_function_run make_undebdist
 
-   ## Required to make deterministic.
-   find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
+   #find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
    ## Not using `dpkg-source` since that does not support any other output dir than '../'.
 
@@ -642,10 +643,13 @@ make_debdist() {
             --owner=root --group=root --numeric-owner \
             --mode=go=rX,u+rw,a-s \
             --sort=name \
+            --mtime='2015-10-21 00:00Z' \
             --xz \
             --file="$make_debian_tarball_absolute_path" \
             -T \
             -
+
+   strip-nondeterminism "$make_debian_tarball_absolute_path"
 
    test -f "$make_debian_tarball_absolute_path"
 }
