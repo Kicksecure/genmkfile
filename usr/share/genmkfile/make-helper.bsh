@@ -608,8 +608,7 @@ make_dist() {
             --no-recursion \
             --create \
             --verbose \
-            --owner="0" --group="0" \
-            --numeric-owner \
+            --owner=root --group=root --numeric-owner \
             --mode=go=rX,u+rw,a-s \
             --sort=name \
             -T \
@@ -640,8 +639,7 @@ make_debdist() {
             --no-recursion \
             --create \
             --verbose \
-            --owner="0" --group="0" \
-            --numeric-owner \
+            --owner=root --group=root --numeric-owner \
             --mode=go=rX,u+rw,a-s \
             --sort=name \
             --xz \
