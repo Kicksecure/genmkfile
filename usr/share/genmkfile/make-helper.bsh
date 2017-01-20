@@ -466,7 +466,7 @@ make_get_variables() {
    fi
    make_debian_tarball_absolute_path="$(realpath "$make_debian_tarball")"
 
-   make_upstream_tarball_relative_path_file_name="${make_source_package_name}_${make_pkg_version}.orig.tar.gz"
+   make_upstream_tarball_relative_path_file_name="${make_source_package_name}_${make_pkg_version}.orig.tar.xz"
    make_upstream_tarball_relative_path="$DISTDIR/$make_upstream_tarball_relative_path_file_name"
    if [ "$make_upstream_tarball_relative_path_tolower" = "false" ]; then
       true
@@ -500,13 +500,13 @@ make_help() {
 make help
    Show this help.
 make dist
-   Create package-version.tar.gz from source files in \$DISTDIR (default \"..\").
+   Create package-version.tar.xz from source files in \$DISTDIR (default \"..\").
 make undist
-   Delete package-version.tar.gz from source files in \$DISTDIR (default \"..\").
+   Delete package-version.tar.xz from source files in \$DISTDIR (default \"..\").
 make debdist
    Create debian.tar.xz from source files in \$DISTDIR (default \"..\").
 make undebdist
-   Delete debian.tar.(gz|xz) from source files in \$DISTDIR (default \"..\").
+   Delete debian.tar.xz from source files in \$DISTDIR (default \"..\").
 make manpages
    Create man page from man source folder, which will be stored in debian/tmp-man folder.
 make uch
@@ -586,13 +586,6 @@ make_all() {
 make_dist() {
    make_function_run make_undist
 
-   local temp_folder
-   temp_folder="$(mktemp --directory)"
-
-   cp --recursive ../"$make_source_package_name" "$temp_folder/$make_upstream_tarball_source_folder_name"
-
-   pushd "$temp_folder/$make_upstream_tarball_source_folder_name"
-
    #find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
    ## No longer using --transform because that does not work with symlinks.
@@ -611,13 +604,10 @@ make_dist() {
             --mode=go=rX,u+rw,a-s \
             --sort=name \
             --mtime='2015-10-21 00:00Z' \
+            --xz \
+            --file="$make_upstream_tarball_real_path" \
             -T \
-            - \
-               | gzip -9 -n > "$make_upstream_tarball_real_path"
-
-   popd
-
-   rm --recursive --force "$temp_folder"
+            -
 
    strip-nondeterminism "$make_upstream_tarball_real_path"
 
@@ -917,14 +907,11 @@ make_deb-cleanup() {
    make_function_run make_clean
    make_function_run make_deb-clean
    local to_delete package
-   ## wheezy: debian.tar.gz
-   ## jessie: debian.tar.xz
    for package in $make_package_list; do
       for to_delete in \
          "../${package}_"*-*_*".deb" \
          "../${package}-dbgsym_"*-*_*".deb" \
          "../${package}_"*-*_*".buildinfo" \
-         "../${package}_"*-*".debian.tar.gz" \
          "../${package}_"*-*".debian.tar.xz" \
          "../${package}_"*-*".dsc" \
          "../${package}_"*-*_*".build" \
