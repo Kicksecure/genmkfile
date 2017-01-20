@@ -322,7 +322,8 @@ make_parse_cmd() {
 make_get_variables() {
    ## Deterministic.
    LC_ALL=C.UTF-8
-   export LC_ALL
+   TZ=UTC
+   export LC_ALL TZ
 
    ## TODO
    package_build_result_temp_folder="/home/user/whonix_binary/packages_temp"
