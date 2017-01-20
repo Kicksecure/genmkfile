@@ -1,3 +1,74 @@
+commit 2ed270f729a8baac9ed7360c26118711ebbae0d2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 20 13:17:35 2017 +0100
+
+    export TZ=UTC to make tar deterministic
+
+commit 3073894b6ac8b44d4472f7e70bc9b0cf9c2303fb
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 20 12:47:48 2017 +0100
+
+    reproducibility: use orig.tar.xz rather than orig.tar.gz
+    
+    so gzip can be avoided which has non-deterministic file ordering
+    
+    There also removed temporary folder creation workaround.
+
+commit 500122e84986e598ff5533aae55ba9f532adda23
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 20 11:27:34 2017 +0100
+
+    remove duplicate test -f
+
+commit f8615d73f1f110132bf7f8c7bb94ff4b02385126
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 20 11:14:02 2017 +0100
+
+    use --mtime='2015-10-21 00:00Z'
+    as per https://reproducible-builds.org/docs/archives/
+    
+    no longer use find / touch as no longer needed
+    
+    use strip-nondeterminism on upstream and debian archive
+
+commit 762fadce053464ba0687ac2ccde4e44807c3253c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 20 08:47:08 2017 +0100
+
+    use --owner=root --group=root --numeric-owner
+    
+    as per https://reproducible-builds.org/docs/archives/
+
+commit 3b52c8ed69c1a95d32705bad749e9864d6c25bd6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 20 08:43:17 2017 +0100
+
+    depend on strip-nondeterminism
+
+commit d91eef7154e28d141b301a13c50ee17865afce34
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 19 14:32:28 2017 +0000
+
+    refactoring
+
+commit b9c2df4a290064aaa6f64156237545f8e927568e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 19 14:29:53 2017 +0000
+
+    fix
+
+commit 9be69e85ec5344c804bf4d94b5fc7365e01f8a6c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 19 14:27:45 2017 +0000
+
+    use tar with --sort=name for deterministic file ordering
+
+commit e6aacaba7ac82046141202a5e4d4eda22a68734a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 19 10:26:54 2017 +0000
+
+    bumped changelog version
+
 commit 0fe840b4dd3c82b88a2d62550de94d11c3f5731d
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Jan 19 09:40:35 2017 +0000
