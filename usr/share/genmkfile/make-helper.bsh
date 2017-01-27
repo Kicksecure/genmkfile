@@ -1199,7 +1199,7 @@ make_git_tag_push_latest() {
 }
 
 make_reprepro-add() {
-   local package package_absolute_path
+   local package package_absolute_path $make_reprepro_codename codename
    make_function_run make_get_variables
 
    if [ "$make_reprepro_codename" = "" ]; then
@@ -1217,14 +1217,22 @@ make_reprepro-add() {
 
    test -f "$make_main_dsc_file"
 
-   $make_reprepro_wrapper \
-      includedsc "$make_reprepro_codename" "$make_main_dsc_file"
+   if [ "$make_reprepro_codename" = "local" ]; then
+      make_reprepro_list_codename="local"
+   else
+      make_reprepro_list_codename="local $make_reprepro_codename"
+   fi
 
-   for package in $make_package_debs_files_list; do
-      test -f "$package"
-      package_absolute_path="$(readlink -f "$package")"
+   for codename in $make_reprepro_list_codename; do
       $make_reprepro_wrapper \
-         includedeb "$make_reprepro_codename" "$package_absolute_path"
+         includedsc "$make_reprepro_codename" "$make_main_dsc_file"
+
+      for package in $make_package_debs_files_list; do
+         test -f "$package"
+         package_absolute_path="$(readlink -f "$package")"
+         $make_reprepro_wrapper \
+            includedeb "$make_reprepro_codename" "$package_absolute_path"
+      done
    done
 }
 
