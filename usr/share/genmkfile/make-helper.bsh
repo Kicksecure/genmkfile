@@ -284,6 +284,12 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
+           reprepro-remove)
+               matched="true"
+               make_function_run make_reprepro-remove
+               exit 0
+               shift
+               ;;
            --)
                shift
                break
@@ -575,7 +581,9 @@ make git-tag-push-latest
    git push most recent git tag. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
 make reprepro-add
    Add main deb package using reprepro wrapper (Environment variable make_reprepro_wrapper, that default to 'reprepro'.)
-   to repository (Environment variable make_reprepro_codename, that defaults to 'developers'.)."
+   to repository (Environment variable make_reprepro_codename, that defaults to 'developers'.).
+make reprepro-remove
+   Delete."
 }
 
 make_all() {
@@ -1198,7 +1206,7 @@ make_git_tag_push_latest() {
    done
 }
 
-make_reprepro-add() {
+make_reprepro-shared() {
    local package package_absolute_path $make_reprepro_codename codename
    make_function_run make_get_variables
 
@@ -1226,16 +1234,34 @@ make_reprepro-add() {
    for codename in $make_reprepro_list_codename; do
       reprepro_codename="$codename"
       export reprepro_codename
-      $make_reprepro_wrapper \
-         includedsc "$codename" "$make_main_dsc_file"
+      if [ "$make_reprepro_cmd" = "add" ]; then
+         $make_reprepro_wrapper includedsc "$codename" "$make_main_dsc_file"
+      else
+         true
+      fi
 
       for package in $make_package_debs_files_list; do
          test -f "$package"
-         package_absolute_path="$(readlink -f "$package")"
-         $make_reprepro_wrapper \
-            includedeb "$codename" "$package_absolute_path"
+         if [ "$make_reprepro_cmd" = "add" ]; then
+            package_absolute_path="$(readlink -f "$package")"
+            $make_reprepro_wrapper includedeb "$codename" "$package_absolute_path"
+         else
+            for package in $make_package_list; do
+               $make_reprepro_wrapper remove "$codename" "$package"
+            done
+         fi
       done
    done
+}
+
+make_reprepro-add() {
+   make_reprepro_cmd=add
+   make_reprepro-shared
+}
+
+make_reprepro-remove() {
+   make_reprepro_cmd=remove
+   make_reprepro-shared
 }
 
 make_source_overrides_file() {

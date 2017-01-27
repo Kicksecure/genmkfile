@@ -139,6 +139,9 @@ git-tag-push-latest:
 reprepro-add:
 	$(GENMKFILE_PATH)/make-helper.bsh reprepro-add
 
+reprepro-remove:
+	$(GENMKFILE_PATH)/make-helper.bsh reprepro-remove
+
 help:
 	$(GENMKFILE_PATH)/make-helper.bsh help
 
