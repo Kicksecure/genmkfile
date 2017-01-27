@@ -1224,6 +1224,8 @@ make_reprepro-add() {
    fi
 
    for codename in $make_reprepro_list_codename; do
+      reprepro_codename="$codename"
+      export reprepro_codename
       $make_reprepro_wrapper \
          includedsc "$codename" "$make_main_dsc_file"
 
