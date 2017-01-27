@@ -1,3 +1,15 @@
+commit 793945c2f3b3b5975f21584d3c1b777e657a8244
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 27 12:24:43 2017 +0000
+
+    make reprepro-add: also add to local repository
+
+commit 79eafed13989bea4f22e831ffb54b83f0187ad0d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 20 17:44:15 2017 +0100
+
+    bumped changelog version
+
 commit 2ed270f729a8baac9ed7360c26118711ebbae0d2
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 20 13:17:35 2017 +0100
