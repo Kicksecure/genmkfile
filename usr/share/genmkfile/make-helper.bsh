@@ -1223,8 +1223,6 @@ make_reprepro-shared() {
       make_reprepro_wrapper="reprepro"
    fi
 
-   test -f "$make_main_dsc_file"
-
    if [ "$make_reprepro_codename" = "local" ]; then
       make_reprepro_list_codename="local"
    else
@@ -1235,15 +1233,16 @@ make_reprepro-shared() {
       reprepro_codename="$codename"
       export reprepro_codename
       if [ "$make_reprepro_cmd" = "add" ]; then
+         test -f "$make_main_dsc_file"
          $make_reprepro_wrapper includedsc "$codename" "$make_main_dsc_file"
       else
          true
       fi
 
       for package in $make_package_debs_files_list; do
-         test -f "$package"
          if [ "$make_reprepro_cmd" = "add" ]; then
             package_absolute_path="$(readlink -f "$package")"
+            test -f "$package_absolute_path"
             $make_reprepro_wrapper includedeb "$codename" "$package_absolute_path"
          else
             for package in $make_package_list; do
