@@ -1,3 +1,33 @@
+commit d77d2547a69c83253ff7e8320e25f34ab652582f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 27 15:58:53 2017 +0000
+
+    fix
+
+commit 26c36569934547d696ff6a8c3e3a29a94f7ea14e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 27 14:04:01 2017 +0000
+
+    implement make reprepro-remove
+
+commit 2b7973aa874d3fc30abea8016c87c0d755feafe2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 27 12:48:01 2017 +0000
+
+    fix
+
+commit 1dae7d19725e37f36fc526ea39a6889e2a838227
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 27 12:28:09 2017 +0000
+
+    fix
+
+commit 8b4044b14b57bb34f92ecf2a74eeeef37a58af45
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 27 12:25:13 2017 +0000
+
+    bumped changelog version
+
 commit 793945c2f3b3b5975f21584d3c1b777e657a8244
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 27 12:24:43 2017 +0000
