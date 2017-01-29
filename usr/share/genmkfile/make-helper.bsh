@@ -609,7 +609,7 @@ make_dist() {
             --no-recursion \
             --create \
             --verbose \
-            --owner=root --group=root --numeric-owner \
+            --owner=0 --group=0 --numeric-owner \
             --mode=go=rX,u+rw,a-s \
             --sort=name \
             --mtime='2015-10-21 00:00Z' \
@@ -638,7 +638,7 @@ make_debdist() {
             --no-recursion \
             --create \
             --verbose \
-            --owner=root --group=root --numeric-owner \
+            --owner=0 --group=0 --numeric-owner \
             --mode=go=rX,u+rw,a-s \
             --sort=name \
             --mtime='2015-10-21 00:00Z' \
