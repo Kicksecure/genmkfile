@@ -1,3 +1,19 @@
+commit 60fcc0280aca8a6995f229b6dc22ee93e2cd97f1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jan 29 16:33:51 2017 +0000
+
+    use tar --owner=0 --group=0 for deterministic results
+    
+    Thanks to anonymous1 for the suggestion!
+    
+    https://forums.whonix.org/t/testing-whonix-installer-for-windows
+
+commit 8d67ec73bc8696c80ecbfb8eb183fd6634d18fcf
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jan 29 15:40:33 2017 +0000
+
+    bumped changelog version
+
 commit d77d2547a69c83253ff7e8320e25f34ab652582f
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 27 15:58:53 2017 +0000
