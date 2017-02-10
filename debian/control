@@ -14,7 +14,8 @@ Standards-Version: 3.9.8
 
 Package: genmkfile
 Architecture: all
-Depends: debhelper (>= 9), faketime, make, dpkg-dev, devscripts, strip-nondeterminism, ${misc:Depends}
+Depends: debhelper (>= 9), faketime, make, dpkg-dev, devscripts,
+ strip-nondeterminism, sudo, ${misc:Depends}
 Description: Generic Makefile for Scripts
  Makes packaging scripts simpler. No more need to manually maintain
  'make install' targets or distribution specific install files such as
