@@ -377,6 +377,7 @@ make_get_variables() {
             cut -d: -f 2- | \
                sed -e 's/ *, */\n/g' | \
                sed -e 's/${misc:Depends}/\n/g' | \
+               sed -e 's/${python:Depends}/\n/g' | \
                   cut -d'(' -f 1 | \
                      tr -d " " \
       )"
