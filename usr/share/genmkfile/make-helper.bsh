@@ -370,6 +370,7 @@ make_get_variables() {
                      tr -d " " \
       )"
 
+   ## TODO FIXME: add support for multiple packages, i.e. multiple Depends: fields
    make_deb_runtime_dependencies="$( \
       grep \
          "^Depends:" "$make_debian_control_file_absolute_path" | \
