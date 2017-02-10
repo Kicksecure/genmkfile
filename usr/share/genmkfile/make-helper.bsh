@@ -349,7 +349,11 @@ make_get_variables() {
 
    local temp dpkg_line
    if ! command -v dpkg-parsechangelog >/dev/null ; then
-      error 'dpkg-parsechangelog not found. Do you have the "build-essential" package installed?'
+      true 'dpkg-parsechangelog not found. Do you have the "build-essential" package installed?
+To install all dependencies, try running:
+sudo make deb-all-dep
+'
+      exit 1
    fi
 
    make_debian_control_file_relative_path="debian/control"
@@ -415,7 +419,7 @@ make_get_variables() {
 
    make_pkg_version_with_revision="${make_pkg_version}-${make_pkg_revision}"
    if [ "$make_pkg_version" = "" ]; then
-      echo "ERROR: variable make_pkg_version is empty." >&2
+      true "ERROR: variable make_pkg_version is empty."
       exit 1
    fi
 
@@ -434,7 +438,7 @@ make_get_variables() {
       read -r architecture_keyword architecture_setting _ <<< "$architecture_grep"
 
       if [ "$architecture_setting" = "" ]; then
-         error 'architecture_grep is empty.'
+         true 'ERROR: architecture_grep is empty.'
       elif [ "$architecture_setting" = "all" ]; then
          architecture="all"
       else
@@ -815,10 +819,20 @@ make_deb-pkg_shared() {
       make_function_run make_dist
 
       if ! command -v debuild >/dev/null ; then
-         error 'debuild not found. Do you have the "devscripts" package installed?'
+         true "ERROR: debuild not found. Do you have the 'devscripts' package installed?
+To install all dependencies, try running:
+sudo make deb-all-dep
+"
+         exit 1
       fi
 
-      dpkg-checkbuilddeps
+      if ! dpkg-checkbuilddeps ; then
+         true "ERROR: dpkg-checkbuilddeps reported missing build dependencies.
+To install all dependencies, try running:
+sudo make deb-all-dep
+"
+         exit 1
+      fi
 
       ## Using --no-lintian, because debuild does not exist with a non-zero exit
       ## code, should lintian find an error. Therefore running lintian afterwards.
@@ -893,7 +907,7 @@ make_deb-install() {
    make_function_run make_get_variables
    for package in $make_package_debs_files_list; do
       if [ ! -f "$package" ]; then
-         echo "ERROR: File $package does not exist. Have you run \"make deb-pkg\" already?" >&2
+         true "ERROR: File $package does not exist. Have you run \"make deb-pkg\" already?"
          exit 1
       fi
       sudo dpkg -i "$package"
@@ -1023,7 +1037,7 @@ make_helper() {
             file_with_destdir="${DESTDIR}${file_without_pwd}"
             if [ "$make_uninstallcheck_" = "true" ]; then
                if [ -f "$file_with_destdir" ]; then
-                  echo "ERROR: file $file_with_destdir still installed." >&2
+                  true "ERROR: file $file_with_destdir still installed."
                   local still_installed="true"
                fi
             elif [ "$make_installcheck_" = "true" ]; then
@@ -1037,7 +1051,7 @@ make_helper() {
                   rm "$file_with_destdir"
                fi
             else
-               echo "ERROR 2: in $FUNCNAME!" >&2
+               true "ERROR: error 2 in $FUNCNAME!"
                exit 1
             fi
          done
@@ -1096,11 +1110,11 @@ make_deb-chl-bumpup() {
       ## Otherwise e-mail address in debian/changelog would default to
       ## user@host.localdomain and then lintian would complain and exit with
       ## failure code.
-      echo "ERROR: environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!" >&2
+      true "ERROR: environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
       exit 1
    fi
    if [ "$DEBFULLNAME" = "" ]; then
-      echo "ERROR: environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!" >&2
+      true "ERROR: environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
       exit 1
    fi
 
@@ -1116,7 +1130,7 @@ make_deb-chl-bumpup() {
       true "Please enter new version number!"
       read new_upstream_version
    else
-      error "make_bump_type $make_bump_type is neither major nor manual!"
+      true "make_bump_type $make_bump_type is neither major nor manual!"
    fi
 
    new_revision="1"
