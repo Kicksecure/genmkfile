@@ -94,6 +94,18 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
+           deb-run-dep)
+               matched="true"
+               make_function_run make_deb-run-dep
+               exit 0
+               shift
+               ;;
+           deb-all-dep)
+               matched="true"
+               make_function_run make_deb-all-dep
+               exit 0
+               shift
+               ;;
            deb-pkg)
                matched="true"
                deb="true"
@@ -358,6 +370,16 @@ make_get_variables() {
                      tr -d " " \
       )"
 
+   make_deb_runtime_dependencies="$( \
+      grep \
+         "^Depends:" "$make_debian_control_file_absolute_path" | \
+            cut -d: -f 2- | \
+               sed -e 's/ *, */\n/g' | \
+               sed -e 's/${misc:Depends}/\n/g' | \
+                  cut -d'(' -f 1 | \
+                     tr -d " " \
+      )"
+
    while read -r -d $'\n' dpkg_line; do
       ## Example dpkg_line:
       ## Version: 0.1-1
@@ -525,6 +547,11 @@ make installsim
 make deb-build-dep
    Install build dependencies listed in debian/control under Build-Depends using apt-get.
    Various environment variables supported.
+make deb-run-dep
+   Install runtime dependencies listed in debian/control under Depends using apt-get.
+   Various environment variables supported.
+make deb-all-dep
+   Combination of deb-build-dep and deb-build-dep.
 make deb-pkg
    Create a deb, which will be stored in parent folder.
 make deb-pkg-install
@@ -709,9 +736,7 @@ make_clean() {
    make_function_run make_deb-clean
 }
 
-make_deb-build-dep() {
-   make_function_run make_get_variables
-
+make_deb-shared-dep() {
    local apt_get_exit_code="0"
    $CHROOT \
       apt-get \
@@ -724,10 +749,28 @@ make_deb-build-dep() {
          --yes \
          --no-install-recommends \
          install \
-         $make_deb_build_dependencies \
+         $make_deb_shared_dependencies \
          || { apt_get_exit_code="$?" ; true; };
 
    exit "$apt_get_exit_code"
+}
+
+make_deb-build-dep() {
+   make_function_run make_get_variables
+   make_deb_shared_dependencies="$make_deb_build_dependencies"
+   make_function_run make_deb-shared-dep
+}
+
+make_deb-run-dep() {
+   make_function_run make_get_variables
+   make_deb_shared_dependencies="$make_deb_runtime_dependencies"
+   make_function_run make_deb-shared-dep
+}
+
+make_deb-all-dep() {
+   make_function_run make_get_variables
+   make_deb_shared_dependencies="$make_deb_build_dependencies $make_deb_runtime_dependencies"
+   make_function_run make_deb-shared-dep
 }
 
 make_deb-pkg_shared() {
