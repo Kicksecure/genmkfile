@@ -366,6 +366,7 @@ sudo make deb-all-dep
 
    ## Thanks to Jason Mehring (nrgaway@gmail.com) for the grep, cut, sed, tr magic.
    ## TODO FIXME: fix Build-Depends: using newlines
+   ## maybe outsource to a python script using https://packages.debian.org/stretch/python3-debian
    make_deb_build_dependencies="$( \
       grep \
          "Build-Depends:" "$make_debian_control_file_absolute_path" | \
