@@ -745,7 +745,6 @@ make_clean() {
 
 make_deb-shared-dep() {
    local apt_get_exit_code="0"
-   $CHROOT \
       apt-get \
          $apt_sourcelist_empty \
          $apt_sourceparts \
