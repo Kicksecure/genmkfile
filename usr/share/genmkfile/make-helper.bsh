@@ -365,6 +365,7 @@ sudo make deb-all-dep
    test -f "$make_debian_changelog_file_absolute_path"
 
    ## Thanks to Jason Mehring (nrgaway@gmail.com) for the grep, cut, sed, tr magic.
+   ## TODO FIXME: fix Build-Depends: using newlines
    make_deb_build_dependencies="$( \
       grep \
          "Build-Depends:" "$make_debian_control_file_absolute_path" | \
@@ -374,6 +375,7 @@ sudo make deb-all-dep
                      tr -d " " \
       )"
 
+   ## TODO FIXME: fix Depends: using newlines
    ## TODO FIXME: add support for multiple packages, i.e. multiple Depends: fields
    make_deb_runtime_dependencies="$( \
       grep \
