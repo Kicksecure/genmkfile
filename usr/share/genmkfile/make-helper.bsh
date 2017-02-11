@@ -566,6 +566,7 @@ make deb-install
    Install deb from parent folder.
 make deb-icup
    Combination of make deb-pkg, make deb-pkg-install and make deb-pkg-cleanup.
+   icup stands for install and cleanup.
 make deb-remove
    apt-get remove make_source_package_name
 make deb-purge
