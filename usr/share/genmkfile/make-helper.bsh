@@ -810,6 +810,8 @@ make_deb-pkg_shared() {
 
       test -f "$make_main_dsc_file"
 
+      true "COWBUILDER_PREFIX: $COWBUILDER_PREFIX"
+
       sudo \
          $COWBUILDER_PREFIX \
          cowbuilder \
