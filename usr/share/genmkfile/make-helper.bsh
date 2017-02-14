@@ -897,17 +897,17 @@ make_lintian() {
 
 make_deb-pkg() {
    make_debuild_maybe_unsigned_opts="-us -uc"
-   make_function_run make_deb-pkg_shared $@
+   make_function_run make_deb-pkg_shared "$@"
 }
 
 make_deb-pkg-signed() {
    make_use_debsign="true"
-   make_function_run make_deb-pkg_shared $@
+   make_function_run make_deb-pkg_shared "$@"
 }
 
 make_deb-pkg-source() {
    make_debuild_maybe_unsigned_opts="-S"
-   make_function_run make_deb-pkg_shared $@
+   make_function_run make_deb-pkg_shared "$@"
 }
 
 make_deb-install() {
