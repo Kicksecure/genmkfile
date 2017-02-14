@@ -36,7 +36,7 @@ make_parse_cmd() {
                ;;
            all)
                matched="true"
-               make_function_run make_all ${1+"$@"}
+               make_function_run make_all "$@"
                exit 0
                shift
                ;;
@@ -320,7 +320,7 @@ make_parse_cmd() {
    ## will remain in the "$@" positional parameters.
 
    if [ ! "$matched" = "true" ]; then
-      make_function_run ${1+"$@"}
+      make_function_run "$@"
    fi
 
    if [ "$deb" = "true" ]; then
@@ -625,7 +625,7 @@ make reprepro-remove
 
 make_all() {
    if [ -f "$PWD/Makefile_orig" ]; then
-      make -f "$PWD/Makefile_orig" all ${1+"$@"}
+      make -f "$PWD/Makefile_orig" all "$@"
    fi
 }
 
@@ -848,7 +848,7 @@ sudo make deb-all-dep
          --no-lintian \
          -sa \
          $make_debuild_maybe_unsigned_opts \
-         ${1+"$@"}
+         "$@"
    fi
 
    if [ "$make_use_lintian" = "false" ]; then
@@ -1365,10 +1365,10 @@ make_function_run() {
    function_name="$1"
    shift
    if type -t "${function_name}_hook_pre" >/dev/null ; then
-      "${function_name}_hook_pre" ${1+"$@"}
+      "${function_name}_hook_pre" "$@"
    fi
    if true ; then
-      "$function_name" ${1+"$@"}
+      "$function_name" "$@"
       function_name_return_code="$?"
       if [ ! "$function_name_return_code" = "0" ]; then
          true "INFO: function_name_return_code: $function_name_return_code"
@@ -1376,7 +1376,7 @@ make_function_run() {
       fi
    fi
    if type -t "${function_name}_hook_post" >/dev/null ; then
-      "${function_name}_hook_post" ${1+"$@"}
+      "${function_name}_hook_post" "$@"
    fi
 }
 
@@ -1398,10 +1398,10 @@ if [ "$make_script_was_sourced" = "false" ]; then
 
    make_function_run make_init
 
-   make_function_run make_source_overrides_file ${1+"$@"}
-   make_function_run make_source_overrides_folder ${1+"$@"}
+   make_function_run make_source_overrides_file "$@"
+   make_function_run make_source_overrides_folder "$@"
 
-   make_function_run make_parse_cmd ${1+"$@"}
+   make_function_run make_parse_cmd "$@"
 
    make_function_run make_deinit
 fi
