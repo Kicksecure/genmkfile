@@ -324,15 +324,15 @@ make_parse_cmd() {
    fi
 
    if [ "$deb" = "true" ]; then
-      make_function_run make_deb-pkg $@
+      make_function_run make_deb-pkg "$@"
       exit 0
    fi
    if [ "$make_deb_signed" = "true" ]; then
-      make_function_run make_deb-pkg-signed $@
+      make_function_run make_deb-pkg-signed "$@"
       exit 0
    fi
    if [ "$make_deb_source" = "true" ]; then
-      make_function_run make_deb-pkg-source $@
+      make_function_run make_deb-pkg-source "$@"
       exit 0
    fi
 }
