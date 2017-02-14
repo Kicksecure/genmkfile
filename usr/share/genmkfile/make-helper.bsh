@@ -750,12 +750,10 @@ make_deb-shared-dep() {
    local apt_get_exit_code="0"
    sudo \
       apt-get \
+         "${APTGETOPT[@]}" \
          $apt_sourcelist_empty \
          $apt_sourceparts \
-         $apt_timeout_opts \
-         $apt_verify_opts \
          $apt_unattended_opts \
-         $apt_misc_opts \
          --yes \
          --no-install-recommends \
          install \
