@@ -1,3 +1,134 @@
+commit 7a67f84f20ec8fcebfd4b2e6911d77f1206429c6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Feb 14 19:26:57 2017 +0000
+
+    replace $apt_timeout_opts $apt_verify_opts $apt_misc_opts with "${APTGETOPT[@]}"
+
+commit 60656ad49c40b1d79b4bdcc5898db18f23db7d30
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Feb 14 17:45:52 2017 +0000
+
+    "$@"
+
+commit 029e59ce1d5845118294de24ffa87bb4993566ff
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Feb 14 17:44:55 2017 +0000
+
+    "$@"
+
+commit d0b0220f74861d6d6abcc82eb2aa76e01502f414
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Feb 14 17:30:30 2017 +0000
+
+    "$@"
+
+commit 78d62680f2547330a56df75b4887799d37ca7d39
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 13 17:02:33 2017 +0000
+
+    output
+
+commit f79475e343c8ad20bafa31bcfe127dd3fdbfe85e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 13 17:02:01 2017 +0000
+
+    refactoring
+
+commit e85a01338a34ec6ecb831211ac3a4a6d5f18b372
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 13 14:12:05 2017 +0100
+
+    fix, depend and build-depend on fakeroot
+    
+    since required by debuild
+    
+    debuild --no-lintian -sa -us -uc
+    dpkg-buildpackage -rfakeroot -us -uc -sa
+    dpkg-buildpackage: error: fakeroot not found, either install the fakeroot
+    package, specify a command with the -r option, or run this as root
+    debuild: fatal error at line 1116:
+    dpkg-buildpackage -rfakeroot -us -uc -sa failed
+    usr/share/genmkfile/makefile-full:53: recipe for target 'deb-pkg' failed
+
+commit 2192d80ab4cbdfd104d696480b3f4c99d02bd7e2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Feb 11 15:15:43 2017 +0000
+
+    comment
+
+commit 254f9ea2527e846dd9430e6f4700878419b86c8b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Feb 11 14:38:33 2017 +0000
+
+    TODO FIXME
+
+commit aba46c078d2f774fd3e9ea52a6ccf3d52b12403c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Feb 11 14:35:55 2017 +0000
+
+    sudo apt-get install dependencies
+
+commit 6666a5c7705e5b2a5d86ac8ea042ba14f42acca9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Feb 11 14:35:09 2017 +0000
+
+    fix, remove $CHROOT from apt-get
+
+commit a3b25599d091bf18343bd40a6f544b9eca08046c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Feb 11 06:28:29 2017 +0000
+
+    output
+
+commit 27d9b9b62bd44dddba476268ec76b1cffc30ce14
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 10 14:52:44 2017 +0000
+
+    remove faketime
+
+commit 111b80ec7d28a487aab7460021a862ebaecf7f56
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 10 14:09:54 2017 +0000
+
+    improve and unify error handling
+
+commit d942060029ed459b49b4fbf4e1b137beebfa217a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 10 13:55:24 2017 +0000
+
+    add sudo to Depends:
+
+commit f44230ce73b88c703926692db78eaea900ad9a8c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 10 13:54:34 2017 +0000
+
+    filter out ${python:Depends} from runtime dependency list
+
+commit 1a9735ec175eb5bd27f00668dc4ceed43ab6ab0a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 10 13:45:10 2017 +0000
+
+    todo fixme
+
+commit 1f1d31c3f7505a99197d528109a4f4b92b232f0c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 10 13:37:52 2017 +0000
+
+    add make deb-run-dep and make deb-all-dep
+    
+    make deb-run-dep
+       Install runtime dependencies listed in debian/control under Depends using apt-get.
+       Various environment variables supported.
+    
+    make deb-all-dep
+       Combination of deb-build-dep and deb-build-dep.
+
+commit 278e77bf2e9e62d4772b36f7222b40ffb7864700
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 6 02:07:49 2017 +0000
+
+    bumped changelog version
+
 commit 60fcc0280aca8a6995f229b6dc22ee93e2cd97f1
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jan 29 16:33:51 2017 +0000
