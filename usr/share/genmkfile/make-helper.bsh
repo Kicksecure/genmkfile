@@ -290,6 +290,12 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
+           git-tag-show-latest)
+               matched="true"
+               make_function_run make_git_tag_show_latest
+               exit 0
+               shift
+               ;;
            git-tag-push-latest)
                matched="true"
                make_function_run make_git_tag_push_latest
@@ -622,6 +628,8 @@ make git-verify
    Combination of tag-check and commit-verify. Only a repository sanity check. Not for security purposes!
 make git-tag-push
    git push latest pkg_version_with_revision from debian/changelog. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
+make git-tag-show-latest
+   echo recent git tag to stdout.
 make git-tag-push-latest
    git push most recent git tag. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
 make reprepro-add
@@ -1272,6 +1280,13 @@ make_git_tag_push() {
    for repository in $make_git_tag_push_targets; do
       git push "$repository" "$make_pkg_version_with_revision"
    done
+}
+
+make_git_tag_show_latest() {
+   make_function_run make_git_tag_shared
+   ## Thanks to kilianc - http://stackoverflow.com/a/7979255/2605155
+   make_git_tag_latest="$(git describe --tags $(git rev-list --tags --max-count=1))"
+   echo "$make_git_tag_latest"
 }
 
 make_git_tag_push_latest() {
