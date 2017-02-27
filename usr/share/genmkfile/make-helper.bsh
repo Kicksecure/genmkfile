@@ -607,7 +607,7 @@ make git-tag-sign
 make git-tag-verify
    git tag (-v) verify latest pkg_version_with_revision from debian/changelog. Only a repository sanity check. Not for security purposes!
 make git-tag-check
-   Check if current git head is a signed git tag. Only a repository sanity check. Not for security purposes!
+   Check if current git tag is a signed git tag. Only a repository sanity check. Not for security purposes!
 make git-commit-verify
    Check if current git head is a signed git commit. Only a repository sanity check. Not for security purposes!
 make git-verify
