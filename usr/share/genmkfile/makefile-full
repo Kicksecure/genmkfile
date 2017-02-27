@@ -121,6 +121,9 @@ deb-uachl-bumpup-manual:
 deb-uachl-bumpup-major:
 	$(GENMKFILE_PATH)/make-helper.bsh deb-uachl-bumpup-major
 
+git-tag-show:
+	$(GENMKFILE_PATH)/make-helper.bsh git-tag-show
+
 git-tag-sign:
 	$(GENMKFILE_PATH)/make-helper.bsh git-tag-sign
 

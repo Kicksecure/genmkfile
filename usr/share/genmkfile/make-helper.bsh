@@ -248,6 +248,12 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
+           git-tag-show)
+               matched="true"
+               make_function_run make_git_tag_show
+               exit 0
+               shift
+               ;;
            git-tag-sign)
                matched="true"
                make_function_run make_git_tag_sign
@@ -1177,6 +1183,11 @@ make_git_tag_shared() {
    [ -n "$make_git_tag_push_targets" ] || make_git_tag_push_targets="origin"
    command -v git >/dev/null
    make_git_tag_shared_done="true"
+}
+
+make_git_tag_show() {
+   make_function_run make_git_tag_shared
+   echo "$make_pkg_version_with_revision"
 }
 
 make_git_tag_sign() {
