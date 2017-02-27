@@ -1,3 +1,15 @@
+commit 40d36a7d486d541c2ed4641bf52dd614ce7824de
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 27 02:12:14 2017 +0000
+
+    also remove source package on make reprepro-remove
+
+commit 9c9edc11148978ad0fc038a1d50f7b82c38a7613
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Feb 17 13:58:06 2017 +0000
+
+    bumped changelog version
+
 commit 7a67f84f20ec8fcebfd4b2e6911d77f1206429c6
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Feb 14 19:26:57 2017 +0000
