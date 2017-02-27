@@ -608,6 +608,8 @@ make deb-chl-bumpup-major
    Major bump upstream version number in debian/changelog.
 make deb-uachl-bumpup-major
    Combination of make uch and make deb-chl-bumpup.
+make git-tag-show
+   echo the current git tag to stdout.
 make git-tag-sign
    git tag (-s) sign latest pkg_version_with_revision from debian/changelog. Only a repository sanity check. Not for security purposes!
 make git-tag-verify
