@@ -1312,6 +1312,7 @@ make_reprepro-shared() {
          else
             for package in $make_package_list; do
                $make_reprepro_wrapper remove "$codename" "$package"
+               $make_reprepro_wrapper removesrc "$codename" "$package"
             done
          fi
       done
