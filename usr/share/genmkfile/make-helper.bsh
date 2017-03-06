@@ -1328,22 +1328,17 @@ make_reprepro-shared() {
       if [ "$make_reprepro_cmd" = "add" ]; then
          test -f "$make_main_dsc_file"
          $make_reprepro_wrapper includedsc "$codename" "$make_main_dsc_file"
-      else
-         true
-      fi
-
-      for package in $make_package_debs_files_list; do
-         if [ "$make_reprepro_cmd" = "add" ]; then
+         for package in $make_package_debs_files_list; do
             package_absolute_path="$(readlink -f "$package")"
             test -f "$package_absolute_path"
             $make_reprepro_wrapper includedeb "$codename" "$package_absolute_path"
-         else
-            for package in $make_package_list; do
-               $make_reprepro_wrapper remove "$codename" "$package"
-               $make_reprepro_wrapper removesrc "$codename" "$package"
-            done
-         fi
-      done
+         done
+      else
+         for package in $make_package_list; do
+            $make_reprepro_wrapper remove "$codename" "$package"
+            $make_reprepro_wrapper removesrc "$codename" "$package"
+         done
+      fi
    done
 }
 
