@@ -1326,13 +1326,9 @@ make_reprepro-shared() {
       reprepro_codename="$codename"
       export reprepro_codename
       if [ "$make_reprepro_cmd" = "add" ]; then
-         test -f "$make_main_dsc_file"
-         $make_reprepro_wrapper includedsc "$codename" "$make_main_dsc_file"
-         for package in $make_package_debs_files_list; do
-            package_absolute_path="$(readlink -f "$package")"
-            test -f "$package_absolute_path"
-            $make_reprepro_wrapper includedeb "$codename" "$package_absolute_path"
-         done
+         changes_file_absolute_path="$(readlink -f "$make_main_changes_file")"
+         test -f "$changes_file_absolute_path"
+         $make_reprepro_wrapper --ignore=wrongdistribution include "$codename" "$changes_file_absolute_path"
       else
          for package in $make_package_list; do
             $make_reprepro_wrapper remove "$codename" "$package"
