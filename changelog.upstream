@@ -1,3 +1,39 @@
+commit 13142e1748f442d016598292c33665b3ac086746
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Mar 6 05:11:47 2017 +0000
+
+    fix
+
+commit c5d04dc53f8eef7a8bad8e2cf28877e38c9d9e83
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 27 20:15:18 2017 +0000
+
+    implement make git-tag-show-latest
+
+commit cc1f1273f9ff1319ff90b118ee8f0d729403f6fa
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 27 20:05:45 2017 +0000
+
+    output
+
+commit 39d0ecb8e3018c2b0ab1cf64e30602fc1537fb83
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 27 20:04:30 2017 +0000
+
+    implement make git-tag-show
+
+commit 57432275b4524140ac752bfbf4ee94b827a97600
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 27 20:01:35 2017 +0000
+
+    typo
+
+commit 1c5b2507b9126a17d0ec2ea961fd4a6b3aa1103d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Feb 27 02:12:55 2017 +0000
+
+    bumped changelog version
+
 commit 40d36a7d486d541c2ed4641bf52dd614ce7824de
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Feb 27 02:12:14 2017 +0000
