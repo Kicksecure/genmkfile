@@ -1,3 +1,15 @@
+commit 3dffe49ae1e0909d2ec781ae4ed9f8917dcf3f27
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Mar 6 20:07:09 2017 +0000
+
+    reprepro import changes file rather than individual packages
+
+commit 1c4c27ce22e3705e52f1e4d679e42f0d2cf57e88
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Mar 6 16:14:39 2017 +0000
+
+    bumped changelog version
+
 commit 13142e1748f442d016598292c33665b3ac086746
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Mar 6 05:11:47 2017 +0000
