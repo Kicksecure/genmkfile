@@ -349,6 +349,14 @@ make_parse_cmd() {
    fi
 }
 
+make_dependencies_filter_helper() {
+   temp="$@"
+   for to_remove in '${misc:Depends}' '${python:Depends}' '|' ; do
+      temp="${temp//"$to_remove"/""}"
+   done
+   echo "$temp"
+}
+
 make_get_variables() {
    ## Deterministic.
    LC_ALL=C.UTF-8
@@ -376,30 +384,15 @@ sudo make deb-all-dep
    make_debian_changelog_file_absolute_path="$(realpath "$make_debian_changelog_file_relative_path")"
    test -f "$make_debian_changelog_file_absolute_path"
 
-   ## Thanks to Jason Mehring (nrgaway@gmail.com) for the grep, cut, sed, tr magic.
-   ## TODO FIXME: fix Build-Depends: using newlines
-   ## maybe outsource to a python script using https://packages.debian.org/stretch/python3-debian
-   make_deb_build_dependencies="$( \
-      grep \
-         "Build-Depends:" "$make_debian_control_file_absolute_path" | \
-            cut -d: -f 2- | \
-               sed -e 's/ *, */\n/g' | \
-                  cut -d'(' -f 1 | \
-                     tr -d " " \
-      )"
+   ## Thanks to jakob for the perl lines.
+   ## http://unix.stackexchange.com/users/20977/jakob
+   ## http://unix.stackexchange.com/a/215919/49297
 
-   ## TODO FIXME: fix Depends: using newlines
-   ## TODO FIXME: add support for multiple packages, i.e. multiple Depends: fields
-   make_deb_runtime_dependencies="$( \
-      grep \
-         "^Depends:" "$make_debian_control_file_absolute_path" | \
-            cut -d: -f 2- | \
-               sed -e 's/ *, */\n/g' | \
-               sed -e 's/${misc:Depends}/\n/g' | \
-               sed -e 's/${python:Depends}/\n/g' | \
-                  cut -d'(' -f 1 | \
-                     tr -d " " \
-      )"
+   make_deb_build_dependencies="$(perl -ne 'next if /^#/; $p=(s/^Build-Depends:\s*/ / or (/^ / and $p)); s/,|\n|\([^)]+\)//mg; print if $p' < "$make_debian_control_file_absolute_path")"
+   make_deb_build_dependencies="$(make_dependencies_filter_helper "$make_deb_build_dependencies")"
+
+   make_deb_runtime_dependencies="$(perl -ne 'next if /^#/; $p=(s/^Depends:\s*/ / or (/^ / and $p)); s/,|\n|\([^)]+\)//mg; print if $p' < "$make_debian_control_file_absolute_path")"
+   make_deb_runtime_dependencies="$(make_dependencies_filter_helper "$make_deb_runtime_dependencies")"
 
    while read -r -d $'\n' dpkg_line; do
       ## Example dpkg_line:
