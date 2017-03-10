@@ -627,7 +627,7 @@ make git-tag-push-latest
    git push most recent git tag. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
 make reprepro-add
    Add main deb package using reprepro wrapper (Environment variable make_reprepro_wrapper, that default to 'reprepro'.)
-   to repository (Environment variable make_reprepro_codename, that defaults to 'developers'.).
+   to repository (Environment variable make_reprepro_codename, that defaults to 'local'.).
 make reprepro-remove
    Delete."
 }
@@ -1298,7 +1298,7 @@ make_reprepro-shared() {
 
    if [ "$make_reprepro_codename" = "" ]; then
       if [ "$WHONIX_BUILD_APT_CODENAME" = "" ]; then
-         make_reprepro_codename="developers"
+         make_reprepro_codename="local"
       else
          make_reprepro_codename="$WHONIX_BUILD_APT_CODENAME"
       fi
