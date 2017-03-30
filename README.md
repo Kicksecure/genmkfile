@@ -1,4 +1,4 @@
-# Generic Makefile for Scripts #
+# Generic Makefile #
 
 Makes packaging scripts simpler. No more need to manually maintain
 'make install' targets or distribution specific install files such as
