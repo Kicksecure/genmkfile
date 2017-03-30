@@ -16,7 +16,7 @@ Package: genmkfile
 Architecture: all
 Depends: debhelper (>= 9), make, dpkg-dev, devscripts, fakeroot,
  strip-nondeterminism, sudo, perl, ${misc:Depends}
-Description: Generic Makefile for Scripts
+Description: Generic Makefile
  Makes packaging scripts simpler. No more need to manually maintain
  'make install' targets or distribution specific install files such as
  debian/pkg-name.install.
