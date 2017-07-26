@@ -1218,42 +1218,13 @@ make_pkg_version_with_revision $make_pkg_version_with_revision differs from make
 }
 
 make_git_commit_verify() {
-   ## Credits for this function: Mike Gerwitz
-   ## Source: mikegerwitz.com/papers/git-horror-story
-   ## Modified by Patrick Schleizer for use within this script.
-
-   # Validate signatures on each and every commit within the given range
-   ##
-
-   # if a ref is provided, append range spec to include all children
-   chkafter="${1+$1..}"
-
-   # note: bash users may instead use $'\t'; the echo statement below is a more
-   # portable option
-   t=$( echo '\t' )
-
-   # Check every commit after chkafter (or all commits if chkafter was not
-   # provided) for a trusted signature, listing invalid commits. %G? will output
-   # "G" if the signature is trusted.
-   local grep_exit_code="0"
-   git log --pretty="format:%H$t%aN$t%s$t%G?" "${chkafter:-HEAD}" \
-     | grep -v "${t}G$" \
-        || { grep_exit_code="$?" ; true; };
-
-   # grep will exit with a non-zero status if no matches are found, which we
-   # consider a success, so invert it
-   # [ $? -gt 0 ]
-   if [ $grep_exit_code -gt 0 ]; then
-      return 0
-   else
-      return 1
-   fi
+   git verify-commit "$1"
 }
 
 make_git_commit_verify_current() {
    make_function_run make_git_tag_shared
    local make_git_commit_verify_return_code="0"
-   make_function_run make_git_commit_verify "HEAD~1" || { make_git_commit_verify_return_code="$?" ; true; };
+   make_function_run make_git_commit_verify "HEAD" || { make_git_commit_verify_return_code="$?" ; true; };
    if [ ! "$make_git_commit_verify_return_code" = "0" ]; then
       echo "Failed! Current git head commit is unsigned" >&2
       exit 1
