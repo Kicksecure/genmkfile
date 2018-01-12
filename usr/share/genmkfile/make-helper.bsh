@@ -886,7 +886,7 @@ sudo make deb-all-dep
 make_lintian() {
    test -f "$make_main_changes_file"
    if [ "$DEBUILD_LINTIAN_OPTS" = "" ]; then
-      export DEBUILD_LINTIAN_OPTS="--pedantic --info --display-info --fail-on-warnings"
+      export DEBUILD_LINTIAN_OPTS="--pedantic --info --display-info"
    fi
    local make_lintian_exit_code="0"
    lintian $DEBUILD_LINTIAN_OPTS "$make_main_changes_file" || { make_lintian_exit_code="$?" ; true; };
