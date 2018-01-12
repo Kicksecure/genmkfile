@@ -889,15 +889,15 @@ make_lintian() {
       export DEBUILD_LINTIAN_OPTS="--pedantic --info --display-info"
    fi
    local make_lintian_exit_code="0"
-   lintian $DEBUILD_LINTIAN_OPTS "$make_main_changes_file" || { make_lintian_exit_code="$?" ; true; };
-   if [ "$make_lintian_exit_code" = "0" ]; then
-      true "INFO: lintian exited 0."
+   lintian_output="$(lintian $DEBUILD_LINTIAN_OPTS "$make_main_changes_file" 2>&1 || { make_lintian_exit_code="$?" ; true; };)"
+   if [ "$make_lintian_exit_code" = "0" ] && [ "" = "$lintian_output" ] ; then
+      true "INFO: lintian ok."
    else
       if [ "$make_use_lintian" = "true" ]; then
-         true "ERROR: lintian exited $make_lintian_exit_code. Failing closed."
+         true "ERROR: lintian warning. Failing closed."
          exit "$make_lintian_exit_code"
       else
-         true "WARNING: lintian exited $make_lintian_exit_code. Failing open."
+         true "WARNING: lintian warning. Failing open."
       fi
    fi
 }
