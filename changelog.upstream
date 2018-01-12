@@ -1,3 +1,21 @@
+commit 70e81835890c67d518d49510b0430af09cfcb6ad
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 12 20:24:30 2018 +0000
+
+    fix failing closed when lintian reports something
+
+commit 0e3ce235b209b3615e51f003dda6f06924fc4f7c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 12 20:13:37 2018 +0000
+
+    remove deprecated lintian --fail-on-warnings parameter
+
+commit 47193a93de138746edfaca31a8effc600fbfaec2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 26 14:29:56 2017 +0000
+
+    bumped changelog version
+
 commit 60943ed16faf01da2366a22cc35eddf0bdbcc08c
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Jul 26 14:23:50 2017 +0000
