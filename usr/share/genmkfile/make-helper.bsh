@@ -883,23 +883,33 @@ sudo make deb-all-dep
    done
 }
 
+make_lintian_on_warning() {
+   if [ "$make_use_lintian" = "true" ]; then
+      true "ERROR: lintian warning. Failing closed."
+      if [ "$make_lintian_exit_code" = "0" ]; then
+         exit 1
+      else
+         exit "$make_lintian_exit_code"
+      fi
+   else
+      true "WARNING: lintian warning. Failing open."
+   fi
+}
+
 make_lintian() {
    test -f "$make_main_changes_file"
    if [ "$DEBUILD_LINTIAN_OPTS" = "" ]; then
-      export DEBUILD_LINTIAN_OPTS="--pedantic --info --display-info"
+      export DEBUILD_LINTIAN_OPTS="--quiet --pedantic --info --display-info"
    fi
    local make_lintian_exit_code="0"
    lintian_output="$(lintian $DEBUILD_LINTIAN_OPTS "$make_main_changes_file" 2>&1 || { make_lintian_exit_code="$?" ; true; };)"
-   if [ "$make_lintian_exit_code" = "0" ] && [ "" = "$lintian_output" ] ; then
-      true "INFO: lintian ok."
-   else
-      if [ "$make_use_lintian" = "true" ]; then
-         true "ERROR: lintian warning. Failing closed."
-         exit "$make_lintian_exit_code"
-      else
-         true "WARNING: lintian warning. Failing open."
-      fi
+   if [ ! "" = "$lintian_output" ]; then
+      make_lintian_on_warning
    fi
+   if [ ! "$make_lintian_exit_code" = "0" ] ; then
+      make_lintian_on_warning
+   fi
+   true "INFO: lintian ok."
 }
 
 make_deb-pkg() {
