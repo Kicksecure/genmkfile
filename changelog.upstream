@@ -1,3 +1,15 @@
+commit 7489403330967dfe2a6ec4d3722c9660e96672c1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jan 20 18:23:31 2018 +0000
+
+    fix error out on lintian warning in lintian fail closed mode
+
+commit d209a46b90384635cf6882cdfab6300d8afc6fe6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 12 20:53:30 2018 +0000
+
+    bumped changelog version
+
 commit 70e81835890c67d518d49510b0430af09cfcb6ad
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 12 20:24:30 2018 +0000
