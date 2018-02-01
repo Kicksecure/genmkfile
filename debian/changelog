@@ -1,3 +1,9 @@
+genmkfile (3:4.9-1) unstable; urgency=medium
+
+  * New upstream version (local package).
+
+ -- Patrick Schleizer <adrelanos@riseup.net>  Thu, 01 Feb 2018 15:03:21 +0000
+
 genmkfile (3:4.8-1) unstable; urgency=medium
 
   * New upstream version (local package).
