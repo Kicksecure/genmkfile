@@ -858,12 +858,12 @@ sudo make deb-all-dep
    fi
 
    if [ "$make_use_lintian" = "false" ]; then
-      true "INFO: make_use_lintian is set to false, skipping lintian."
+      true "INFO: make_use_lintian=false - skipping lintian."
    elif [ "$make_use_lintian" = "true" ]; then
-      true "INFO: make_use_lintian is set to true, running lintian..."
+      true "INFO: make_use_lintian=true - running lintian..."
       make_function_run make_lintian
    else
-      true "INFO: make_use_lintian is neither set to true or false. Autodetecting if lintian is installed..."
+      true "INFO: make_use_lintian='' - Autodetecting if lintian is installed..."
       if command -v lintian >/dev/null 2>&1 ; then
          true "INFO: lintian auto detected, using it..."
          make_function_run make_lintian
