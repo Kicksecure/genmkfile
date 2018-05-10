@@ -758,7 +758,7 @@ make_deb-shared-dep() {
    local apt_get_exit_code="0"
    sudo \
       apt-get \
-         "${APTGETOPT[@]}" \
+         ${APTGETOPT[@]} \
          $apt_sourcelist_empty \
          $apt_sourceparts \
          $apt_unattended_opts \
