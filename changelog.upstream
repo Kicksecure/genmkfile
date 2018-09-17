@@ -1,3 +1,15 @@
+commit 5884bc718953cab198ac5a2c1303c3ce60f17e8c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Sep 17 09:57:06 2018 +0000
+
+    add support for $genmkfile_lintian_pre_opts $genmkfile_lintian_post_opts
+
+commit 064075524e251c2b0f9d3e241b287488dd18ddfd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Aug 27 16:37:50 2018 +0000
+
+    bumped changelog version
+
 commit 875a21df8f13e9b78dd53fa8182b85a60f493933
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Aug 21 05:17:58 2018 +0800
