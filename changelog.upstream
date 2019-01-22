@@ -1,3 +1,31 @@
+commit 1c0625cd3c74176fe45eed526e6008aaadb0c843
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jan 22 05:20:37 2019 +0000
+
+    sanity test: `gpg --verify` `debsign`ed changes ('.dsc') file
+
+commit 2023d66d30fea53eddd408400e85bdc61998ea18
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jan 21 04:04:26 2019 -0500
+
+    https by default
+    
+    add support for REPO_PROXY / apt-cacher-ng
+    
+    make cowbuilder apt --mirror configureable through variable make_cowbuilder_mirror
+    
+    make cowbuilder --distribution configureable through variable make_cowbuilder_distribution
+    
+    fallback make_cowbuilder_distribution lsb_release --short --codename
+    
+    set make_cowbuilder_distribution to $whonix_build_apt_stable_release if set
+
+commit 15ee56c45317eadbbcf25b3a50474304ea29c605
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Nov 8 09:55:05 2018 +0000
+
+    bumped changelog version
+
 commit 9a537602429297b5818737e63f08f94cd4778804
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Nov 8 09:52:38 2018 +0000
