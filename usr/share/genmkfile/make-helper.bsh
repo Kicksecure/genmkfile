@@ -901,6 +901,9 @@ sudo make deb-all-dep
 
    if [ "$make_use_debsign" = "true" ]; then
       debsign $make_debsign_opts "$make_main_changes_file"
+
+      ## sanity test
+      gpg --verify "$make_main_changes_file"
    fi
 
    for package in $make_package_debs_files_list; do
