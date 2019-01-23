@@ -824,6 +824,8 @@ make_deb-pkg_shared() {
          [ -n "$make_cowbuilder_distribution" ] || make_cowbuilder_distribution="$(lsb_release --short --codename)"
       fi
 
+      ## Whonix build script sets variable `make_cowbuilder_mirror`.
+
       if [ ! "$whonix_build_apt_sources_mirror" = "" ]; then
          [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="$whonix_build_apt_sources_mirror"
       else
@@ -837,16 +839,13 @@ make_deb-pkg_shared() {
          [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="https://deb.debian.org/debian"
       fi
 
-      if [ "$REPO_PROXY" = "http://127.0.0.1:3142" ]; then
-         http_proxy_maybe="$REPO_PROXY"
-      fi
-      if [ "$REPO_PROXY" = "http://127.0.0.1:3142/" ]; then
-         http_proxy_maybe="$REPO_PROXY"
-      fi
-
+      ## COWBUILDER_PREFIX could set variables such as http_proxy.
+      ## Whonix build script sets:
+      ## COWBUILDER_PREFIX+=" env http_proxy=${REPO_PROXY}"
+      ## which results in:
+      ## sudo env http_proxy=http://127.0.0.1:3142 cowbuilder [...]
       sudo \
          $COWBUILDER_PREFIX \
-         http_proxy="$http_proxy_maybe" \
             cowbuilder \
                --build "$make_main_dsc_file" \
                --distribution "$make_cowbuilder_distribution" \
