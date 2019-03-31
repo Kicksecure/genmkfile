@@ -453,6 +453,13 @@ sudo make deb-all-dep
       fi
    fi
 
+   ## No reason to overwrite architecture_changes_file manually, just in case.
+   if [ "$architecture" = "all" ]; then
+      [ -n "$architecture_changes_file" ] || architecture_changes_file="$dpkg_print_architecture"
+   else
+      [ -n "$architecture_changes_file" ] || architecture_changes_file="$architecture"
+   fi
+
    local grep_line a package
 
    grep_line="$(grep "Source:" "$make_debian_control_file_absolute_path")"
@@ -491,10 +498,10 @@ sudo make deb-all-dep
 
    if [ "$make_use_cowbuilder" = "true" ]; then
       make_main_dsc_file="$package_build_pkg_src_temp_folder/$make_main_dsc_file_name"
-      make_main_changes_file="$package_build_result_temp_folder/${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}_${architecture}.changes"
+      make_main_changes_file="$package_build_result_temp_folder/${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}_${architecture_changes_file}.changes"
    else
       make_main_dsc_file="../$make_main_dsc_file_name"
-      make_main_changes_file="../${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}_${architecture}.changes"
+      make_main_changes_file="../${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}_${architecture_changes_file}.changes"
    fi
 
    make_debian_tarball_file_name="${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}.debian.tar.xz"
@@ -839,8 +846,19 @@ make_deb-pkg_shared() {
       fi
 
       ## TODO: change that folder
-      cow_folder="/var/cache/pbuilder/cow.cow_${architecture}"
-      base_folder="/var/cache/pbuilder/base.cow_${architecture}"
+      if [ "$architecture" = "all" ]; then
+         cow_folder="/var/cache/pbuilder/cow.cow_${dpkg_print_architecture}"
+         base_folder="/var/cache/pbuilder/base.cow_${dpkg_print_architecture}"
+      else
+         cow_folder="/var/cache/pbuilder/cow.cow_${architecture}"
+         base_folder="/var/cache/pbuilder/base.cow_${architecture}"
+      fi
+
+      if [ "$architecture" = "all" ]; then
+         true
+      else
+         [ -n "$make_cowbuilder_arch_opt" ] || make_cowbuilder_arch_opt="--host-arch $architecture"
+      fi
 
       ## COWBUILDER_PREFIX could set variables such as http_proxy.
       ## Whonix build script sets:
@@ -851,7 +869,7 @@ make_deb-pkg_shared() {
          $COWBUILDER_PREFIX \
             cowbuilder \
                --build "$make_main_dsc_file" \
-               --host-arch "$architecture" \
+               $make_cowbuilder_arch_opt \
                --basepath "$base_folder" \
                --buildplace "$cow_folder" \
                --distribution "$make_cowbuilder_distribution" \
