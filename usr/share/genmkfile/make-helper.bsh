@@ -6,7 +6,7 @@
 set -x
 set -e
 
-make_helper_mydir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+true "make_cross_build_platform_list: $make_cross_build_platform_list"
 
 ## If make_cross_build_platform_list is unset, just build same platform as
 ## output of 'dpkg --print-architecture'.
@@ -18,5 +18,5 @@ fi
 for arch in $make_cross_build_platform_list ; do
    architecture="$arch"
    export architecture
-   "$make_helper_mydir/make-helper-one.bsh" "$@"
+   "$GENMKFILE_PATH/make-helper-one.bsh" "$@"
 done

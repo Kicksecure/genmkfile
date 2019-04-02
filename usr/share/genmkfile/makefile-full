@@ -31,6 +31,12 @@ debdist:
 undebdist:
 	$(GENMKFILE_PATH)/make-helper.bsh undebdist
 
+debdsc:
+	$(GENMKFILE_PATH)/make-helper.bsh debdsc
+
+undebdsc:
+	$(GENMKFILE_PATH)/make-helper.bsh undebdsc
+
 manpages:
 	$(GENMKFILE_PATH)/make-helper.bsh manpages
 
