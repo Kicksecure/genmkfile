@@ -1,0 +1,28 @@
+#!/bin/bash
+
+make_shared_function() {
+   make_debian_control_file_relative_path="debian/control"
+   make_debian_control_file_absolute_path="$(realpath "$make_debian_control_file_relative_path")"
+   test -f "$make_debian_control_file_absolute_path"
+
+   dpkg_print_architecture="$(dpkg --print-architecture)"
+
+   ## debian/control:
+   ## Script packages (example: sdwdate):
+   ## Architecture: all
+   ## Compiled packages (example: kloak):
+   ## Architecture: any
+
+   local architecture_keyword architecture_setting architecture_grep
+
+   architecture_grep="$(cat "$make_debian_control_file_absolute_path" | grep "Architecture:")"
+   read -r architecture_keyword architecture_setting _ <<< "$architecture_grep"
+
+   ## variable architecture will be set by make-helper.bsh.
+
+   if [ "$architecture_setting" = "" ]; then
+      true 'ERROR: architecture_grep is empty.'
+   elif [ "$architecture_setting" = "all" ]; then
+      architecture="all"
+   fi
+}
