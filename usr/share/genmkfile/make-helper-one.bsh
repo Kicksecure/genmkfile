@@ -698,6 +698,7 @@ make_debdist() {
 
    #find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
+   ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=657401
    ## Not using `dpkg-source` since that does not support any other output dir than '../'.
 
    find \
@@ -901,6 +902,10 @@ beforehand?
       ## COWBUILDER_PREFIX+=" env http_proxy=${REPO_PROXY}"
       ## which results in:
       ## sudo env http_proxy=http://127.0.0.1:3142 cowbuilder [...]
+      ##
+      ## creates $make_main_changes_file
+      ##
+      ## creates again (overwrites) $make_debian_tarball_file_name
       sudo \
          $COWBUILDER_PREFIX \
             cowbuilder \
@@ -940,6 +945,16 @@ sudo make deb-all-dep
          -sa \
          $make_debuild_maybe_unsigned_opts \
          "$@"
+
+
+   fi
+
+   if [ "$make_use_debsign" = "true" ]; then
+      ## clearsign's $make_main_changes_file
+      debsign $make_debsign_opts "$make_main_changes_file"
+
+      ## sanity test
+      gpg --verify "$make_main_changes_file"
    fi
 
    if [ "$make_use_lintian" = "false" ]; then
@@ -955,13 +970,6 @@ sudo make deb-all-dep
       else
          true "INFO: lintian not installed, skipping."
       fi
-   fi
-
-   if [ "$make_use_debsign" = "true" ]; then
-      debsign $make_debsign_opts "$make_main_changes_file"
-
-      ## sanity test
-      gpg --verify "$make_main_changes_file"
    fi
 
    for package in $make_package_debs_files_list; do
