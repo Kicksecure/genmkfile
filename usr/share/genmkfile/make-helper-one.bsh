@@ -976,7 +976,7 @@ make_lintian_on_warning() {
 make_lintian() {
    test -f "$make_main_changes_file"
    if [ "$DEBUILD_LINTIAN_OPTS" = "" ]; then
-      export DEBUILD_LINTIAN_OPTS="--quiet --pedantic --info --display-info"
+      export DEBUILD_LINTIAN_OPTS="--suppress-tags testsuite-autopkgtest-missing --quiet --pedantic --info --display-info"
    fi
    local make_lintian_exit_code="0"
    lintian_output="$(lintian $genmkfile_lintian_pre_opts $DEBUILD_LINTIAN_OPTS $genmkfile_lintian_post_opts "$make_main_changes_file" 2>&1 || { make_lintian_exit_code="$?" ; true; };)"
