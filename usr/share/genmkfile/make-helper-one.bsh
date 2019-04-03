@@ -712,7 +712,7 @@ make_undist() {
 make_debdsc() {
    make_function_run make_undebdsc
 
-   pushd "$package_build_result_temp_folder"
+   pushd "$DISTDIR"
 
    ## Creates make_main_dsc_file.
    dpkg-source \
@@ -724,9 +724,9 @@ make_debdsc() {
       "$make_upstream_tarball_real_path" \
       "$make_debian_tarball_absolute_path"
 
-   test -f "$make_main_dsc_file"
-
    popd
+
+   test -f "$make_main_dsc_file"
 }
 
 make_undebdsc() {
