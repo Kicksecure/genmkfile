@@ -713,8 +713,8 @@ make_manpages() {
       true "${bold}${cyan}INFO: Creating man page $PWD/debian/tmp-man/$filename_without_ronn_file_extension ${reset}"
 
       ronn \
-         --manual="Whonix Documentation" \
-         --organization="Whonix" \
+         --manual="$make_source_package_name Manual" \
+         --organization="$make_source_package_name" \
          < "$i" \
          > "$PWD/debian/tmp-man/$filename_without_ronn_file_extension"
 
