@@ -12,6 +12,7 @@
 make_init() {
    pushd "$GENMKFILE_ROOT_DIR"
    make_function_run make_get_distdir
+   make_function_run make_get_destdir
    make_function_run make_get_variables
 }
 
@@ -119,36 +120,15 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
-           deb-pkg)
+           deb-pkg-build)
                matched="true"
-               deb="true"
-               shift
-               ;;
-           deb-pkg-signed)
-               matched="true"
-               make_deb_signed="true"
-               shift
-               ;;
-           deb-pkg-source)
-               matched="true"
-               make_deb_source="true"
-               shift
-               ;;
-           deb-pkg-install)
-               matched="true"
-               make_function_run make_deb-pkg-install
+               make_function_run make_deb-pkg-build
                exit 0
                shift
                ;;
            deb-install)
                matched="true"
                make_function_run make_deb-install
-               exit 0
-               shift
-               ;;
-           deb-icup)
-               matched="true"
-               make_function_run make_deb-icup
                exit 0
                shift
                ;;
@@ -162,11 +142,6 @@ make_parse_cmd() {
                matched="true"
                make_function_run make_deb-purge
                exit 0
-               shift
-               ;;
-           deb-pkg)
-               matched="true"
-               deb="true"
                shift
                ;;
            deb-clean)
@@ -346,19 +321,6 @@ make_parse_cmd() {
 
    if [ ! "$matched" = "true" ]; then
       make_function_run "$@"
-   fi
-
-   if [ "$deb" = "true" ]; then
-      make_function_run make_deb-pkg "$@"
-      exit 0
-   fi
-   if [ "$make_deb_signed" = "true" ]; then
-      make_function_run make_deb-pkg-signed "$@"
-      exit 0
-   fi
-   if [ "$make_deb_source" = "true" ]; then
-      make_function_run make_deb-pkg-source "$@"
-      exit 0
    fi
 }
 
@@ -572,14 +534,12 @@ make deb-run-dep
    Various environment variables supported.
 make deb-all-dep
    Combination of deb-build-dep and deb-build-dep.
-make deb-pkg
+make deb-pkg-build
    Create a deb, which will be stored in parent folder.
-make deb-pkg-install
-   Create a deb, which will be stored in parent folder, and install it.
 make deb-install
    Install deb from parent folder.
 make deb-icup
-   Combination of make deb-pkg, make deb-pkg-install and make deb-pkg-cleanup.
+   Combination of make deb-cleanup, deb-pkg-build, make deb-pkg-install and make deb-pkg-cleanup.
    icup stands for install and cleanup.
 make deb-remove
    apt-get remove make_source_package_name
@@ -645,8 +605,6 @@ make_all() {
 }
 
 make_dist() {
-   make_function_run make_undist
-
    #find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
    ## No longer using --transform because that does not work with symlinks.
@@ -676,8 +634,6 @@ make_dist() {
 }
 
 make_debdist() {
-   make_function_run make_undebdist
-
    #find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
    ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=657401
@@ -710,8 +666,6 @@ make_undist() {
 }
 
 make_debdsc() {
-   make_function_run make_undebdsc
-
    pushd "$DISTDIR"
 
    ## Creates make_main_dsc_file.
@@ -812,7 +766,7 @@ make_deb-all-dep() {
    make_function_run make_deb-shared-dep
 }
 
-make_deb-pkg_shared() {
+make_deb-pkg-build_shared() {
    if [ "$make_use_cowbuilder" = "true" ]; then
       if ! test -f "$make_upstream_tarball_real_path" ; then
          true "ERROR: upstream tarball $make_upstream_tarball_real_path does not exist.
@@ -901,9 +855,6 @@ beforehand?
                --buildresult "$package_build_result_temp_folder"
 
    else
-      make_function_run make_deb-cleanup
-      make_function_run make_dist
-
       if ! command -v debuild >/dev/null ; then
          true "ERROR: debuild not found. Do you have the 'devscripts' package installed?
 To install all dependencies, try running:
@@ -989,26 +940,16 @@ make_lintian() {
    true "INFO: lintian ok."
 }
 
-make_deb-pkg() {
+make_deb-pkg-build() {
    make_debuild_maybe_unsigned_opts="-us -uc"
-   make_function_run make_deb-pkg_shared "$@"
-}
-
-make_deb-pkg-signed() {
-   make_use_debsign="true"
-   make_function_run make_deb-pkg_shared "$@"
-}
-
-make_deb-pkg-source() {
-   make_debuild_maybe_unsigned_opts="-S"
-   make_function_run make_deb-pkg_shared "$@"
+   make_function_run make_deb-pkg-build_shared "$@"
 }
 
 make_deb-install() {
    local package
    for package in $make_package_debs_files_list; do
       if [ ! -f "$package" ]; then
-         true "ERROR: File $package does not exist. Have you run \"make deb-pkg\" already?"
+         true "ERROR: File $package does not exist. Have you run \"make deb-pkg-build\" already?"
          exit 1
       fi
       sudo dpkg -i "$package"
@@ -1021,16 +962,6 @@ make_deb-remove() {
 
 make_deb-purge() {
    sudo apt-get purge "$make_source_package_name"
-}
-
-make_deb-pkg-install() {
-   make_function_run make_deb-pkg
-   make_function_run make_deb-install
-}
-
-make_deb-icup() {
-   make_function_run make_deb-pkg-install
-   make_function_run make_deb-cleanup
 }
 
 make_deb-clean() {
@@ -1070,6 +1001,8 @@ make_deb-clean() {
 
 make_deb-cleanup() {
    make_function_run make_undist
+   make_function_run make_undebdist
+   make_function_run make_undebdsc
    make_function_run make_clean
    make_function_run make_deb-clean
    local to_delete package
@@ -1105,7 +1038,6 @@ make_checkout() {
 }
 
 make_helper() {
-   make_function_run make_get_destdir
    [ -n "$make_folder_list_for_un_and_install" ] || make_folder_list_for_un_and_install="bin boot dev etc home lib opt sbin srv sys usr var"
    shopt -s globstar dotglob nullglob
    local d source_file file_without_pwd file_with_destdir

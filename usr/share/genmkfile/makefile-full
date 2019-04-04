@@ -58,15 +58,6 @@ deb-all-dep:
 deb-pkg:
 	$(GENMKFILE_PATH)/make-helper.bsh deb-pkg ${ARGS}
 
-deb-pkg-signed:
-	$(GENMKFILE_PATH)/make-helper.bsh deb-pkg-signed ${ARGS}
-
-deb-pkg-install:
-	$(GENMKFILE_PATH)/make-helper.bsh deb-pkg-install ${ARGS}
-
-deb-pkg-source:
-	$(GENMKFILE_PATH)/make-helper.bsh deb-pkg-source ${ARGS}
-
 deb-install:
 	$(GENMKFILE_PATH)/make-helper.bsh deb-install
 
