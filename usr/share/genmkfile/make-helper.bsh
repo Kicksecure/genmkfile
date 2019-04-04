@@ -24,6 +24,10 @@ if [ "$make_cross_build_platform_list" = "" ]; then
    make_cross_build_platform_list="$dpkg_print_architecture"
 fi
 
+if [ "$architecture" = "" ]; then
+   architecture="all"
+fi
+
 if [ "$1" = "deb-pkg" ]; then
    "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
    "$GENMKFILE_PATH/make-helper-one.bsh" dist
