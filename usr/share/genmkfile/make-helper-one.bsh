@@ -496,6 +496,17 @@ make_get_distdir() {
       else
          DISTDIR="$make_cowbuilder_dist_folder"
       fi
+
+      if ! test -d "$make_cowbuilder_dist_folder" ; then
+         true "ERROR: make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
+mkdir -p $make_cowbuilder_dist_folder"
+         exit 1
+      fi
+   fi
+
+   if ! test -d "$DISTDIR" ; then
+      true "ERROR: DISTDIR $DISTDIR does not exist!"
+      exit 1
    fi
 }
 
