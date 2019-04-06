@@ -1,3 +1,111 @@
+commit d4a99dd95d9f426d849efe6ca2549fc5d55a2fa2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Apr 5 15:56:30 2019 -0400
+
+    help when DISTDIR is non-existing
+
+commit 7b97eef819c0da4f65f2e436851b0680bd7750dd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Apr 5 15:50:27 2019 -0400
+
+    fix
+
+commit 937b7ea05f809a175789f10bcab3475a449c1967
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 10:55:30 2019 -0400
+
+    fix
+
+commit 0a0051ef4230196a08cc2854fa232251e3576c0d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 10:49:59 2019 -0400
+
+    fix
+
+commit 55dd9909c3dc389021c6f6d558cc6e84cc87d994
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 10:13:18 2019 -0400
+
+    man page
+
+commit f625da9fb5a49532f7b66858876be900fbc9b7fa
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 4 09:25:50 2019 -0400
+
+    simplification
+
+commit 0c47a0bfb1b2efb13c062e07067e656a02402faf
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 3 19:42:26 2019 -0400
+
+    fix
+
+commit 91c9df35e6b95d33ed4897fc9be2ffb295ebe95d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 3 19:18:29 2019 -0400
+
+    fix lintian warnings
+
+commit f05bf1fb7fcfb0138b042ca163e21806aca02b70
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 3 18:04:50 2019 -0400
+
+    readme
+
+commit c9aef704d749706622e3a9ff21d83b79018ff908
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 2 13:57:40 2019 +0000
+
+    work on cross build support
+
+commit 997c7de7b6bd3c2cccb946d875d2a7d7c766cff5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 2 10:43:06 2019 +0000
+
+    minor
+
+commit cd091351dd49b0b234237e9572747eba0c2f770f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Apr 2 09:23:07 2019 +0000
+
+    work on cross build support and reproducible builds
+
+commit b1508383dc4cb1738153c62e5eb777c5abb3f7a5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Apr 1 13:05:36 2019 +0000
+
+    refactoring
+
+commit 1593b8cb124f6cf7461b686b8d7ca0fbc3d513f8
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Apr 1 13:02:21 2019 +0000
+
+    add make_cross_build_platform_list support
+
+commit 5a5650162c1ac6ad2ff76bd6f29cbe444da0ef7e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Mar 31 14:11:51 2019 +0000
+
+    cross platform package build support
+
+commit 008dc316ab0e3efde72ce0e7dfa9ace2bc9dfa44
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Mar 31 13:49:11 2019 +0000
+
+    cross platform package build support
+
+commit 6f84b59e1cea066ccec68fdbaf245a40cbbe1b5f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Mar 31 13:02:54 2019 +0000
+
+    work on multi platform package build support
+
+commit 636a14038f60b5ebba49521ee999c1e048b212cd
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Mar 29 09:52:38 2019 +0000
+
+    bumped changelog version
+
 commit cc63fb08b8cb758ec8be72712909807a808937ef
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Mar 29 09:03:15 2019 +0000
