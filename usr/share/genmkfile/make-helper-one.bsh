@@ -1386,7 +1386,7 @@ else
 fi
 
 if [ "$make_script_was_sourced" = "false" ]; then
-   #set -x
+   set -x
 
    if [ -f /usr/lib/helper-scripts/pre.bsh ]; then
       source /usr/lib/helper-scripts/pre.bsh
