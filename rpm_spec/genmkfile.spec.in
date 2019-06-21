@@ -1,0 +1,53 @@
+Name:		genmkfile
+Version:	@VERSION@
+Release:	1%{?dist}
+Summary:	Generic Makefile
+
+License:	GPL-3+-with-additional-terms-1
+URL:		https://github.com/Whonix/genmkfile
+Source0:	genmkfile-%{version}.tar.xz
+
+BuildRequires: dpkg-dev
+Requires:	make
+BuildArch:  noarch
+
+%description
+Makes packaging scripts simpler. No more need to manually maintain
+'make install' targets or distribution specific install files such as
+debian/pkg-name.install.
+
+Files in etc/... in root source folder will be installed to /etc/..., files in
+usr/... will be installed to /usr/... and so forth. This should make renaming,
+moving files around, packaging, etc. very simple. Packaging of most packages
+can look very similar.
+
+Provides common make targets such as 'make install'. Very extensible through
+file ./make-helper-overrides.bsh or
+folder ./make-helper-overrides.d. By using overrides, any make target can be
+easily extended using pre or post hooks or replaced.
+
+Contains a minimal Makefile while the heavy lifting is done by a bash script
+make-helper.bsh.
+
+%prep
+%setup -q
+
+
+%build
+make %{?_smp_mflags}
+
+
+%install
+%make_install
+
+
+%files
+%license    debian/copyright
+/usr/share/genmkfile/Makefile
+/usr/share/genmkfile/make-helper-one.bsh
+/usr/share/genmkfile/make-helper.bsh
+/usr/share/genmkfile/makefile-full
+/usr/share/genmkfile/shared.bsh
+
+%changelog
+@CHANGELOG@
