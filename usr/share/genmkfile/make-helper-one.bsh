@@ -775,6 +775,18 @@ make_deb-all-dep() {
    make_function_run make_deb-shared-dep
 }
 
+
+make_dpkg_source_verification_sanity_test_help_message() {
+   true "ERROR: dpkg-source verification failed!
+
+Does your key exist in file '~/.gnupg/trustedkeys.gpg'?
+
+To add you could use for example:
+
+gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/Whonix/packages/whonix-repository/usr/share/whonix-repository/whonix.asc
+"
+}
+
 make_deb-pkg-build_shared() {
    if [ "$make_use_cowbuilder" = "true" ]; then
       if ! test -f "$make_upstream_tarball_real_path" ; then
@@ -897,6 +909,25 @@ sudo make deb-all-dep
 
       ## sanity test
       gpg --verify "$make_main_changes_file"
+
+      local temp_dir
+      temp_dir="$(mktemp --directory)"
+      ## Required, otherwise:
+      ## dpkg-source: error: unpack target exists: /tmp/tmp.n1V3KXmMtI
+      rm --recursive --force "$temp_dir"
+
+      ##
+
+      ## Sanity test.
+      dpkg-source \
+         --require-strong-checksums \
+         --require-valid-signature \
+         -x \
+         "$make_main_dsc_file" \
+         "$temp_dir/" || \
+            { make_dpkg_source_verification_sanity_test_help_message ; return 1; };
+
+      rm --recursive --force "$temp_dir"
    fi
 
    if [ "$make_use_lintian" = "false" ]; then
