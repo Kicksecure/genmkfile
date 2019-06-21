@@ -1,3 +1,23 @@
+commit d0f282107971b10cd4443a9a1a788e58b56b4d69
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 21 05:13:07 2019 +0000
+
+    minor
+
+commit 73aef2a0c8441e052581a9bc019ac2236e011889
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 21 05:12:03 2019 +0000
+
+    sanity test: dpkg-source  --require-strong-checksums --require-valid-signature
+    
+    https://github.com/Whonix/security-misc/pull/8
+
+commit 04a11c25df6620caebf90083c08a65c9ef6ee8d9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jun 8 11:10:37 2019 +0000
+
+    bumped changelog version
+
 commit b5d708bebda045e89126ba4acda63dd0c3cc337e
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sat Jun 8 00:05:32 2019 -0400
