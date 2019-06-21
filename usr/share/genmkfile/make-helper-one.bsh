@@ -916,8 +916,6 @@ sudo make deb-all-dep
       ## dpkg-source: error: unpack target exists: /tmp/tmp.n1V3KXmMtI
       rm --recursive --force "$temp_dir"
 
-      ##
-
       ## Sanity test.
       dpkg-source \
          --require-strong-checksums \
