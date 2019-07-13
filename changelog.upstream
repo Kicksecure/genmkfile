@@ -1,3 +1,16 @@
+commit aeaf5b3de8a83af9f2c0ed87de7ecfc8ead81f21
+Merge: cc00a99 b585596
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 13 18:49:28 2019 +0000
+
+    Merge branch 'master' of ssh://github.com/Whonix/genmkfile
+
+commit cc00a993057a99af448ef8ee038980ad2addf302
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 13 18:48:49 2019 +0000
+
+    bumped changelog version
+
 commit 7ddfcf2e731fa3899a8ed129b25bd029bd623e67
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sat Jul 13 18:48:34 2019 +0000
@@ -22,6 +35,15 @@ Date:   Sat Jul 13 17:52:23 2019 +0000
 
     comment
 
+commit b58559618ef1b4c18827e985cc60d2b903e72872
+Merge: 5bc4eed 2761a59
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jun 21 07:45:03 2019 -0400
+
+    Merge pull request #1 from marmarek/packaging
+    
+    qubes-builder integration
+
 commit 5bc4eed9e4751b1502f4a4370e7c51e818697fa7
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jun 21 05:39:30 2019 +0000
@@ -41,6 +63,22 @@ Date:   Fri Jun 21 05:12:03 2019 +0000
     sanity test: dpkg-source  --require-strong-checksums --require-valid-signature
     
     https://github.com/Whonix/security-misc/pull/8
+
+commit 2761a59b2e17c0ad1007b0736de8ff65743141ca
+Author: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+Date:   Fri Jun 21 04:50:16 2019 +0200
+
+    Add rpm packaging
+    
+    QubesOS/qubes-issues#1885
+
+commit aa8c30b8586c7922c12ab5aee5ef06a4cdf1e4f6
+Author: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+Date:   Fri Jun 21 04:49:34 2019 +0200
+
+    Add Makefile.builder for qubes-builder
+    
+    QubesOS/qubes-issues#1885
 
 commit 04a11c25df6620caebf90083c08a65c9ef6ee8d9
 Author: Patrick Schleizer <adrelanos@riseup.net>
