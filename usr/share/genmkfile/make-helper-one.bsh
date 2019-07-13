@@ -1421,6 +1421,7 @@ if [ "$make_script_was_sourced" = "false" ]; then
       ## pre.bsh would `source` the following folders:
       ## /etc/make-helper-one.bsh_pre.d/*.conf
       ## /usr/local/etc/make-helper-one.bsh_pre.d/*.conf
+      #source /usr/lib/helper-scripts/pre.bsh
    fi
 
    set -e
