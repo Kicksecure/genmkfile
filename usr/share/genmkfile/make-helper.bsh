@@ -6,8 +6,8 @@
 set -x
 set -e
 
-true "make_cross_build_platform_list: $make_cross_build_platform_list"
-true "1: $1"
+true "$0: 1: $1"
+true "$0: make_cross_build_platform_list: $make_cross_build_platform_list"
 
 ## sets: architecture
 ## sets: make_debian_control_file_relative_path
