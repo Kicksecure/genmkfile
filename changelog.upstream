@@ -1,3 +1,56 @@
+commit c787dcc3981d6765b0cd9bea8f57cdfd427d8662
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 21 21:09:15 2019 -0400
+
+    implement genmkfile-default-target-about
+    
+    which might run first
+
+commit e0028dd0bb26cafafc5e17c37067f4c458ead330
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 21 21:01:16 2019 -0400
+
+    minor
+
+commit d03f478fee9cc865248ce7857fb46d1aad14a18b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 21 20:58:49 2019 -0400
+
+    move make help target up (becomes default target)
+    
+    better than running make dist as default target since this could change
+    archive sizes which could lead to build failure
+    
+    add /usr/lib/helper-scripts/pre.bsh skeleton import
+    
+    lower debugging
+
+commit 7cc0c31b8c69117db379ca5fbb7709cd25da26b1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 21 20:33:34 2019 -0400
+
+    remove make targets which are unneeded and conflict with upstream 'Makefile's
+    
+    - make all
+    - make clean
+    - wildcard
+    
+    therefore these can be implemented by upstream
+    
+    https://github.com/Whonix/genmkfile/pull/1#issuecomment-513578854
+
+commit 570ef16fbc9b64d10b26f310769f4d96a1d8299e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 21 20:32:27 2019 -0400
+
+    debugging
+
+commit 99ec810dd58cd4140f513ffcfc468e62931437c5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Jul 13 18:50:23 2019 +0000
+
+    bumped changelog version
+
 commit aeaf5b3de8a83af9f2c0ed87de7ecfc8ead81f21
 Merge: cc00a99 b585596
 Author: Patrick Schleizer <adrelanos@riseup.net>
