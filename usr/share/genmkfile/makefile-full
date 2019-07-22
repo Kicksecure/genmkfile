@@ -16,8 +16,8 @@ DESTDIR ?= /
 export GENMKFILE_PATH
 export DESTDIR
 
-all:
-	$(GENMKFILE_PATH)/make-helper.bsh all $(ARGS)
+# all:
+# 	$(GENMKFILE_PATH)/make-helper.bsh all $(ARGS)
 
 dist:
 	$(GENMKFILE_PATH)/make-helper.bsh dist
@@ -82,8 +82,8 @@ lintian:
 dput-ubuntu-ppa:
 	$(GENMKFILE_PATH)/make-helper.bsh dput-ubuntu-ppa
 
-clean:
-	$(GENMKFILE_PATH)/make-helper.bsh clean
+# clean:
+# 	$(GENMKFILE_PATH)/make-helper.bsh clean
 
 distclean:
 	$(GENMKFILE_PATH)/make-helper.bsh distclean
@@ -154,5 +154,5 @@ reprepro-remove:
 help:
 	$(GENMKFILE_PATH)/make-helper.bsh help
 
-%:
-	$(GENMKFILE_PATH)/make-helper.bsh $@ $(ARGS)
+# %:
+# 	$(GENMKFILE_PATH)/make-helper.bsh $@ $(ARGS)
