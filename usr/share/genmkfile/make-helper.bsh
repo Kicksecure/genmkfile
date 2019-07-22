@@ -9,6 +9,14 @@ set -e
 true "$0: 1: $1"
 true "$0: make_cross_build_platform_list: $make_cross_build_platform_list"
 
+if [ -f /usr/lib/helper-scripts/pre.bsh ]; then
+   ## pre.bsh would `source` the following folders:
+   ## /etc/make-helper-one.bsh_pre.d/*.conf
+   ## /usr/local/etc/make-helper-one.bsh_pre.d/*.conf
+   #source /usr/lib/helper-scripts/pre.bsh
+   true
+fi
+
 ## sets: architecture
 ## sets: make_debian_control_file_relative_path
 ## sets: make_debian_control_file_absolute_path
@@ -51,6 +59,7 @@ fi
 ## If $architecture is set to 'all', in other words if it is an uncompiled
 ## package, there is no reason to iterate over $make_cross_build_platform_list.
 if [ "$architecture" = "all" ]; then
+   echo "${bold}$0: $GENMKFILE_PATH/make-helper-one.bsh $@${reset}"
    "$GENMKFILE_PATH/make-helper-one.bsh" "$@"
    exit $?
 fi
@@ -58,5 +67,6 @@ fi
 for arch in $make_cross_build_platform_list ; do
    architecture="$arch"
    export architecture
+   echo "${bold}$0: $GENMKFILE_PATH/make-helper-one.bsh $@${reset}"
    "$GENMKFILE_PATH/make-helper-one.bsh" "$@"
 done

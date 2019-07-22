@@ -19,6 +19,9 @@ export DESTDIR
 # all:
 # 	$(GENMKFILE_PATH)/make-helper.bsh all $(ARGS)
 
+help:
+	$(GENMKFILE_PATH)/make-helper.bsh help
+
 dist:
 	$(GENMKFILE_PATH)/make-helper.bsh dist
 
@@ -151,8 +154,7 @@ reprepro-add:
 reprepro-remove:
 	$(GENMKFILE_PATH)/make-helper.bsh reprepro-remove
 
-help:
-	$(GENMKFILE_PATH)/make-helper.bsh help
+
 
 # %:
 # 	$(GENMKFILE_PATH)/make-helper.bsh $@ $(ARGS)
