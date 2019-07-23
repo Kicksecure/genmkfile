@@ -52,7 +52,7 @@ Description: Generic Makefile
  export make_use_lintian=true
  .
  Can build packages without chroot using debuild (default) or inside chroot
- sing cowbuilder. To enable cowbuilder, use:
+ using cowbuilder. To enable cowbuilder, use:
  export make_use_cowbuilder=true
  .
  Supports signing packages using debsign.
