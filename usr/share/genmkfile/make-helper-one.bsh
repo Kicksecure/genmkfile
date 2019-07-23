@@ -10,14 +10,14 @@
 ## https://github.com/Whonix/genmkfile/blob/master/usr/share/genmkfile/make-helper.bsh
 
 make_init() {
-   pushd "$GENMKFILE_ROOT_DIR"
+   pushd "$GENMKFILE_ROOT_DIR" >/dev/null
    make_function_run make_get_distdir
    make_function_run make_get_destdir
    make_function_run make_get_variables
 }
 
 make_deinit() {
-   popd
+   popd >/dev/null
 }
 
 make_parse_cmd() {
@@ -172,7 +172,7 @@ make_parse_cmd() {
                ;;
            distclean)
                matched="true"
-               make_function_run make_clean
+               make_function_run make_distclean
                exit 0
                shift
                ;;
@@ -560,8 +560,6 @@ make deb-cleanup
    Same as make deb-clean and deletes debuild artifacts from parent folder.
 make dput-ubuntu-ppa
    Upload to Ubuntu ppa. Requires functional .dput.cf.
-make clean
-   Currently same as make deb-clean.
 make distclean
    Currently same as make clean.
 make checkout
@@ -621,7 +619,9 @@ make_dist() {
 
    find \
       "." \
-      -not -iwholename '*.git*' \
+      -not -path '*/\.git/*' \
+      -not -path '*/\.git' \
+      -not -name ".gitignore" \
       -print0 \
          | tar \
             --null \
@@ -673,7 +673,7 @@ make_undist() {
 }
 
 make_debdsc() {
-   pushd "$DISTDIR"
+   pushd "$DISTDIR" >/dev/null
 
    ## Creates make_main_dsc_file.
    dpkg-source \
@@ -685,7 +685,7 @@ make_debdsc() {
       "$make_upstream_tarball_real_path" \
       "$make_debian_tarball_absolute_path"
 
-   popd
+   popd >/dev/null
 
    test -f "$make_main_dsc_file"
 }
@@ -734,11 +734,22 @@ make_uch() {
    test -f "$PWD/changelog.upstream"
 }
 
+make_distclean() {
+   if [ -f "$PWD/Makefile_orig" ]; then
+      make -f "$PWD/Makefile_orig" clean
+   else
+      if make -n clean ; then
+         make clean
+      else
+         true "no target 'make clean', ok."
+      fi
+   fi
+}
+
 make_clean() {
    if [ -f "$PWD/Makefile_orig" ]; then
       make -f "$PWD/Makefile_orig" clean
    fi
-   make_function_run make_deb-clean
 }
 
 make_deb-shared-dep() {
@@ -926,37 +937,37 @@ sudo make deb-all-dep
       rm --recursive --force "$temp_dir"
    fi
 
-   if [ "$make_use_lintian" = "false" ]; then
-      true "INFO: make_use_lintian=false - skipping lintian."
-   elif [ "$make_use_lintian" = "true" ]; then
-      true "INFO: make_use_lintian=true - running lintian..."
-      make_function_run make_lintian
-   else
-      true "INFO: make_use_lintian='' - Autodetecting if lintian is installed..."
-      if command -v lintian >/dev/null 2>&1 ; then
-         true "INFO: lintian auto detected, using it..."
-         make_function_run make_lintian
-      else
-         true "INFO: lintian not installed, skipping."
-      fi
-   fi
-
    for package in $make_package_debs_files_list; do
       test -f "$package"
-      true "INFO: You can find your deb file here: $package"
+      echo "INFO: You can find your deb file here: $package"
    done
+
+   if [ "$make_use_lintian" = "false" ]; then
+      echo "INFO: make_use_lintian=false - skipping lintian."
+   elif [ "$make_use_lintian" = "true" ]; then
+      echo "INFO: make_use_lintian=true - running lintian..."
+      make_function_run make_lintian
+   else
+      echo "INFO: make_use_lintian='' - Autodetecting if lintian is installed..."
+      if command -v lintian &>/dev/null ; then
+         echo "INFO: lintian auto detected, using it..."
+         make_function_run make_lintian
+      else
+         echo "INFO: lintian not installed, skipping."
+      fi
+   fi
 }
 
 make_lintian_on_warning() {
    if [ "$make_use_lintian" = "true" ]; then
-      true "ERROR: lintian warning. Failing closed."
+      echo "ERROR: lintian warning. Failing closed."
       if [ "$make_lintian_exit_code" = "0" ]; then
          exit 1
       else
          exit "$make_lintian_exit_code"
       fi
    else
-      true "WARNING: lintian warning. Failing open."
+      echo "WARNING: lintian warning. Failing open."
    fi
 }
 
@@ -968,6 +979,13 @@ make_lintian() {
    local make_lintian_exit_code="0"
    lintian_output="$(lintian $genmkfile_lintian_pre_opts $DEBUILD_LINTIAN_OPTS $genmkfile_lintian_post_opts "$make_main_changes_file" 2>&1 || { make_lintian_exit_code="$?" ; true; };)"
    if [ ! "" = "$lintian_output" ]; then
+      if ! test -o xtrace ; then
+         echo "lintian exit code: $make_lintian_exit_code"
+         echo "lintian output:"
+         echo "################################################################################"
+         echo "$lintian_output"
+         echo "################################################################################"
+      fi
       make_lintian_on_warning
    fi
    if [ ! "$make_lintian_exit_code" = "0" ] ; then
@@ -1413,7 +1431,9 @@ else
 fi
 
 if [ "$make_script_was_sourced" = "false" ]; then
-   set -x
+   echo "$0 $@"
+
+   #set -x
 
    if [ -f /usr/lib/helper-scripts/pre.bsh ]; then
       ## pre.bsh would `source` the following folders:
