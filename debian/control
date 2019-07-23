@@ -25,7 +25,9 @@ Description: Generic Makefile
  moving files around, packaging, etc. very simple. Packaging of most packages
  can look very similar.
  .
- Provides common make targets such as 'make install'.
+ Provides common make targets such as 'make install', 'make dist',
+ 'make installsim', 'make installcheck', 'make uninstall',
+ 'make uninstallcheck', 'make distclean'.
  .
  Very extensible through
  file ./make-helper-overrides.bsh or
