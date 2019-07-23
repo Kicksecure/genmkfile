@@ -25,7 +25,9 @@ Description: Generic Makefile
  moving files around, packaging, etc. very simple. Packaging of most packages
  can look very similar.
  .
- Provides common make targets such as 'make install'. Very extensible through
+ Provides common make targets such as 'make install'.
+ .
+ Very extensible through
  file ./make-helper-overrides.bsh or
  folder ./make-helper-overrides.d.
  By using overrides, any make target can be easily extended using pre or post
