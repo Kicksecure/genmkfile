@@ -5,7 +5,7 @@ Source: genmkfile
 Section: misc
 Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@riseup.net>
-Build-Depends: debhelper (>= 12), devscripts, strip-nondeterminism, fakeroot, perl
+Build-Depends: debhelper (>= 12), devscripts, strip-nondeterminism, perl
 Homepage: https://github.com/Whonix/genmkfile
 Vcs-Browser: https://github.com/Whonix/genmkfile
 Vcs-Git: https://github.com/Whonix/genmkfile.git
@@ -13,7 +13,7 @@ Standards-Version: 4.3.0
 
 Package: genmkfile
 Architecture: all
-Depends: make, dpkg-dev, devscripts, fakeroot,
+Depends: make, dpkg-dev, devscripts,
  strip-nondeterminism, sudo, perl, ${misc:Depends}
 Description: Generic Makefile
  Makes packaging simpler. No more need to manually maintain
