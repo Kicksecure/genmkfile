@@ -1,3 +1,60 @@
+commit 34afb14866f8d04e2136ffc620c52963ecb3966a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 23 01:48:18 2019 +0000
+
+    description
+
+commit ff188546a1772fc7a780adf1c2dc24ad68934eec
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 23 01:46:58 2019 +0000
+
+    fakeroot is no longer a dependency
+
+commit 57a607138a5f63f680d35007a20dd14f9eca07f7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 23 01:44:44 2019 +0000
+
+    description
+
+commit 7925aabb578c6b0530c23b5c7b4fcc4f3525b855
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 23 01:42:35 2019 +0000
+
+    description
+
+commit 2fe79fe102c186f80fe97035dfc23dc6ee49d5d9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 23 01:41:47 2019 +0000
+
+    description
+
+commit f1ad8c1a2061f1933d58fcf7a2ac2edbc5834f8a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 23 01:35:38 2019 +0000
+
+    description
+
+commit 175abe01d9bde27d196d3049fad8a18f4d259849
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 23 01:18:13 2019 +0000
+
+    lower debugging
+    
+    support .github folder in source folder
+    (previously skipped through too far fetched find ignore
+    which lead to source package mismatch)
+    
+    'make distclean' (called by debhelper) now runs 'make clean',
+    if made available by upstream.
+    
+    output
+
+commit cd3166511aacea1baa3cc15fb5525d0ef14d34c0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 22 01:15:00 2019 +0000
+
+    bumped changelog version
+
 commit c787dcc3981d6765b0cd9bea8f57cdfd427d8662
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jul 21 21:09:15 2019 -0400
