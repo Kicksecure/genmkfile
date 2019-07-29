@@ -735,20 +735,20 @@ make_uch() {
 }
 
 make_distclean() {
-   if [ -f "$PWD/Makefile_orig" ]; then
-      make -f "$PWD/Makefile_orig" clean
-   else
-      if make -n clean ; then
-         make clean
-      else
-         true "no target 'make clean', ok."
-      fi
-   fi
+   echo "$0: ${green}INFO:${reset} (internal) make distclean"
+   make_clean
 }
 
 make_clean() {
    if [ -f "$PWD/Makefile_orig" ]; then
       make -f "$PWD/Makefile_orig" clean
+   else
+      if make --dry-run clean &>/dev/null ; then
+         echo "$0: ${green}INFO:${reset} (internal) make clean"
+         make clean
+      else
+         echo "$0: ${green}INFO:${reset} no target 'make clean', ok."
+      fi
    fi
 }
 
