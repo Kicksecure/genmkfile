@@ -908,8 +908,6 @@ sudo make deb-all-dep
          -sa \
          $make_debuild_maybe_unsigned_opts \
          "$@"
-
-
    fi
 
    if [ "$make_use_debsign" = "true" ]; then
