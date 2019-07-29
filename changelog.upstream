@@ -1,3 +1,21 @@
+commit 61b705b89b58425cf732d3ad850fc34e5dd50a06
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 12:55:51 2019 +0000
+
+    output
+
+commit febbc930a2e7eb6aba05c03188623fa3503c52c3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 12:31:31 2019 +0000
+
+    fix, actually run "make clean" on "make clean"
+
+commit e25b1bba4e231d5ed18b50634f07c823c5009f37
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 09:59:40 2019 +0000
+
+    bumped changelog version
+
 commit e9cfb969abb6ef4c59ae7b6464d71b1e6cf4abe5
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jul 29 09:49:02 2019 +0000
