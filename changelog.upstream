@@ -1,3 +1,57 @@
+commit e9cfb969abb6ef4c59ae7b6464d71b1e6cf4abe5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 09:49:02 2019 +0000
+
+    output
+
+commit 436e3a74c2ff60a4a67d41803ad0eb3a0e165bd4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 09:47:30 2019 +0000
+
+    output
+
+commit f46559ec97e460d59bcb3f304b6876b03bcc0d8b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 09:45:13 2019 +0000
+
+    output
+
+commit 901c708b541fae5809d1fbba456b386514165def
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 09:41:22 2019 +0000
+
+    output
+
+commit 09e47a95e49a56ee70fe97d0ff951cefba4ae56b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 09:40:05 2019 +0000
+
+    output
+
+commit 6a2e98d81ec1fd6a1be9a6bf01085034bfbe5b62
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 09:38:28 2019 +0000
+
+    minor
+
+commit c25feea9e6c7302af4eb38fef0931804c401f922
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 09:37:54 2019 +0000
+
+    `source /usr/lib/helper-scripts/pre.bsh` if available
+
+commit bda244851143ca8b7221c756baf59bc38d008b04
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 09:36:17 2019 +0000
+
+    `source /usr/lib/helper-scripts/pre.bsh` if available
+
+commit 6a94579cd32f1ae1320ee5a9a6794deb976f3103
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 28 19:29:39 2019 +0000
+
+    bumped changelog version
+
 commit 34afb14866f8d04e2136ffc620c52963ecb3966a
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Jul 23 01:48:18 2019 +0000
