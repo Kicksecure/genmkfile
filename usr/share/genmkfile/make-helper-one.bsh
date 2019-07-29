@@ -1429,8 +1429,6 @@ else
 fi
 
 if [ "$make_script_was_sourced" = "false" ]; then
-   echo "$0: ${green}INFO:${reset} $@"
-
    #set -x
 
    if [ -f /usr/lib/helper-scripts/pre.bsh ]; then
@@ -1441,6 +1439,8 @@ if [ "$make_script_was_sourced" = "false" ]; then
       source /usr/lib/helper-scripts/pre.bsh
       true
    fi
+
+   echo "$0: ${green}INFO:${reset} $@"
 
    set -e
    set -o pipefail
