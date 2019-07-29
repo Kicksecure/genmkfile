@@ -307,7 +307,7 @@ make_parse_cmd() {
                break
                ;;
            -*)
-               echo "unknown option: $1" >&2
+               echo "$0: ERROR: unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -937,35 +937,35 @@ sudo make deb-all-dep
 
    for package in $make_package_debs_files_list; do
       test -f "$package"
-      echo "INFO: You can find your deb file here: ${bold}$package${reset}"
+      echo "$0: INFO: You can find your deb file here: ${bold}$package${reset}"
    done
 
    if [ "$make_use_lintian" = "false" ]; then
-      echo "INFO: make_use_lintian=false - skipping lintian."
+      echo "$0: INFO: make_use_lintian=false - skipping lintian."
    elif [ "$make_use_lintian" = "true" ]; then
-      echo "INFO: make_use_lintian=true - running lintian..."
+      echo "$0: INFO: make_use_lintian=true - running lintian..."
       make_function_run make_lintian
    else
-      echo "INFO: make_use_lintian='' - Autodetecting if lintian is installed..."
+      echo "$0: INFO: make_use_lintian='' - Autodetecting if lintian is installed..."
       if command -v lintian &>/dev/null ; then
-         echo "INFO: lintian auto detected, using it..."
+         echo "$0: INFO: lintian auto detected, using it..."
          make_function_run make_lintian
       else
-         echo "INFO: lintian not installed, skipping."
+         echo "$0: INFO: lintian not installed, skipping."
       fi
    fi
 }
 
 make_lintian_on_warning() {
    if [ "$make_use_lintian" = "true" ]; then
-      echo "ERROR: lintian warning. Failing closed."
+      echo "$0: ERROR: lintian warning. Failing closed."
       if [ "$make_lintian_exit_code" = "0" ]; then
          exit 1
       else
          exit "$make_lintian_exit_code"
       fi
    else
-      echo "WARNING: lintian warning. Failing open."
+      echo "$0: WARNING: lintian warning. Failing open."
    fi
 }
 
@@ -978,8 +978,8 @@ make_lintian() {
    lintian_output="$(lintian $genmkfile_lintian_pre_opts $DEBUILD_LINTIAN_OPTS $genmkfile_lintian_post_opts "$make_main_changes_file" 2>&1 || { make_lintian_exit_code="$?" ; true; };)"
    if [ ! "" = "$lintian_output" ]; then
       if ! test -o xtrace ; then
-         echo "lintian exit code: $make_lintian_exit_code"
-         echo "lintian output:"
+         echo "$0: INFO: lintian exit code: $make_lintian_exit_code"
+         echo "$0: INFO: lintian output:"
          echo "################################################################################"
          echo "$lintian_output"
          echo "################################################################################"
@@ -989,7 +989,7 @@ make_lintian() {
    if [ ! "$make_lintian_exit_code" = "0" ] ; then
       make_lintian_on_warning
    fi
-   echo "INFO: lintian ok."
+   echo "$0: INFO: lintian ok."
 }
 
 make_deb-pkg-build() {
@@ -1270,12 +1270,12 @@ make_git_tag_check() {
    local make_git_describe_output
    make_git_describe_output="$(git describe --always --abbrev=1000000000)"
    if [ ! "$make_pkg_version_with_revision" = "$make_git_describe_output" ]; then
-      echo "Failed! Current git head a unsigned git tag! \
+      echo "$0: ERROR: Failed! Current git head a unsigned git tag! \
 make_pkg_version_with_revision $make_pkg_version_with_revision differs from make_git_describe_output $make_git_describe_output" >&2
       exit 1
    fi
    make_function_run make_git_tag_verify
-   echo "Ok, current git head is a signed git tag."
+   echo "$0: INFO: Ok, current git head is a signed git tag."
 }
 
 make_git_commit_verify() {
@@ -1296,7 +1296,7 @@ make_git_commit_verify_current() {
 make_git_verify() {
    make_function_run make_git_commit_verify_current
    make_function_run make_git_tag_check
-   echo "Ok, current git head is a signed git commit and a signed git tag."
+   echo "$0: INFO: Ok, current git head is a signed git commit and a signed git tag."
 }
 
 make_git_tag_push() {
@@ -1429,7 +1429,7 @@ else
 fi
 
 if [ "$make_script_was_sourced" = "false" ]; then
-   echo "$0 $@"
+   echo "$0: INFO: $@"
 
    #set -x
 
