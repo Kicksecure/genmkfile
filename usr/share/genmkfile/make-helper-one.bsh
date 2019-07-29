@@ -989,7 +989,7 @@ make_lintian() {
    if [ ! "$make_lintian_exit_code" = "0" ] ; then
       make_lintian_on_warning
    fi
-   true "INFO: lintian ok."
+   echo "INFO: lintian ok."
 }
 
 make_deb-pkg-build() {
