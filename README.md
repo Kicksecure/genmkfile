@@ -1,6 +1,6 @@
 # Generic Makefile #
 
-Makes packaging scripts simpler. No more need to manually maintain
+Makes packaging simpler. No more need to manually maintain
 'make install' targets or distribution specific install files such as
 debian/pkg-name.install.
 
@@ -9,13 +9,39 @@ usr/... will be installed to /usr/... and so forth. This should make renaming,
 moving files around, packaging, etc. very simple. Packaging of most packages
 can look very similar.
 
-Provides common make targets such as 'make install'. Very extensible through
+Provides common make targets such as 'make install', 'make dist',
+'make installsim', 'make installcheck', 'make uninstall',
+'make uninstallcheck', 'make distclean'.
+
+Very extensible through
 file ./make-helper-overrides.bsh or
-folder ./make-helper-overrides.d. By using overrides, any make target can be
-easily extended using pre or post hooks or replaced.
+folder ./make-helper-overrides.d.
+By using overrides, any make target can be easily extended using pre or post
+hooks or replaced.
+Override files which are executable will be used.
+Override files which are not executable will be skipped.
 
 Contains a minimal Makefile while the heavy lifting is done by a bash script
 make-helper.bsh.
+
+Building for multiple platforms possible, example:
+export make_cross_build_platform_list="i386 amd64"
+
+Can call with lintian (static analysis tool for Debian packages).
+By default it will be using lintian if installed while failing open
+(non-zero exit code).
+lintian can be disabled.
+export make_use_lintian=false
+Or can be configured to fail closed (non-zero exit code).
+export make_use_lintian=true
+
+Can build packages without chroot using debuild (default) or inside chroot
+using cowbuilder. To enable cowbuilder, use:
+export make_use_cowbuilder=true
+
+Supports signing packages using debsign.
+(sign a Debian .changes and .dsc file pair using GPG)
+export make_use_debsign=true
 ## How to install `genmkfile` using apt-get ##
 
 1\. Add [Whonix's Signing Key](https://www.whonix.org/wiki/Whonix_Signing_Key).
