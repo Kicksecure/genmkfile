@@ -307,7 +307,7 @@ make_parse_cmd() {
                break
                ;;
            -*)
-               echo "$0: ERROR: unknown option: $1" >&2
+               echo "$0: ${red}${bold}ERROR:${reset} unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -401,7 +401,7 @@ sudo make deb-all-dep
 
    make_pkg_version_with_revision="${make_pkg_version}-${make_pkg_revision}"
    if [ "$make_pkg_version" = "" ]; then
-      true "ERROR: variable make_pkg_version is empty."
+      true "${red}${bold}ERROR:${reset} variable make_pkg_version is empty."
       exit 1
    fi
 
@@ -491,21 +491,21 @@ make_get_distdir() {
 
    if [ "$make_use_cowbuilder" = "true" ]; then
       if [ "$make_cowbuilder_dist_folder" = "" ]; then
-         true "ERROR: make_use_cowbuilder = $make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set!"
+         true "${red}${bold}ERROR:${reset} make_use_cowbuilder = $make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set!"
          exit 1
       else
          DISTDIR="$make_cowbuilder_dist_folder"
       fi
 
       if ! test -d "$make_cowbuilder_dist_folder" ; then
-         true "ERROR: make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
+         true "${red}${bold}ERROR:${reset} make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
 mkdir -p $make_cowbuilder_dist_folder"
          exit 1
       fi
    fi
 
    if ! test -d "$DISTDIR" ; then
-      true "ERROR: DISTDIR $DISTDIR does not exist!"
+      true "${red}${bold}ERROR:${reset} DISTDIR $DISTDIR does not exist!"
       exit 1
    fi
 }
@@ -701,7 +701,7 @@ make_undebdist() {
 make_test() {
    ## Automatically run by debhelper. To prevent debhelper from failing,
    ## implemented a dummy function here.
-   true "INFO: $FUNCNAME not implemented"
+   true "${green}INFO:${reset} $FUNCNAME not implemented"
 }
 
 make_manpages() {
@@ -717,7 +717,7 @@ make_manpages() {
 
       mkdir --parents "$PWD/debian/tmp-man/$source_folder"
 
-      true "${bold}${cyan}INFO: Creating man page $PWD/debian/tmp-man/$filename_without_ronn_file_extension ${reset}"
+      true "${bold}${cyan}${green}INFO:${reset} Creating man page $PWD/debian/tmp-man/$filename_without_ronn_file_extension ${reset}"
 
       ronn \
          --manual="$make_source_package_name Manual" \
@@ -786,7 +786,7 @@ make_deb-all-dep() {
 
 
 make_dpkg_source_verification_sanity_test_help_message() {
-   true "ERROR: dpkg-source verification failed!
+   true "${red}${bold}ERROR:${reset} dpkg-source verification failed!
 
 Does your key exist in file '~/.gnupg/trustedkeys.gpg'?
 
@@ -799,7 +799,7 @@ gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/Whonix/packages/wh
 make_deb-pkg-build_shared() {
    if [ "$make_use_cowbuilder" = "true" ]; then
       if ! test -f "$make_upstream_tarball_real_path" ; then
-         true "ERROR: upstream tarball $make_upstream_tarball_real_path does not exist.
+         true "${red}${bold}ERROR:${reset} upstream tarball $make_upstream_tarball_real_path does not exist.
 Did you run
 make dist && make debdist && make debdsc
 beforehand?
@@ -808,7 +808,7 @@ beforehand?
       fi
 
       if ! test -f "$make_debian_tarball_absolute_path" ; then
-         true "ERROR: debian tarball $make_debian_tarball_absolute_path does not exist.
+         true "${red}${bold}ERROR:${reset} debian tarball $make_debian_tarball_absolute_path does not exist.
 Did you run
 make dist && make debdist && make debdsc
 beforehand?
@@ -817,7 +817,7 @@ beforehand?
       fi
 
       if ! test -f "$make_main_dsc_file" ; then
-         true "ERROR: dsc file $make_main_dsc_file does not exist.
+         true "${red}${bold}ERROR:${reset} dsc file $make_main_dsc_file does not exist.
 Did you run
 make dist && make debdist && make debdsc
 beforehand?
@@ -886,7 +886,7 @@ beforehand?
 
    else
       if ! command -v debuild >/dev/null ; then
-         true "ERROR: debuild not found. Do you have the 'devscripts' package installed?
+         true "${red}${bold}ERROR:${reset} debuild not found. Do you have the 'devscripts' package installed?
 To install all dependencies, try running:
 sudo make deb-all-dep
 "
@@ -894,7 +894,7 @@ sudo make deb-all-dep
       fi
 
       if ! dpkg-checkbuilddeps ; then
-         true "ERROR: dpkg-checkbuilddeps reported missing build dependencies.
+         true "${red}${bold}ERROR:${reset} dpkg-checkbuilddeps reported missing build dependencies.
 To install all dependencies, try running:
 sudo make deb-all-dep
 "
@@ -937,35 +937,35 @@ sudo make deb-all-dep
 
    for package in $make_package_debs_files_list; do
       test -f "$package"
-      echo "$0: INFO: You can find your deb file here: ${bold}$package${reset}"
+      echo "$0: ${green}INFO:${reset} You can find your deb file here: ${bold}$package${reset}"
    done
 
    if [ "$make_use_lintian" = "false" ]; then
-      echo "$0: INFO: make_use_lintian=false - skipping lintian."
+      echo "$0: ${green}INFO:${reset} make_use_lintian=false - skipping lintian."
    elif [ "$make_use_lintian" = "true" ]; then
-      echo "$0: INFO: make_use_lintian=true - running lintian..."
+      echo "$0: ${green}INFO:${reset} make_use_lintian=true - running lintian..."
       make_function_run make_lintian
    else
-      echo "$0: INFO: make_use_lintian='' - Autodetecting if lintian is installed..."
+      echo "$0: ${green}INFO:${reset} make_use_lintian='' - Autodetecting if lintian is installed..."
       if command -v lintian &>/dev/null ; then
-         echo "$0: INFO: lintian auto detected, using it..."
+         echo "$0: ${green}INFO:${reset} lintian auto detected, using it..."
          make_function_run make_lintian
       else
-         echo "$0: INFO: lintian not installed, skipping."
+         echo "$0: ${green}INFO:${reset} lintian not installed, skipping."
       fi
    fi
 }
 
 make_lintian_on_warning() {
    if [ "$make_use_lintian" = "true" ]; then
-      echo "$0: ERROR: lintian warning. Failing closed."
+      echo "$0: ${red}${bold}ERROR:${reset} lintian warning. Failing closed."
       if [ "$make_lintian_exit_code" = "0" ]; then
          exit 1
       else
          exit "$make_lintian_exit_code"
       fi
    else
-      echo "$0: WARNING: lintian warning. Failing open."
+      echo "$0: ${red}WARNING:${reset} lintian warning. Failing open."
    fi
 }
 
@@ -978,8 +978,8 @@ make_lintian() {
    lintian_output="$(lintian $genmkfile_lintian_pre_opts $DEBUILD_LINTIAN_OPTS $genmkfile_lintian_post_opts "$make_main_changes_file" 2>&1 || { make_lintian_exit_code="$?" ; true; };)"
    if [ ! "" = "$lintian_output" ]; then
       if ! test -o xtrace ; then
-         echo "$0: INFO: lintian exit code: $make_lintian_exit_code"
-         echo "$0: INFO: lintian output:"
+         echo "$0: ${green}INFO:${reset} lintian exit code: $make_lintian_exit_code"
+         echo "$0: ${green}INFO:${reset} lintian output:"
          echo "################################################################################"
          echo "$lintian_output"
          echo "################################################################################"
@@ -989,7 +989,7 @@ make_lintian() {
    if [ ! "$make_lintian_exit_code" = "0" ] ; then
       make_lintian_on_warning
    fi
-   echo "$0: INFO: lintian ok."
+   echo "$0: ${green}INFO:${reset} lintian ok."
 }
 
 make_deb-pkg-build() {
@@ -1001,7 +1001,7 @@ make_deb-install() {
    local package
    for package in $make_package_debs_files_list; do
       if [ ! -f "$package" ]; then
-         true "ERROR: File $package does not exist. Have you run \"make deb-pkg-build\" already?"
+         true "${red}${bold}ERROR:${reset} File $package does not exist. Have you run \"make deb-pkg-build\" already?"
          exit 1
       fi
       sudo dpkg -i "$package"
@@ -1104,11 +1104,11 @@ make_helper() {
                break
             elif [ "$make_installsim_" = "true" ]; then
                if [ ! -d "$DESTDIR" ]; then
-                  true "INFO: would do: mkdir --parents \"$DESTDIR\""
+                  true "${green}INFO:${reset} would do: mkdir --parents \"$DESTDIR\""
                else
-                  true "INFO: No need to run, because folder already exists: mkdir --parents \"$DESTDIR\""
+                  true "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents \"$DESTDIR\""
                fi
-               true "INFO: would do: cp -R \"$d\" \"$DESTDIR\""
+               true "${green}INFO:${reset} would do: cp -R \"$d\" \"$DESTDIR\""
                break
             fi
             if [ ! -f "$source_file" ]; then
@@ -1118,21 +1118,21 @@ make_helper() {
             file_with_destdir="${DESTDIR}${file_without_pwd}"
             if [ "$make_uninstallcheck_" = "true" ]; then
                if [ -f "$file_with_destdir" ]; then
-                  true "ERROR: file $file_with_destdir still installed."
+                  true "${red}${bold}ERROR:${reset} file $file_with_destdir still installed."
                   local still_installed="true"
                fi
             elif [ "$make_installcheck_" = "true" ]; then
                diff "$source_file" "$file_with_destdir"
             elif [ "$make_uninstallsim_" = "true" ]; then
                if [ -f "$file_with_destdir" ]; then
-                  true "INFO: would do: rm \"$file_with_destdir\""
+                  true "${green}INFO:${reset} would do: rm \"$file_with_destdir\""
                fi
             elif [ "$make_uninstall_" = "true" ]; then
                if [ -f "$file_with_destdir" ]; then
                   rm "$file_with_destdir"
                fi
             else
-               true "ERROR: error 2 in $FUNCNAME!"
+               true "${red}${bold}ERROR:${reset} error 2 in $FUNCNAME!"
                exit 1
             fi
          done
@@ -1191,11 +1191,11 @@ make_deb-chl-bumpup() {
       ## Otherwise e-mail address in debian/changelog would default to
       ## user@host.localdomain and then lintian would complain and exit with
       ## failure code.
-      true "ERROR: environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+      true "${red}${bold}ERROR:${reset} environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
       exit 1
    fi
    if [ "$DEBFULLNAME" = "" ]; then
-      true "ERROR: environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+      true "${red}${bold}ERROR:${reset} environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
       exit 1
    fi
 
@@ -1270,12 +1270,12 @@ make_git_tag_check() {
    local make_git_describe_output
    make_git_describe_output="$(git describe --always --abbrev=1000000000)"
    if [ ! "$make_pkg_version_with_revision" = "$make_git_describe_output" ]; then
-      echo "$0: ERROR: Failed! Current git head a unsigned git tag! \
+      echo "$0: ${red}${bold}ERROR:${reset} Failed! Current git head a unsigned git tag! \
 make_pkg_version_with_revision $make_pkg_version_with_revision differs from make_git_describe_output $make_git_describe_output" >&2
       exit 1
    fi
    make_function_run make_git_tag_verify
-   echo "$0: INFO: Ok, current git head is a signed git tag."
+   echo "$0: ${green}INFO:${reset} Ok, current git head is a signed git tag."
 }
 
 make_git_commit_verify() {
@@ -1296,7 +1296,7 @@ make_git_commit_verify_current() {
 make_git_verify() {
    make_function_run make_git_commit_verify_current
    make_function_run make_git_tag_check
-   echo "$0: INFO: Ok, current git head is a signed git commit and a signed git tag."
+   echo "$0: ${green}INFO:${reset} Ok, current git head is a signed git commit and a signed git tag."
 }
 
 make_git_tag_push() {
@@ -1413,7 +1413,7 @@ make_function_run() {
       "$function_name" "$@"
       function_name_return_code="$?"
       if [ ! "$function_name_return_code" = "0" ]; then
-         true "INFO: function_name_return_code: $function_name_return_code"
+         true "${green}INFO:${reset} function_name_return_code: $function_name_return_code"
          return "$function_name_return_code"
       fi
    fi
@@ -1429,7 +1429,7 @@ else
 fi
 
 if [ "$make_script_was_sourced" = "false" ]; then
-   echo "$0: INFO: $@"
+   echo "$0: ${green}INFO:${reset} $@"
 
    #set -x
 
