@@ -937,7 +937,7 @@ sudo make deb-all-dep
 
    for package in $make_package_debs_files_list; do
       test -f "$package"
-      echo "INFO: You can find your deb file here: $package"
+      echo "INFO: You can find your deb file here: ${bold}$package${reset}"
    done
 
    if [ "$make_use_lintian" = "false" ]; then
