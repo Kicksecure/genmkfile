@@ -10,6 +10,11 @@
 ## https://github.com/Whonix/genmkfile/blob/master/usr/share/genmkfile/make-helper.bsh
 
 make_init() {
+   ## For manual invocation.
+   ## Should be set by makefile already.
+   [ -n "$GENMKFILE_PATH" ] || GENMKFILE_PATH="/usr/share/genmkfile"
+   export GENMKFILE_PATH
+
    pushd "$GENMKFILE_ROOT_DIR" >/dev/null
    make_function_run make_get_distdir
    make_function_run make_get_destdir
