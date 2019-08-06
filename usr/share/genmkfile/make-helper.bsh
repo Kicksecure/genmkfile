@@ -18,6 +18,11 @@ if [ -f /usr/lib/helper-scripts/pre.bsh ]; then
    true
 fi
 
+## For manual invocation.
+## Should be set by makefile already.
+[ -n "$GENMKFILE_PATH" ] || GENMKFILE_PATH="/usr/share/genmkfile"
+export GENMKFILE_PATH
+
 ## sets: architecture
 ## sets: make_debian_control_file_relative_path
 ## sets: make_debian_control_file_absolute_path
