@@ -1,3 +1,36 @@
+commit 9bc66f090948677cc0a71db8dd28067ed5ff0af3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 6 15:23:44 2019 +0000
+
+    also source ./debian/make-helper-overrides.d folder
+
+commit 9f3b2f6e218321764f4f28c6cb6fbe4733a9db01
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 6 15:22:20 2019 +0000
+
+    also source ./debian/make-helper-overrides.bsh
+
+commit 482a46159c0c08f601f4567346f41e29db90ffa9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 6 15:20:56 2019 +0000
+
+    consistency
+
+commit a0dfa2b6c084e33455717bfece2edc6209e7bc0e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 6 14:47:44 2019 +0000
+
+    support being used without Makefile
+    
+    example:
+    /usr/share/genmkfile/make-helper.bsh deb-pkg
+
+commit 29f989c2c08866975598cb5346d418b4446ad6e5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 1 11:38:04 2019 +0000
+
+    bumped changelog version
+
 commit c4e99fe068dcaf413b73bf07fa75f3ad07701631
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Aug 1 11:13:37 2019 +0000
