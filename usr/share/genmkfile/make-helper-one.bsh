@@ -1383,6 +1383,10 @@ make_source_overrides_file() {
       bash -n "./make-helper-overrides.bsh"
       source "./make-helper-overrides.bsh"
    fi
+   if [ -x "./debian/make-helper-overrides.bsh" ]; then
+      bash -n "./debian/make-helper-overrides.bsh"
+      source "./debian/make-helper-overrides.bsh"
+   fi
 }
 
 make_source_overrides_folder() {
