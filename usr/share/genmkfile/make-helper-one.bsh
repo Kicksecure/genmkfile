@@ -706,7 +706,7 @@ make_undebdist() {
 make_test() {
    ## Automatically run by debhelper. To prevent debhelper from failing,
    ## implemented a dummy function here.
-   true "${green}INFO:${reset} $FUNCNAME not implemented"
+   echo "${green}INFO:${reset} $FUNCNAME not implemented"
 }
 
 make_manpages() {
@@ -791,7 +791,7 @@ make_deb-all-dep() {
 
 
 make_dpkg_source_verification_sanity_test_help_message() {
-   true "${red}${bold}ERROR:${reset} dpkg-source verification failed!
+   echo "${red}${bold}ERROR:${reset} dpkg-source verification failed!
 
 Does your key exist in file '~/.gnupg/trustedkeys.gpg'?
 
@@ -804,7 +804,7 @@ gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/Whonix/packages/wh
 make_deb-pkg-build_shared() {
    if [ "$make_use_cowbuilder" = "true" ]; then
       if ! test -f "$make_upstream_tarball_real_path" ; then
-         true "${red}${bold}ERROR:${reset} upstream tarball $make_upstream_tarball_real_path does not exist.
+         echo "${red}${bold}ERROR:${reset} upstream tarball $make_upstream_tarball_real_path does not exist.
 Did you run
 make dist && make debdist && make debdsc
 beforehand?
@@ -813,7 +813,7 @@ beforehand?
       fi
 
       if ! test -f "$make_debian_tarball_absolute_path" ; then
-         true "${red}${bold}ERROR:${reset} debian tarball $make_debian_tarball_absolute_path does not exist.
+         echo "${red}${bold}ERROR:${reset} debian tarball $make_debian_tarball_absolute_path does not exist.
 Did you run
 make dist && make debdist && make debdsc
 beforehand?
@@ -822,7 +822,7 @@ beforehand?
       fi
 
       if ! test -f "$make_main_dsc_file" ; then
-         true "${red}${bold}ERROR:${reset} dsc file $make_main_dsc_file does not exist.
+         echo "${red}${bold}ERROR:${reset} dsc file $make_main_dsc_file does not exist.
 Did you run
 make dist && make debdist && make debdsc
 beforehand?
@@ -891,7 +891,7 @@ beforehand?
 
    else
       if ! command -v debuild >/dev/null ; then
-         true "${red}${bold}ERROR:${reset} debuild not found. Do you have the 'devscripts' package installed?
+         echo "${red}${bold}ERROR:${reset} debuild not found. Do you have the 'devscripts' package installed?
 To install all dependencies, try running:
 sudo make deb-all-dep
 "
@@ -899,7 +899,7 @@ sudo make deb-all-dep
       fi
 
       if ! dpkg-checkbuilddeps ; then
-         true "${red}${bold}ERROR:${reset} dpkg-checkbuilddeps reported missing build dependencies.
+         echo "${red}${bold}ERROR:${reset} dpkg-checkbuilddeps reported missing build dependencies.
 To install all dependencies, try running:
 sudo make deb-all-dep
 "
@@ -1007,7 +1007,7 @@ make_deb-install() {
    local package
    for package in $make_package_debs_files_list; do
       if [ ! -f "$package" ]; then
-         true "${red}${bold}ERROR:${reset} File $package does not exist. Have you run \"make deb-pkg-build\" already?"
+         echo "${red}${bold}ERROR:${reset} File $package does not exist. Have you run \"make deb-pkg-build\" already?"
          exit 1
       fi
       sudo dpkg -i "$package"
@@ -1110,11 +1110,11 @@ make_helper() {
                break
             elif [ "$make_installsim_" = "true" ]; then
                if [ ! -d "$DESTDIR" ]; then
-                  true "${green}INFO:${reset} would do: mkdir --parents \"$DESTDIR\""
+                  echo "${green}INFO:${reset} would do: mkdir --parents \"$DESTDIR\""
                else
-                  true "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents \"$DESTDIR\""
+                  echo "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents \"$DESTDIR\""
                fi
-               true "${green}INFO:${reset} would do: cp -R \"$d\" \"$DESTDIR\""
+               echo "${green}INFO:${reset} would do: cp -R \"$d\" \"$DESTDIR\""
                break
             fi
             if [ ! -f "$source_file" ]; then
@@ -1124,21 +1124,21 @@ make_helper() {
             file_with_destdir="${DESTDIR}${file_without_pwd}"
             if [ "$make_uninstallcheck_" = "true" ]; then
                if [ -f "$file_with_destdir" ]; then
-                  true "${red}${bold}ERROR:${reset} file $file_with_destdir still installed."
+                  echo "${red}${bold}ERROR:${reset} file $file_with_destdir still installed."
                   local still_installed="true"
                fi
             elif [ "$make_installcheck_" = "true" ]; then
                diff "$source_file" "$file_with_destdir"
             elif [ "$make_uninstallsim_" = "true" ]; then
                if [ -f "$file_with_destdir" ]; then
-                  true "${green}INFO:${reset} would do: rm \"$file_with_destdir\""
+                  echo "${green}INFO:${reset} would do: rm \"$file_with_destdir\""
                fi
             elif [ "$make_uninstall_" = "true" ]; then
                if [ -f "$file_with_destdir" ]; then
                   rm "$file_with_destdir"
                fi
             else
-               true "${red}${bold}ERROR:${reset} error 2 in $FUNCNAME!"
+               echo "${red}${bold}ERROR:${reset} error 2 in $FUNCNAME!"
                exit 1
             fi
          done
@@ -1197,11 +1197,11 @@ make_deb-chl-bumpup() {
       ## Otherwise e-mail address in debian/changelog would default to
       ## user@host.localdomain and then lintian would complain and exit with
       ## failure code.
-      true "${red}${bold}ERROR:${reset} environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+      echo "${red}${bold}ERROR:${reset} environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
       exit 1
    fi
    if [ "$DEBFULLNAME" = "" ]; then
-      true "${red}${bold}ERROR:${reset} environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+      echo "${red}${bold}ERROR:${reset} environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
       exit 1
    fi
 
@@ -1213,8 +1213,8 @@ make_deb-chl-bumpup() {
       new_revision="1"
       new_changelog_version="$make_epoch:$new_upstream_version-$new_revision"
    elif [ "$make_bump_type" = "manual" ]; then
-      true "Current version number: $make_pkg_version"
-      true "Please enter new version number!"
+      echo "Current version number: $make_pkg_version"
+      echo "Please enter new version number!"
       read new_changelog_version
    else
       true "make_bump_type $make_bump_type is neither major nor manual!"
