@@ -406,7 +406,7 @@ sudo make deb-all-dep
 
    make_pkg_version_with_revision="${make_pkg_version}-${make_pkg_revision}"
    if [ "$make_pkg_version" = "" ]; then
-      true "${red}${bold}ERROR:${reset} variable make_pkg_version is empty."
+      echo "${red}${bold}ERROR:${reset} variable make_pkg_version is empty."
       exit 1
    fi
 
@@ -496,21 +496,21 @@ make_get_distdir() {
 
    if [ "$make_use_cowbuilder" = "true" ]; then
       if [ "$make_cowbuilder_dist_folder" = "" ]; then
-         true "${red}${bold}ERROR:${reset} make_use_cowbuilder = $make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set!"
+         echo "${red}${bold}ERROR:${reset} make_use_cowbuilder = $make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set!"
          exit 1
       else
          DISTDIR="$make_cowbuilder_dist_folder"
       fi
 
       if ! test -d "$make_cowbuilder_dist_folder" ; then
-         true "${red}${bold}ERROR:${reset} make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
+         echo "${red}${bold}ERROR:${reset} make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
 mkdir -p $make_cowbuilder_dist_folder"
          exit 1
       fi
    fi
 
    if ! test -d "$DISTDIR" ; then
-      true "${red}${bold}ERROR:${reset} DISTDIR $DISTDIR does not exist!"
+      echo "${red}${bold}ERROR:${reset} DISTDIR $DISTDIR does not exist!"
       exit 1
    fi
 }
