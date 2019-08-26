@@ -1048,6 +1048,12 @@ make_deb-clean() {
    if [ -d "debian/.debhelper" ]; then
       rm --recursive "debian/.debhelper"
    fi
+   if [ -f "debian/autoreconf.after" ]; then
+      rm "debian/autoreconf.after"
+   fi
+   if [ -f "debian/autoreconf.before" ]; then
+      rm "debian/autoreconf.before"
+   fi
    local to_delete package
    for package in $make_package_list; do
       if [ -d "debian/$package" ]; then
