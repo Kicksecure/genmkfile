@@ -1006,8 +1006,9 @@ make_lintian() {
    fi
    if [ ! "$make_lintian_exit_code" = "0" ] ; then
       make_lintian_on_warning
+   else
+      echo "$0: ${green}INFO:${reset} lintian ok."
    fi
-   echo "$0: ${green}INFO:${reset} lintian ok."
 }
 
 make_deb-pkg-build() {
