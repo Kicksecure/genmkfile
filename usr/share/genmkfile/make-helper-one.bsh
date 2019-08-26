@@ -759,6 +759,17 @@ make_clean() {
 }
 
 make_deb-shared-dep() {
+   echo "sudo \
+      apt-get \
+         ${APTGETOPT[@]} \
+         $apt_sourcelist_empty \
+         $apt_sourceparts \
+         $apt_unattended_opts \
+         --yes \
+         --no-install-recommends \
+         install \
+         $make_deb_shared_dependencies"
+
    local apt_get_exit_code="0"
    sudo \
       apt-get \
