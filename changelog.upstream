@@ -1,3 +1,39 @@
+commit 47ff2921ff7d85685660140b48e40b709f65dbe4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Aug 26 14:29:24 2019 -0400
+
+    output
+
+commit c0d278c2ce6bef37764cae57ffc72489be0b4c3a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Aug 26 14:20:28 2019 -0400
+
+    cleanup auto generated files debian/autoreconf.after and debian/autoreconf.before
+
+commit 30ec1f5214020a778fe7c108ea63168f95cbd340
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Aug 26 14:14:52 2019 -0400
+
+    output
+
+commit d79e37d7c3bb2b0eb5ee37df095cc0e89f7468fe
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Aug 26 14:13:55 2019 -0400
+
+    output
+
+commit aee6947fdb19bf90649e6557a7a3120cce0d86c7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Aug 26 14:10:38 2019 -0400
+
+    filter '${shlibs:Depends}' from dependency parser
+
+commit d0bd04a0976546a2fb917aa921f59d399bb435ab
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Aug 24 16:40:47 2019 +0000
+
+    bumped changelog version
+
 commit aa9fb43c0ab22046d3a3de946feab1003528078d
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sat Aug 24 07:21:55 2019 -0400
