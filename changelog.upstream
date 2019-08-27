@@ -1,3 +1,21 @@
+commit 1d8285ca3aa397dbb9129ff2088dbb9dc0ce1fc2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 27 09:47:04 2019 -0400
+
+    debugging
+
+commit 51102bfc0cf6a568d7ef684449fa9e71fb89963a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 27 09:35:30 2019 -0400
+
+    improve GENMKFILE_PATH auto detection
+
+commit a4555aacd0f99ac89289c31cbd99f75d1c5d883f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 27 09:00:40 2019 -0400
+
+    bumped changelog version
+
 commit 80e533745019afecf11846e5e40eb5845d166704
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Aug 27 08:51:32 2019 -0400
