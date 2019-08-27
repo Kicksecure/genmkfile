@@ -21,6 +21,8 @@ if [ -f /usr/lib/helper-scripts/pre.bsh ]; then
    true
 fi
 
+true "$0: GENMKFILE_PATH: $GENMKFILE_PATH"
+
 ## For manual invocation.
 ## Should be set by makefile already.
 [ -n "$GENMKFILE_PATH" ] || GENMKFILE_PATH="/usr/share/genmkfile"
