@@ -9,6 +9,8 @@
 ## master location:
 ## https://github.com/Whonix/genmkfile/blob/master/usr/share/genmkfile/make-helper.bsh
 
+set -x
+
 if [ "$GENMKFILE_DEBUG" = "1" ]; then
    set -x
 fi
