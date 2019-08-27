@@ -9,6 +9,10 @@
 ## master location:
 ## https://github.com/Whonix/genmkfile/blob/master/usr/share/genmkfile/make-helper.bsh
 
+if [ "$GENMKFILE_DEBUG" = "1" ]; then
+   set -x
+fi
+
 make_init() {
    ## For manual invocation.
    ## Should be set by makefile already.
@@ -1462,8 +1466,6 @@ else
 fi
 
 if [ "$make_script_was_sourced" = "false" ]; then
-   #set -x
-
    if [ -f /usr/lib/helper-scripts/pre.bsh ]; then
       no_disable_echo=true
       ## pre.bsh would `source` the following folders:
