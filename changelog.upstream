@@ -1,3 +1,21 @@
+commit a4874ded43c320558b086c3e7795b0579cc2cd9e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 28 06:32:29 2019 -0400
+
+    cleanup
+
+commit 8d709a409d101a6b953df9be57fa2d698ecbc801
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 28 05:43:12 2019 -0400
+
+    If /usr/share/genmkfile/make-helper.bsh is run directly without arguments, run "make all".
+
+commit d2c0f389ad08d06f7a1ec4c2e86f2ff024cc62b7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 27 09:47:35 2019 -0400
+
+    bumped changelog version
+
 commit 1d8285ca3aa397dbb9129ff2088dbb9dc0ce1fc2
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Aug 27 09:47:04 2019 -0400
