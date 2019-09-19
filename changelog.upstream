@@ -1,3 +1,15 @@
+commit 5ea1b0f013de993ee184ed1794889a2172ce2ee6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 19 14:01:23 2019 +0000
+
+    multi arch build fixes
+
+commit 2a43df2f2bd3f1d725e712838c1edf9d1b450c38
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Aug 28 11:10:07 2019 +0000
+
+    bumped changelog version
+
 commit a4874ded43c320558b086c3e7795b0579cc2cd9e
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Aug 28 06:32:29 2019 -0400
