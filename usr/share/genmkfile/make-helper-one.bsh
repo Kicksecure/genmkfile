@@ -366,7 +366,7 @@ sudo make deb-all-dep
       exit 1
    fi
 
-   ## sets: architecture
+   ## sets: architecture_of_source_package
    ## sets: make_debian_control_file_relative_path
    ## sets: make_debian_control_file_absolute_path
    ## sets: dpkg_print_architecture
@@ -424,11 +424,16 @@ sudo make deb-all-dep
       exit 1
    fi
 
-   ## No reason to overwrite architecture_changes_file manually, just in case.
-   if [ "$architecture" = "all" ]; then
-      [ -n "$architecture_changes_file" ] || architecture_changes_file="$dpkg_print_architecture"
-   else
-      [ -n "$architecture_changes_file" ] || architecture_changes_file="$architecture"
+   [ -n "$host_architecture" ] || host_architecture="$dpkg_print_architecture"
+   [ -n "$target_architecture" ] || target_architecture="$dpkg_print_architecture"
+
+   if [ "$binary_package_architecture" = "" ]; then
+      if [ "$architecture_of_source_package" = "all" ]; then
+         ## binary_package_architecture=all
+         binary_package_architecture="$architecture_of_source_package"
+      else
+         binary_package_architecture="$target_architecture"
+      fi
    fi
 
    local grep_line a package
@@ -446,7 +451,8 @@ sudo make deb-all-dep
 
    while read -r -d $'\n' grep_line; do
       read -r a package _ <<< "$grep_line"
-      temp="${package}_${make_pkg_version}-${make_pkg_revision}_${architecture}.deb"
+      ## Example architecture independent "all" pacakge: anon-apt-sources-list_3.4-1_all.deb
+      temp="${package}_${make_pkg_version}-${make_pkg_revision}_${binary_package_architecture}.deb"
       temp="${DISTDIR}/$temp"
       make_package_debs_files_list="$make_package_debs_files_list $temp"
       if [ "$package" = "$make_source_package_name" ]; then
@@ -458,17 +464,20 @@ sudo make deb-all-dep
    true "make_package_list: $make_package_list"
    true "make_package_debs_files_list: $make_package_debs_files_list"
 
-   make_main_deb_file_name="${package}_${make_pkg_version}-${make_pkg_revision}_${architecture}.deb"
+   make_main_deb_file_name="${package}_${make_pkg_version}-${make_pkg_revision}_${binary_package_architecture}.deb"
    make_main_deb_file="${DISTDIR}/$make_main_deb_file_name"
 
    make_main_dsc_file_name="${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}.dsc"
 
+   ## Changes file contains target_architecture such as 'amd64', not 'all'.
+   ## Example changes file for architecture independent package:
+   ## anon-apt-sources-list_3.4-1_amd64.changes
    if [ "$make_use_cowbuilder" = "true" ]; then
       make_main_dsc_file="$DISTDIR/$make_main_dsc_file_name"
-      make_main_changes_file="$DISTDIR/${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}_${architecture_changes_file}.changes"
+      make_main_changes_file="$DISTDIR/${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}_${target_architecture}.changes"
    else
       make_main_dsc_file="${DISTDIR}/$make_main_dsc_file_name"
-      make_main_changes_file="${DISTDIR}/${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}_${architecture_changes_file}.changes"
+      make_main_changes_file="${DISTDIR}/${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}_${target_architecture}.changes"
    fi
 
    make_debian_tarball_file_name="${make_source_package_name}_${make_pkg_version}-${make_pkg_revision}.debian.tar.xz"
@@ -880,18 +889,14 @@ beforehand?
       fi
 
       ## TODO: change that folder
-      if [ "$architecture" = "all" ]; then
-         cow_folder="/var/cache/pbuilder/cow.cow_${dpkg_print_architecture}"
-         base_folder="/var/cache/pbuilder/base.cow_${dpkg_print_architecture}"
-      else
-         cow_folder="/var/cache/pbuilder/cow.cow_${architecture}"
-         base_folder="/var/cache/pbuilder/base.cow_${architecture}"
-      fi
+      cow_folder="/var/cache/pbuilder/cow.cow_${target_architecture}"
+      base_folder="/var/cache/pbuilder/base.cow_${target_architecture}"
 
-      if [ "$architecture" = "all" ]; then
+      if [ "$architecture_of_source_package" = "all" ]; then
+         ## No need to pass --host-arch to cowbuilder.
          true
       else
-         [ -n "$make_cowbuilder_arch_opt" ] || make_cowbuilder_arch_opt="--host-arch $architecture"
+         [ -n "$make_cowbuilder_arch_opt" ] || make_cowbuilder_arch_opt="--host-arch $host_architecture"
       fi
 
       ## COWBUILDER_PREFIX could set variables such as http_proxy.

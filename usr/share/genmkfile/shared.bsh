@@ -18,11 +18,11 @@ make_shared_function() {
    architecture_grep="$(cat "$make_debian_control_file_absolute_path" | grep "Architecture:")"
    read -r architecture_keyword architecture_setting _ <<< "$architecture_grep"
 
-   ## variable architecture will be set by make-helper.bsh.
+   ## variable architecture_of_source_package will be set by make-helper.bsh.
 
    if [ "$architecture_setting" = "" ]; then
       true 'ERROR: architecture_grep is empty.'
    elif [ "$architecture_setting" = "all" ]; then
-      architecture="all"
+      architecture_of_source_package="all"
    fi
 }

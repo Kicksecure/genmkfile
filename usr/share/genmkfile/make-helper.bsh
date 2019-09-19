@@ -41,14 +41,14 @@ fi
 
 export GENMKFILE_PATH
 
-## sets: architecture
+## sets: architecture_of_source_package
 ## sets: make_debian_control_file_relative_path
 ## sets: make_debian_control_file_absolute_path
 ## sets: dpkg_print_architecture
 source "$GENMKFILE_PATH/shared.bsh"
 make_shared_function
 
-export architecture
+export architecture_of_source_package
 
 ## If $make_cross_build_platform_list is unset, just build same platform as
 ## output of 'dpkg --print-architecture'.
@@ -56,9 +56,15 @@ if [ "$make_cross_build_platform_list" = "" ]; then
    make_cross_build_platform_list="$dpkg_print_architecture"
 fi
 
-if [ "$architecture" = "" ]; then
-   architecture="$dpkg_print_architecture"
+## Just in case?
+if [ "$architecture_of_source_package" = "" ]; then
+   architecture_of_source_package="$dpkg_print_architecture"
 fi
+
+for arch in $make_cross_build_platform_list ; do
+   target_architecture="$arch"
+   export target_architecture
+done
 
 if [ "$1" = "deb-pkg" ]; then
    "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
@@ -80,15 +86,13 @@ if [ "$1" = "deb-icup" ]; then
    exit $?
 fi
 
-## If $architecture is set to 'all', in other words if it is an uncompiled
-## package, there is no reason to iterate over $make_cross_build_platform_list.
-if [ "$architecture" = "all" ]; then
-   "$GENMKFILE_PATH/make-helper-one.bsh" "$@"
-   exit $?
-fi
-
 for arch in $make_cross_build_platform_list ; do
-   architecture="$arch"
-   export architecture
+   target_architecture="$arch"
+   export target_architecture
    "$GENMKFILE_PATH/make-helper-one.bsh" "$@"
+
+   ## If $architecture_of_source_package is set to 'all', in other words if it is
+   ## an uncompiled package, there is no reason to iterate over
+   ## $make_cross_build_platform_list.
+   break
 done
