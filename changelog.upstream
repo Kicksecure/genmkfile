@@ -1,3 +1,15 @@
+commit d979c7f3733b5862573e618e45deb273306803c3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 20 08:15:01 2019 +0000
+
+    remove [linux-any] and [all] from build dependencies; comment
+
+commit 2d9ac5e5865526e74a0f331a13141ba553b323f0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 20 06:29:32 2019 +0000
+
+    bumped changelog version
+
 commit e913dc66e1b716008e8be7bf3685e28050bedff1
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Sep 20 06:22:43 2019 +0000
