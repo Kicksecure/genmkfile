@@ -1,3 +1,35 @@
+commit e913dc66e1b716008e8be7bf3685e28050bedff1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 20 06:22:43 2019 +0000
+
+    pass whonix_build_pbuilder_config_file to cowbuilder als --configfile if set
+    
+    to fix cross platform builds
+
+commit 422b047d7511c0ee02ce2045a846e93b3fe1c56d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 20 05:54:35 2019 +0000
+
+    specify cowbuilder target --architecture
+
+commit ef1560d152e63dc0e84038af8570dcc7acf46751
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 20 05:49:23 2019 +0000
+
+    refactoring
+
+commit 48829d6a910af85ba41057c055fd2d8ab3749af4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 20 05:40:33 2019 +0000
+
+    fix, always pass --host-arch to cowbuilder
+
+commit 2843e310a6880ae06d874e9d16a2d04ac30ef552
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Sep 19 14:15:43 2019 +0000
+
+    bumped changelog version
+
 commit 5ea1b0f013de993ee184ed1794889a2172ce2ee6
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Sep 19 14:01:23 2019 +0000
