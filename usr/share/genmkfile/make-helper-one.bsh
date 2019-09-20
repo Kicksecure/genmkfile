@@ -892,6 +892,10 @@ beforehand?
       cow_folder="/var/cache/pbuilder/cow.cow_${target_architecture}"
       base_folder="/var/cache/pbuilder/base.cow_${target_architecture}"
 
+      if [ ! "$whonix_build_pbuilder_config_file" = "" ]; then
+         make_cowbuilder_config_file_arg="--configfile $whonix_build_pbuilder_config_file"
+      fi
+
       ## COWBUILDER_PREFIX could set variables such as http_proxy.
       ## Whonix build script sets:
       ## COWBUILDER_PREFIX+=" env http_proxy=${REPO_PROXY}"
@@ -906,6 +910,7 @@ beforehand?
             cowbuilder \
                --host-arch "$host_architecture" \
                --architecture "$target_architecture" \
+               $make_cowbuilder_config_file_arg \
                --build "$make_main_dsc_file" \
                --basepath "$base_folder" \
                --buildplace "$cow_folder" \
