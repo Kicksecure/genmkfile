@@ -384,6 +384,9 @@ sudo make deb-all-dep
    make_deb_build_dependencies="$(perl -ne 'next if /^#/; $p=(s/^Build-Depends:\s*/ / or (/^ / and $p)); s/,|\n|\([^)]+\)//mg; print if $p' < "$make_debian_control_file_absolute_path")"
    make_deb_build_dependencies="$(make_dependencies_filter_helper "$make_deb_build_dependencies")"
 
+   make_deb_build_dependencies=${make_deb_build_dependencies//"[linux-any]"}
+   make_deb_build_dependencies=${make_deb_build_dependencies//"[all]"}
+
    make_deb_runtime_dependencies="$(perl -ne 'next if /^#/; $p=(s/^Depends:\s*/ / or (/^ / and $p)); s/,|\n|\([^)]+\)//mg; print if $p' < "$make_debian_control_file_absolute_path")"
    make_deb_runtime_dependencies="$(make_dependencies_filter_helper "$make_deb_runtime_dependencies")"
 
@@ -895,6 +898,16 @@ beforehand?
       if [ ! "$whonix_build_pbuilder_config_file" = "" ]; then
          make_cowbuilder_config_file_arg="--configfile $whonix_build_pbuilder_config_file"
       fi
+
+      ## Using cowbuilder with
+      ## --host-arch "$host_architecture" \
+      ## --architecture "$BUILD_TARGET_ARCH" \
+      ## can cause the following build error:
+      ## The following packages have unmet dependencies:
+      ## builddeps:/build/anon-apps-config_3.0-1.dsc:amd64 : Depends: genmkfile:amd64 but it is not installable
+      ##
+      ## Test command:
+      ## whonix_build_pbuilder_config_file=/home/user/whonix_binary/pbuilder.conf make_cross_build_platform_list=arm64 make_cowbuilder_dist_folder=~/genmkfile-packages-result make_use_cowbuilder=true make deb-pkg
 
       ## COWBUILDER_PREFIX could set variables such as http_proxy.
       ## Whonix build script sets:
