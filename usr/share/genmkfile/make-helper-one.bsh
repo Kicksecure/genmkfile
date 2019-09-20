@@ -905,6 +905,7 @@ beforehand?
          $COWBUILDER_PREFIX \
             cowbuilder \
                --host-arch "$host_architecture" \
+               --architecture "$target_architecture" \
                --build "$make_main_dsc_file" \
                --basepath "$base_folder" \
                --buildplace "$cow_folder" \
