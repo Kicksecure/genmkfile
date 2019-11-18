@@ -1,3 +1,15 @@
+commit 1ca95315a34b4ff9b5f461e52922448105279b91
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 18 10:08:48 2019 +0000
+
+    make version bump compatible with x.x.x format
+
+commit 42c9d3919e47918f04dc72343ee722c6e6e8f2d0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 20 10:12:18 2019 +0000
+
+    bumped changelog version
+
 commit d979c7f3733b5862573e618e45deb273306803c3
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Sep 20 08:15:01 2019 +0000
