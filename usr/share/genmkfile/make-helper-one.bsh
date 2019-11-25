@@ -1261,9 +1261,14 @@ make_deb-chl-bumpup() {
    if [ "$make_bump_type" = "major" ]; then
       true "make_pkg_version: $make_pkg_version"
 
-      ## Thanks to:
-      ## https://stackoverflow.com/a/4485581
-      new_upstream_version="$(echo "$make_pkg_version" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')"
+      if [ "$version_numbers_by_upstream" = "true" ] ; then
+         ## Thanks to:
+         ## https://stackoverflow.com/a/4485581
+         new_upstream_version="$(echo "$make_pkg_version" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')"
+      else
+         new_upstream_version_without_leading_zero="$(bc -l <<< "scale=9 ; $make_pkg_version + 0.1")"
+         new_upstream_version="$(printf '%3.1f\n' "$new_upstream_version_without_leading_zero")"
+      fi
 
       new_revision="1"
       new_changelog_version="$make_epoch:$new_upstream_version-$new_revision"
