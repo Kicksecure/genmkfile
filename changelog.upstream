@@ -1,3 +1,15 @@
+commit 0c643d1e41afdfde1bcb01550418a89c4d00d5d7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 25 08:23:56 2019 +0000
+
+    add support for version_numbers_by_upstream
+
+commit b2bcd2d40d94e476cc68a88aa8294593a2b9d49c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 18 10:11:39 2019 +0000
+
+    bumped changelog version
+
 commit 1ca95315a34b4ff9b5f461e52922448105279b91
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Nov 18 10:08:48 2019 +0000
