@@ -357,6 +357,10 @@ make_get_variables() {
    TZ=UTC
    export LC_ALL TZ
 
+   ## XXX: maybe better set dynamically but would that be deterministic?
+   [ -n "$XZ_OPT" ] || XZ_OPT="--threads=8"
+   export XZ_OPT
+
    local temp dpkg_line
    if ! command -v dpkg-parsechangelog >/dev/null ; then
       true 'dpkg-parsechangelog not found. Do you have the "build-essential" package installed?
