@@ -1,3 +1,15 @@
+commit f93ca4088828ffcdc5ffd59a51fa47b41280f693
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Jan 16 06:43:37 2020 -0500
+
+    set XZ_OPT="--threads=8" by default
+
+commit 5f76ce27af7921f141aba77a52ecfcdf0c36d4c6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 25 08:43:45 2019 +0000
+
+    bumped changelog version
+
 commit 0c643d1e41afdfde1bcb01550418a89c4d00d5d7
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Nov 25 08:23:56 2019 +0000
