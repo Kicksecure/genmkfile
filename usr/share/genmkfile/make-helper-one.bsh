@@ -562,7 +562,7 @@ make undebdist
 make debdsc
    Create dsc file \$DISTDIR (default \"..\").
 make undebdsc
-   Deltes dsc file \$DISTDIR (default \"..\").
+   Deletes dsc file \$DISTDIR (default \"..\").
 make manpages
    Create man page from man source folder, which will be stored in debian/tmp-man folder.
 make uch
