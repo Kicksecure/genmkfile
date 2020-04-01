@@ -458,7 +458,7 @@ sudo make deb-all-dep
 
    while read -r -d $'\n' grep_line; do
       read -r a package _ <<< "$grep_line"
-      ## Example architecture independent "all" pacakge: anon-apt-sources-list_3.4-1_all.deb
+      ## Example architecture independent "all" package: anon-apt-sources-list_3.4-1_all.deb
       temp="${package}_${make_pkg_version}-${make_pkg_revision}_${binary_package_architecture}.deb"
       temp="${DISTDIR}/$temp"
       make_package_debs_files_list="$make_package_debs_files_list $temp"
