@@ -749,16 +749,19 @@ make_undebdist() {
 make_debinstfile() {
    local line d missing
 
+   if ! test -f "$make_debian_install_file_relative_path" ; then
+      make_debinstfile_create
+      return 0
+   fi
+
    for d in $make_folder_list_for_un_and_install; do
       if [ ! -d "$d" ]; then
          continue
       fi
-      echo "d: $d"
       missing=yes
       while read -r -d $'\n' line; do
          if [ "$line" = "${d}/*" ]; then
             missing=no
-            echo found!
             break
          fi
       done < "$make_debian_install_file_relative_path"
@@ -768,11 +771,7 @@ make_debinstfile() {
    done
 
    if [ "$missing" = "yes" ]; then
-      echo create now
       make_debinstfile_create
-
-   else
-      echo no need
    fi
 }
 
