@@ -1134,9 +1134,6 @@ make_deb-clean() {
    if [ -d "debian/tmp" ]; then
       rm --recursive "debian/tmp"
    fi
-   if [ -d "auto-generated-man-pages" ]; then
-      rm --recursive "auto-generated-man-pages"
-   fi
    if [ -d "deb_dist" ]; then
       rm --recursive "deb_dist"
    fi
