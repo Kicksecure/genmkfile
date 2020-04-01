@@ -576,7 +576,7 @@ make undebdsc
 make debinstfile
    Creates files debian/pkg-name.install.
 make manpages
-   Create man page from man source folder, which will be stored in debian/tmp-man folder.
+   Create man page from man source folder, which will be stored in auto-generated-man-pages folder.
 make uch
    Store upstream changelog from git log in changelog.upstream.
 make install
@@ -783,15 +783,15 @@ make_manpages() {
       base_name="${i##*/}"
       filename_without_ronn_file_extension="${base_name%.*}"
 
-      mkdir --parents "$PWD/debian/tmp-man/$source_folder"
+      mkdir --parents "$PWD/auto-generated-man-pages/$source_folder"
 
-      true "${bold}${cyan}${green}INFO:${reset} Creating man page $PWD/debian/tmp-man/$filename_without_ronn_file_extension ${reset}"
+      true "${bold}${cyan}${green}INFO:${reset} Creating man page $PWD/auto-generated-man-pages/$filename_without_ronn_file_extension ${reset}"
 
       ronn \
          --manual="$make_source_package_name Manual" \
          --organization="$make_source_package_name" \
          < "$i" \
-         > "$PWD/debian/tmp-man/$filename_without_ronn_file_extension"
+         > "$PWD/auto-generated-man-pages/$filename_without_ronn_file_extension"
 
    done
    shopt -u globstar dotglob nullglob
@@ -1107,8 +1107,8 @@ make_deb-clean() {
    if [ -d "debian/tmp" ]; then
       rm --recursive "debian/tmp"
    fi
-   if [ -d "debian/tmp-man" ]; then
-      rm --recursive "debian/tmp-man"
+   if [ -d "auto-generated-man-pages" ]; then
+      rm --recursive "auto-generated-man-pages"
    fi
    if [ -d "deb_dist" ]; then
       rm --recursive "deb_dist"
