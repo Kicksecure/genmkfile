@@ -1,32 +1,11 @@
 #!/bin/bash
 
-## Copyright (C) 2012 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+## Copyright (C) 2020 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
-#set -x
+# MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# cd "$MYDIR"
 
-if [ "$GENMKFILE_DEBUG" = "1" ]; then
-   set -x
-fi
-
-set -e
-
-true "$0: 1: $1"
-true "$0: make_cross_build_platform_list: $make_cross_build_platform_list"
-
-if [ -f /usr/lib/helper-scripts/pre.bsh ]; then
-   no_disable_echo=true
-   ## pre.bsh would `source` the following folders:
-   ## /etc/make-helper-one.bsh_pre.d/*.conf
-   ## /usr/local/etc/make-helper-one.bsh_pre.d/*.conf
-   source /usr/lib/helper-scripts/pre.bsh
-   true
-fi
-
-true "$0: GENMKFILE_PATH: $GENMKFILE_PATH"
-
-## For manual invocation.
-## Should be set by makefile already.
 if [ "$GENMKFILE_PATH" = "" ] ; then
    if [ -f "./packages/genmkfile/usr/share/genmkfile/makefile-full" ]; then
       GENMKFILE_PATH="./packages/genmkfile/usr/share/genmkfile"
@@ -39,60 +18,4 @@ if [ "$GENMKFILE_PATH" = "" ] ; then
    fi
 fi
 
-export GENMKFILE_PATH
-
-## sets: architecture_of_source_package
-## sets: make_debian_control_file_relative_path
-## sets: make_debian_control_file_absolute_path
-## sets: dpkg_print_architecture
-source "$GENMKFILE_PATH/shared.bsh"
-make_shared_function
-
-export architecture_of_source_package
-
-## If $make_cross_build_platform_list is unset, just build same platform as
-## output of 'dpkg --print-architecture'.
-if [ "$make_cross_build_platform_list" = "" ]; then
-   make_cross_build_platform_list="$dpkg_print_architecture"
-fi
-
-## Just in case?
-if [ "$architecture_of_source_package" = "" ]; then
-   architecture_of_source_package="$dpkg_print_architecture"
-fi
-
-for arch in $make_cross_build_platform_list ; do
-   target_architecture="$arch"
-   export target_architecture
-done
-
-if [ "$1" = "deb-pkg" ]; then
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
-   "$GENMKFILE_PATH/make-helper-one.bsh" dist
-   "$GENMKFILE_PATH/make-helper-one.bsh" debdist
-   "$GENMKFILE_PATH/make-helper-one.bsh" debdsc
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-pkg-build
-   exit $?
-fi
-
-if [ "$1" = "deb-icup" ]; then
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
-   "$GENMKFILE_PATH/make-helper-one.bsh" dist
-   "$GENMKFILE_PATH/make-helper-one.bsh" debdist
-   "$GENMKFILE_PATH/make-helper-one.bsh" debdsc
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-pkg-build
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-install
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
-   exit $?
-fi
-
-for arch in $make_cross_build_platform_list ; do
-   target_architecture="$arch"
-   export target_architecture
-   "$GENMKFILE_PATH/make-helper-one.bsh" "$@"
-
-   ## If $architecture_of_source_package is set to 'all', in other words if it is
-   ## an uncompiled package, there is no reason to iterate over
-   ## $make_cross_build_platform_list.
-   break
-done
+"${GENMKFILE_PATH}/make-helper.bsh" "$@"
