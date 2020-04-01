@@ -747,8 +747,36 @@ make_undebdist() {
 }
 
 make_debinstfile() {
-   ## TODO
+   local line d missing
 
+   for d in $make_folder_list_for_un_and_install; do
+      if [ ! -d "$d" ]; then
+         continue
+      fi
+      echo "d: $d"
+      missing=yes
+      while read -r -d $'\n' line; do
+         if [ "$line" = "${d}/*" ]; then
+            missing=no
+            echo found!
+            break
+         fi
+      done < "$make_debian_install_file_relative_path"
+      if [ "$missing" = "yes" ]; then
+         break
+      fi
+   done
+
+   if [ "$missing" = "yes" ]; then
+      echo create now
+      make_debinstfile_create
+
+   else
+      echo no need
+   fi
+}
+
+make_debinstfile_create() {
    rm -f "$make_debian_install_file_relative_path"
 
    echo "\
@@ -756,12 +784,12 @@ make_debinstfile() {
 ## See the file COPYING for copying conditions.
 
 ## This file was generated using genmkfile 'make debinstfile'.
-" | tee -a "$make_debian_install_file_relative_path"
+" | tee -a "$make_debian_install_file_relative_path" >/dev/null
 
    local d
    for d in $make_folder_list_for_un_and_install; do
       if [ -d "$d" ]; then
-         echo "${d}/*" | tee -a "$make_debian_install_file_relative_path"
+         echo "${d}/*" | tee -a "$make_debian_install_file_relative_path" >/dev/null
       fi
    done
 }
