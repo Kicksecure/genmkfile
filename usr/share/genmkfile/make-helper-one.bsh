@@ -95,6 +95,12 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
+           debinstfile)
+               matched="true"
+               make_function_run make_debinstfile
+               exit 0
+               shift
+               ;;
            manpages)
                matched="true"
                make_function_run make_manpages
@@ -352,6 +358,8 @@ make_dependencies_filter_helper() {
 }
 
 make_get_variables() {
+   [ -n "$make_folder_list_for_un_and_install" ] || make_folder_list_for_un_and_install="bin boot dev etc home lib opt sbin srv sys usr var"
+
    ## Deterministic.
    LC_ALL=C.UTF-8
    TZ=UTC
@@ -451,6 +459,8 @@ sudo make deb-all-dep
    ## Source package name may or may not match binary package name.
    make_package_list="$make_source_package_name"
    make_package_debs_files_list=""
+
+   make_debian_install_file_relative_path="debian/${make_source_package_name}.install"
 
    ## Example: grep_output
    ## Package: anon-shared-packages-dependencies
@@ -563,6 +573,8 @@ make debdsc
    Create dsc file \$DISTDIR (default \"..\").
 make undebdsc
    Deletes dsc file \$DISTDIR (default \"..\").
+make debinstfile
+   Creates files debian/pkg-name.install.
 make manpages
    Create man page from man source folder, which will be stored in debian/tmp-man folder.
 make uch
@@ -732,6 +744,26 @@ make_undebdsc() {
 
 make_undebdist() {
    rm --force "$make_debian_tarball_absolute_path"
+}
+
+make_debinstfile() {
+   ## TODO
+
+   rm -f "$make_debian_install_file_relative_path"
+
+   echo "\
+## Copyright (C) 2020 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+## This file was generated using genmkfile 'make debinstfile'.
+" | tee -a "$make_debian_install_file_relative_path"
+
+   local d
+   for d in $make_folder_list_for_un_and_install; do
+      if [ -d "$d" ]; then
+         echo "${d}/*" | tee -a "$make_debian_install_file_relative_path"
+      fi
+   done
 }
 
 make_test() {
@@ -1151,7 +1183,6 @@ make_checkout() {
 }
 
 make_helper() {
-   [ -n "$make_folder_list_for_un_and_install" ] || make_folder_list_for_un_and_install="bin boot dev etc home lib opt sbin srv sys usr var"
    shopt -s globstar dotglob nullglob
    local d source_file file_without_pwd file_with_destdir
    for d in $make_folder_list_for_un_and_install; do

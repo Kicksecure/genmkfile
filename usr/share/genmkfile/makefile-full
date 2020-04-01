@@ -45,6 +45,9 @@ debdsc:
 undebdsc:
 	$(GENMKFILE_PATH)/make-helper.bsh undebdsc
 
+debinstfile:
+	$(GENMKFILE_PATH)/make-helper.bsh debinstfile
+
 manpages:
 	$(GENMKFILE_PATH)/make-helper.bsh manpages
 
