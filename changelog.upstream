@@ -1,3 +1,35 @@
+commit 3b99fc0d75bee937642d33ed543381813ffce87a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 13:17:05 2020 -0400
+
+    disable debugging
+
+commit 27ec6fd1706dddd2bb228df1df2947f010318464
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 12:43:17 2020 -0400
+
+    implement "make debinstfile"
+    
+    Creates files debian/pkg-name.install.
+
+commit 47fb017386f1f2b03615c54377f4ad1b1e35ce7e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 12:08:00 2020 -0400
+
+    typo
+
+commit 445f53c93619e62c3c480eb2815e5e3c01592da2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 12:03:50 2020 -0400
+
+    typo
+
+commit 32b078b2ced62a317b31ae9d5e978af668e5b09e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 10:36:21 2020 -0400
+
+    bumped changelog version
+
 commit 389e0c2062b67e046b7dde71dce42208d53afde9
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 1 08:49:55 2020 -0400
