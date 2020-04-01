@@ -45,7 +45,7 @@ make %{?_smp_mflags}
 %license    debian/copyright
 /usr/share/genmkfile/Makefile
 /usr/share/genmkfile/make-helper-one.bsh
-/usr/share/genmkfile/make-helper.bsh
+/usr/bin/genmkfile
 /usr/share/genmkfile/makefile-full
 /usr/share/genmkfile/shared.bsh
 
