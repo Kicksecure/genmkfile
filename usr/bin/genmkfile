@@ -3,8 +3,11 @@
 ## Copyright (C) 2020 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
-# MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# cd "$MYDIR"
+MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+pushd "$MYDIR" >/dev/null
+cd ..
+cd ..
 
 if [ "$GENMKFILE_PATH" = "" ] ; then
    if [ -f "./packages/genmkfile/usr/share/genmkfile/makefile-full" ]; then
@@ -17,5 +20,10 @@ if [ "$GENMKFILE_PATH" = "" ] ; then
       echo "$0: ERROR: Auto detection of GENMKFILE_PATH failed!"
    fi
 fi
+
+GENMKFILE_PATH="$(realpath "$GENMKFILE_PATH")"
+export GENMKFILE_PATH
+
+popd >/dev/null
 
 "${GENMKFILE_PATH}/make-helper.bsh" "$@"
