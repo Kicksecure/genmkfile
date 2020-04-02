@@ -1,3 +1,89 @@
+commit 15f8773d295df46e653d80479af92db86da305c2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 07:22:28 2020 -0400
+
+    readme
+
+commit 7cb0587b5f28d4fa9f54431f7b7f570b0079fed3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 05:27:44 2020 -0400
+
+    do not overwrite debian install file if that file contains nogenmkfile
+
+commit 0095d5e9239aa2b20e08673b997a48e1e64f931a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 05:25:43 2020 -0400
+
+    install man page
+
+commit 6f9471f8b841928234ac14ce9a29519e3157700b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 05:24:42 2020 -0400
+
+    generate auto-generated-man-pages/genmkfile.8
+
+commit 6c16337a17cbbd352609f549b612d08748d2e8c5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 05:24:26 2020 -0400
+
+    add man file
+
+commit 54aa4abba6b7d780c3554aa3f862ee9750193975
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 05:22:29 2020 -0400
+
+    remove duplicate Makefile
+    
+    still have usr/share/genmkfile/Makefile
+
+commit 1bdef3d1b19ff35a10eab8347630ce90c4ab00ac
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 17:31:31 2020 -0400
+
+    fix, do not delete auto-generated-man-pages
+
+commit 793c1c45aa5391a6ed686022eaec20864f06457c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 16:30:08 2020 -0400
+
+    add debian install file
+
+commit 08c89be78a26a0be4e78b081e76affae98c41f18
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 16:23:37 2020 -0400
+
+    improve make_debinstfile
+
+commit 356f3bed6e99e2e47ccc9c8180e005697400603b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 16:18:18 2020 -0400
+
+    create install file only when needed
+
+commit 2be50b449d3d5b30a7fa308bc72c9d0111a9381b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 15:42:24 2020 -0400
+
+    change path to auto generated man pages
+
+commit 1b0767b697efec3592353e9cae66c8395c944f7e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 15:29:41 2020 -0400
+
+    implement usr/bin/genmkfile
+
+commit e4542f1dd1bac72b58049d80808ed37b2e709af2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 15:11:47 2020 -0400
+
+    move genmkfile to /usr/bin/genmkfile
+
+commit 0ee76e04b451cdb7f9a161f2e14d67598588c916
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Apr 1 13:17:52 2020 -0400
+
+    bumped changelog version
+
 commit 3b99fc0d75bee937642d33ed543381813ffce87a
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 1 13:17:05 2020 -0400
