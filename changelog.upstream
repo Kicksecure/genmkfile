@@ -1,3 +1,15 @@
+commit 2f24059da68bd79bdea81755a3d386af932d630e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 12:50:55 2020 -0400
+
+    fix GENMKFILE_PATH detection
+
+commit f7b4fb19829228cc5e15fcb604dec44fc11365e0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 07:43:12 2020 -0400
+
+    bumped changelog version
+
 commit 15f8773d295df46e653d80479af92db86da305c2
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Apr 2 07:22:28 2020 -0400
