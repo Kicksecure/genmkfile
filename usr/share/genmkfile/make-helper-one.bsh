@@ -754,6 +754,10 @@ make_debinstfile() {
       return 0
    fi
 
+   if cat "$make_debian_install_file_relative_path" | grep -q nogenmkfile ; then
+      return 0
+   fi
+
    for d in $make_folder_list_for_un_and_install; do
       if [ ! -d "$d" ]; then
          continue
