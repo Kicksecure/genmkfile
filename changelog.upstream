@@ -1,3 +1,15 @@
+commit 224118b8da9b97ec1c33d9f4b7945051721b14f3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Apr 4 06:32:55 2020 -0400
+
+    remove cowbuilder --host-arch to fix arm64 builds
+
+commit 31abbe76abe2243f43f31a01d24540341b234e02
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 2 12:52:16 2020 -0400
+
+    bumped changelog version
+
 commit 2f24059da68bd79bdea81755a3d386af932d630e
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Apr 2 12:50:55 2020 -0400
