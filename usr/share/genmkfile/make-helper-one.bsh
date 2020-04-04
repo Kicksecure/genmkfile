@@ -988,7 +988,6 @@ beforehand?
       sudo \
          $COWBUILDER_PREFIX \
             cowbuilder \
-               --host-arch "$host_architecture" \
                --architecture "$target_architecture" \
                $make_cowbuilder_config_file_arg \
                --build "$make_main_dsc_file" \
