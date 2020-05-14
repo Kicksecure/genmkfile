@@ -360,6 +360,13 @@ make_dependencies_filter_helper() {
 make_get_variables() {
    [ -n "$make_folder_list_for_un_and_install" ] || make_folder_list_for_un_and_install="bin boot dev etc home lib opt sbin srv sys usr var"
 
+   my_user_id="$(id -u)"
+   if [ "$my_user_id" = "0" ]; then
+      running_as_root_maybe="Running as ${under}root${eunder}. ($my_user_id)"
+   else
+      running_as_root_maybe="Running as ${under}user${eunder}. ($my_user_id)"
+   fi
+
    ## Deterministic.
    LC_ALL=C.UTF-8
    TZ=UTC
@@ -1398,7 +1405,7 @@ make_git_tag_check() {
    local make_git_describe_output
    make_git_describe_output="$(git describe --always --abbrev=1000000000)"
    if [ ! "$make_pkg_version_with_revision" = "$make_git_describe_output" ]; then
-      echo "$0: ${red}${bold}ERROR:${reset} Failed! Current git head a unsigned git tag! \
+      echo "$0: ${red}${bold}ERROR:${reset} Failed! Current git head a unsigned git tag! $running_as_root_maybe \
 make_pkg_version_with_revision $make_pkg_version_with_revision differs from make_git_describe_output $make_git_describe_output" >&2
       exit 1
    fi
@@ -1415,10 +1422,10 @@ make_git_commit_verify_current() {
    local make_git_commit_verify_return_code="0"
    make_function_run make_git_commit_verify "HEAD" || { make_git_commit_verify_return_code="$?" ; true; };
    if [ ! "$make_git_commit_verify_return_code" = "0" ]; then
-      echo "Failed! Current git head commit is unsigned" >&2
+      echo "$0: ${red}${bold}ERROR:${reset} Failed! Current git head commit is unsigned! $running_as_root_maybe" >&2
       exit 1
    fi
-   echo "Ok, current git head commit is signed."
+   echo "$0: ${green}INFO:${reset} Ok, current git head commit is signed."
 }
 
 make_git_verify() {
