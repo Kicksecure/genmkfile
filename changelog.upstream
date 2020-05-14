@@ -1,3 +1,15 @@
+commit 7e59e2784ccdf6191c987fd01279658100848a43
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu May 14 08:13:48 2020 -0400
+
+    output if gpg verification runs as user or root
+
+commit fbafb0d609770da18f37f8372590f33d036747e2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 16 08:30:45 2020 -0400
+
+    bumped changelog version
+
 commit 1dd89effca51fd94b3ce6c6f6e0fae48d6a621fd
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 15 14:05:31 2020 -0400
