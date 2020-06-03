@@ -696,7 +696,8 @@ make_dist() {
    test -w "$make_upstream_tarball_real_path"
    rm -f "$make_upstream_tarball_real_path"
 
-   echo "DEBUG manual reproduction: cd $(pwd)"
+   echo "DEBUG manual reproduction:
+cd $(pwd)"
 
    echo "DEBUG manual reproduction:
 find \
