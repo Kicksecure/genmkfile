@@ -692,12 +692,38 @@ make_dist() {
    ## Debugging.
    pwd="$(pwd)"
    test -w "$(pwd)"
+   touch "$make_upstream_tarball_real_path"
+   test -w "$make_upstream_tarball_real_path"
+   rm -f "$make_upstream_tarball_real_path"
 
-   find \
-      "." \
+   echo "DEBUG manual reproduction: cd $(pwd)"
+
+   echo "DEBUG manual reproduction:
+find \
+      '.' \
       -not -path '*/\.git/*' \
       -not -path '*/\.git' \
-      -not -name ".gitignore" \
+      -not -name '.gitignore' \
+      -print0 \
+         | tar \
+            --null \
+            --no-recursion \
+            --create \
+            --owner=0 --group=0 --numeric-owner \
+            --mode=go=rX,u+rw,a-s \
+            --sort=name \
+            --mtime='2015-10-21 00:00Z' \
+            --xz \
+            --file='$make_upstream_tarball_real_path' \
+            -T \
+            -
+   "
+
+   find \
+      '.' \
+      -not -path '*/\.git/*' \
+      -not -path '*/\.git' \
+      -not -name '.gitignore' \
       -print0 \
          | tar \
             --null \
