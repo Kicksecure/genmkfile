@@ -21,14 +21,18 @@ make_init() {
    [ -n "$GENMKFILE_PATH" ] || GENMKFILE_PATH="/usr/share/genmkfile"
    export GENMKFILE_PATH
 
-   pushd "$GENMKFILE_ROOT_DIR" >/dev/null
+   ## No longer in use.
+   #pushd "$GENMKFILE_ROOT_DIR" >/dev/null
+
    make_function_run make_get_distdir
    make_function_run make_get_destdir
    make_function_run make_get_variables
 }
 
 make_deinit() {
-   popd >/dev/null
+   ## No longer in use.
+   #popd >/dev/null
+   true
 }
 
 make_parse_cmd() {
@@ -324,7 +328,7 @@ make_parse_cmd() {
                break
                ;;
            -*)
-               echo "$0: ${red}${bold}ERROR:${reset} unknown option: $1" >&2
+               echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -442,7 +446,7 @@ sudo make deb-all-dep
 
    make_pkg_version_with_revision="${make_pkg_version}-${make_pkg_revision}"
    if [ "$make_pkg_version" = "" ]; then
-      echo "${red}${bold}ERROR:${reset} variable make_pkg_version is empty."
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') variable make_pkg_version is empty."
       exit 1
    fi
 
@@ -543,7 +547,7 @@ make_get_distdir() {
 
    if [ "$make_use_cowbuilder" = "true" ]; then
       if [ "$make_cowbuilder_dist_folder" = "" ]; then
-         echo "${red}${bold}ERROR:${reset} make_use_cowbuilder=$make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set! For example:"
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_use_cowbuilder=$make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set! For example:"
          echo "make_use_cowbuilder=$make_use_cowbuilder make_cowbuilder_dist_folder=~/genmkfile-packages-result"
          exit 1
       else
@@ -551,14 +555,18 @@ make_get_distdir() {
       fi
 
       if ! test -d "$make_cowbuilder_dist_folder" ; then
-         echo "${red}${bold}ERROR:${reset} make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
 mkdir -p $make_cowbuilder_dist_folder"
          exit 1
       fi
    fi
 
    if ! test -d "$DISTDIR" ; then
-      echo "${red}${bold}ERROR:${reset} DISTDIR $DISTDIR does not exist!"
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
+      exit 1
+   fi
+   if ! test -w "$DISTDIR" ; then
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
       exit 1
    fi
 }
@@ -672,6 +680,19 @@ make_dist() {
    ## No longer using --transform because that does not work with symlinks.
    ## (Important for 'corridor' package.)
 
+   if ! test -d "$DISTDIR" ; then
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
+      exit 1
+   fi
+   if ! test -w "$DISTDIR" ; then
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
+      exit 1
+   fi
+
+   ## Debugging.
+   pwd="$(pwd)"
+   test -w "$(pwd)"
+
    find \
       "." \
       -not -path '*/\.git/*' \
@@ -728,6 +749,15 @@ make_undist() {
 }
 
 make_debdsc() {
+   if ! test -d "$DISTDIR" ; then
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
+      exit 1
+   fi
+   if ! test -w "$DISTDIR" ; then
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
+      exit 1
+   fi
+
    pushd "$DISTDIR" >/dev/null
 
    ## Creates make_main_dsc_file.
@@ -903,7 +933,7 @@ make_deb-all-dep() {
 
 
 make_dpkg_source_verification_sanity_test_help_message() {
-   echo "${red}${bold}ERROR:${reset} dpkg-source verification failed!
+   echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-source verification failed!
 
 Does your key exist in file '~/.gnupg/trustedkeys.gpg'?
 
@@ -916,7 +946,7 @@ gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/Whonix/packages/wh
 make_deb-pkg-build_shared() {
    if [ "$make_use_cowbuilder" = "true" ]; then
       if ! test -f "$make_upstream_tarball_real_path" ; then
-         echo "${red}${bold}ERROR:${reset} upstream tarball $make_upstream_tarball_real_path does not exist.
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') upstream tarball $make_upstream_tarball_real_path does not exist.
 Did you run
 make dist && make debdist && make debdsc
 beforehand?
@@ -925,7 +955,7 @@ beforehand?
       fi
 
       if ! test -f "$make_debian_tarball_absolute_path" ; then
-         echo "${red}${bold}ERROR:${reset} debian tarball $make_debian_tarball_absolute_path does not exist.
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') debian tarball $make_debian_tarball_absolute_path does not exist.
 Did you run
 make dist && make debdist && make debdsc
 beforehand?
@@ -934,7 +964,7 @@ beforehand?
       fi
 
       if ! test -f "$make_main_dsc_file" ; then
-         echo "${red}${bold}ERROR:${reset} dsc file $make_main_dsc_file does not exist.
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dsc file $make_main_dsc_file does not exist.
 Did you run
 make dist && make debdist && make debdsc
 beforehand?
@@ -1007,7 +1037,7 @@ beforehand?
 
    else
       if ! command -v debuild >/dev/null ; then
-         echo "${red}${bold}ERROR:${reset} debuild not found. Do you have the 'devscripts' package installed?
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') debuild not found. Do you have the 'devscripts' package installed?
 To install all dependencies, try running:
 sudo make deb-all-dep
 "
@@ -1015,7 +1045,7 @@ sudo make deb-all-dep
       fi
 
       if ! dpkg-checkbuilddeps ; then
-         echo "${red}${bold}ERROR:${reset} dpkg-checkbuilddeps reported missing build dependencies.
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-checkbuilddeps reported missing build dependencies.
 To install all dependencies, try running:
 sudo make deb-all-dep
 "
@@ -1079,7 +1109,7 @@ sudo make deb-all-dep
 
 make_lintian_on_warning() {
    if [ "$make_use_lintian" = "true" ]; then
-      echo "$0: ${red}${bold}ERROR:${reset} lintian warning. Failing closed."
+      echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') lintian warning. Failing closed."
       if [ "$make_lintian_exit_code" = "0" ]; then
          exit 1
       else
@@ -1124,7 +1154,7 @@ make_deb-install() {
    local package
    for package in $make_package_debs_files_list; do
       if [ ! -f "$package" ]; then
-         echo "${red}${bold}ERROR:${reset} File $package does not exist. Have you run \"make deb-pkg-build\" already?"
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') File $package does not exist. Have you run \"make deb-pkg-build\" already?"
          exit 1
       fi
       echo "sudo dpkg -i '$package'"
@@ -1219,6 +1249,16 @@ make_checkout() {
 make_helper() {
    shopt -s globstar dotglob nullglob
    local d source_file file_without_pwd file_with_destdir
+
+   if ! test -d "$DESTDIR" ; then
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' does not exist!"
+      exit 1
+   fi
+   if ! test -w "$DESTDIR" ; then
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' is not writeable!"
+      exit 1
+   fi
+
    for d in $make_folder_list_for_un_and_install; do
       if [ -d "$d" ]; then
          for source_file in "$PWD/$d"/**; do
@@ -1244,7 +1284,7 @@ make_helper() {
             file_with_destdir="${DESTDIR}${file_without_pwd}"
             if [ "$make_uninstallcheck_" = "true" ]; then
                if [ -f "$file_with_destdir" ]; then
-                  echo "${red}${bold}ERROR:${reset} file $file_with_destdir still installed."
+                  echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') file $file_with_destdir still installed."
                   local still_installed="true"
                fi
             elif [ "$make_installcheck_" = "true" ]; then
@@ -1258,7 +1298,7 @@ make_helper() {
                   rm "$file_with_destdir"
                fi
             else
-               echo "${red}${bold}ERROR:${reset} error 2 in $FUNCNAME!"
+               echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') error 2 in $FUNCNAME!"
                exit 1
             fi
          done
@@ -1317,11 +1357,11 @@ make_deb-chl-bumpup() {
       ## Otherwise e-mail address in debian/changelog would default to
       ## user@host.localdomain and then lintian would complain and exit with
       ## failure code.
-      echo "${red}${bold}ERROR:${reset} environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
       exit 1
    fi
    if [ "$DEBFULLNAME" = "" ]; then
-      echo "${red}${bold}ERROR:${reset} environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
       exit 1
    fi
 
@@ -1405,7 +1445,7 @@ make_git_tag_check() {
    local make_git_describe_output
    make_git_describe_output="$(git describe --always --abbrev=1000000000)"
    if [ ! "$make_pkg_version_with_revision" = "$make_git_describe_output" ]; then
-      echo "$0: ${red}${bold}ERROR:${reset} Failed! Current git head a unsigned git tag! $running_as_root_maybe \
+      echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed! Current git head a unsigned git tag! $running_as_root_maybe \
 make_pkg_version_with_revision $make_pkg_version_with_revision differs from make_git_describe_output $make_git_describe_output" >&2
       exit 1
    fi
@@ -1422,7 +1462,7 @@ make_git_commit_verify_current() {
    local make_git_commit_verify_return_code="0"
    make_function_run make_git_commit_verify "HEAD" || { make_git_commit_verify_return_code="$?" ; true; };
    if [ ! "$make_git_commit_verify_return_code" = "0" ]; then
-      echo "$0: ${red}${bold}ERROR:${reset} Failed! Current git head commit is unsigned! $running_as_root_maybe" >&2
+      echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed! Current git head commit is unsigned! $running_as_root_maybe" >&2
       exit 1
    fi
    echo "$0: ${green}INFO:${reset} Ok, current git head commit is signed."
