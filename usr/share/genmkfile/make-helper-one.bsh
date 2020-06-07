@@ -882,7 +882,9 @@ make_manpages() {
 
       true "${bold}${cyan}${green}INFO:${reset} Creating man page $PWD/auto-generated-man-pages/$filename_without_ronn_file_extension ${reset}"
 
+      ## '--date=2020-01-01' for deterministic man pages.
       ronn \
+         --date=2020-01-01 \
          --manual="$make_source_package_name Manual" \
          --organization="$make_source_package_name" \
          < "$i" \
