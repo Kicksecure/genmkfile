@@ -1,3 +1,15 @@
+commit cb5d43e99d2781ed261a55a046dd1378ebe725ae
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jun 7 10:30:21 2020 -0400
+
+    ronn: add '--date=2020-01-01' for deterministic man pages.
+
+commit 6a1b93effab79003fb5df415cc2815eb0b5c2cc6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jun 3 16:32:19 2020 -0400
+
+    bumped changelog version
+
 commit 92659bbf04c947d30d4da1cfb6e287d2aa049992
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Jun 3 10:48:37 2020 -0400
