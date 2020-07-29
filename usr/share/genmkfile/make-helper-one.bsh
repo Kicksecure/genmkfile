@@ -921,9 +921,6 @@ make_deb-shared-dep() {
    echo "sudo \
       apt-get \
          ${APTGETOPT[@]} \
-         $apt_sourcelist_empty \
-         $apt_sourceparts \
-         $apt_unattended_opts \
          --yes \
          --no-install-recommends \
          install \
@@ -933,9 +930,6 @@ make_deb-shared-dep() {
    sudo \
       apt-get \
          ${APTGETOPT[@]} \
-         $apt_sourcelist_empty \
-         $apt_sourceparts \
-         $apt_unattended_opts \
          --yes \
          --no-install-recommends \
          install \
