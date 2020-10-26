@@ -44,7 +44,7 @@ Supports signing packages using debsign.
 export make_use_debsign=true
 ## How to install `genmkfile` using apt-get ##
 
-1\. Download [Whonix's Signing Key]().
+1\. Download Whonix's Signing Key.
 
 ```
 wget https://www.whonix.org/patrick.asc
