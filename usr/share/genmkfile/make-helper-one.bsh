@@ -908,12 +908,8 @@ make_clean() {
    if [ -f "$PWD/Makefile_orig" ]; then
       make -f "$PWD/Makefile_orig" clean
    else
-      if make --dry-run clean &>/dev/null ; then
-         echo "$0: ${green}INFO:${reset} (internal) make clean"
-         make clean
-      else
-         echo "$0: ${green}INFO:${reset} no target 'make clean', ok."
-      fi
+      echo "$0: ${green}INFO:${reset} (internal) make clean"
+      genmkfile clean
    fi
 }
 
@@ -1034,7 +1030,7 @@ beforehand?
       ## builddeps:/build/anon-apps-config_3.0-1.dsc:amd64 : Depends: genmkfile:amd64 but it is not installable
       ##
       ## Test command:
-      ## whonix_build_pbuilder_config_file=/home/user/whonix_binary/pbuilder.conf make_cross_build_platform_list=arm64 make_cowbuilder_dist_folder=~/genmkfile-packages-result make_use_cowbuilder=true make deb-pkg
+      ## whonix_build_pbuilder_config_file=/home/user/whonix_binary/pbuilder.conf make_cross_build_platform_list=arm64 make_cowbuilder_dist_folder=~/genmkfile-packages-result make_use_cowbuilder=true genmkfile deb-pkg
 
       ## COWBUILDER_PREFIX could set variables such as http_proxy.
       ## Whonix build script sets:
