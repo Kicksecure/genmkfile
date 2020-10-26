@@ -384,7 +384,7 @@ make_get_variables() {
    if ! command -v dpkg-parsechangelog >/dev/null ; then
       true 'dpkg-parsechangelog not found. Do you have the "build-essential" package installed?
 To install all dependencies, try running:
-sudo make deb-all-dep
+sudo genmkfile deb-all-dep
 '
       exit 1
    fi
@@ -574,97 +574,97 @@ mkdir -p $make_cowbuilder_dist_folder"
 make_help() {
    set +x
    echo "\
-make help
+genmkfile help
    Show this help.
-make dist
+genmkfile dist
    Create package-version.tar.xz from source files in \$DISTDIR (default \"..\").
-make undist
+genmkfile undist
    Delete package-version.tar.xz from source files in \$DISTDIR (default \"..\").
-make debdist
+genmkfile debdist
    Create debian.tar.xz from source files in \$DISTDIR (default \"..\").
-make undebdist
+genmkfile undebdist
    Delete debian.tar.xz from source files in \$DISTDIR (default \"..\").
-make debdsc
+genmkfile debdsc
    Create dsc file \$DISTDIR (default \"..\").
-make undebdsc
+genmkfile undebdsc
    Deletes dsc file \$DISTDIR (default \"..\").
-make debinstfile
+genmkfile debinstfile
    Creates files debian/pkg-name.install.
-make manpages
+genmkfile manpages
    Create man page from man source folder, which will be stored in auto-generated-man-pages folder.
-make uch
+genmkfile uch
    Store upstream changelog from git log in changelog.upstream.
-make install
+genmkfile install
    Copying the files from the source tree to system-wide directories.
-make installsim
+genmkfile installsim
    Simulate copying the files from the source tree to system-wide directories.
-make deb-build-dep
+genmkfile deb-build-dep
    Install build dependencies listed in debian/control under Build-Depends using apt-get.
    Various environment variables supported.
-make deb-run-dep
+genmkfile deb-run-dep
    Install runtime dependencies listed in debian/control under Depends using apt-get.
    Various environment variables supported.
-make deb-all-dep
+genmkfile deb-all-dep
    Combination of deb-build-dep and deb-build-dep.
-make deb-pkg-build
+genmkfile deb-pkg-build
    Create a deb, which will be stored in parent folder.
-make deb-install
+genmkfile deb-install
    Install deb from parent folder.
-make deb-icup
-   Combination of make deb-cleanup, deb-pkg-build, make deb-pkg-install and make deb-pkg-cleanup.
+genmkfile deb-icup
+   Combination of genmkfile deb-cleanup, deb-pkg-build, genmkfile deb-pkg-install and genmkfile deb-pkg-cleanup.
    icup stands for install and cleanup.
-make deb-remove
+genmkfile deb-remove
    apt-get remove make_source_package_name
-make deb-purge
+genmkfile deb-purge
    apt-get purge make_source_package_name
-make deb-clean
+genmkfile deb-clean
    Delete temporary debhelper files.
-make deb-cleanup
-   Same as make deb-clean and deletes debuild artifacts from parent folder.
-make dput-ubuntu-ppa
+genmkfile deb-cleanup
+   Same as genmkfile deb-clean and deletes debuild artifacts from parent folder.
+genmkfile dput-ubuntu-ppa
    Upload to Ubuntu ppa. Requires functional .dput.cf.
-make distclean
-   Currently same as make clean.
-make checkout
+genmkfile distclean
+   Currently same as genmkfile clean.
+genmkfile checkout
    Fetch from git.
-make installcheck
+genmkfile installcheck
    Check if source files match installed files.
-make uninstallcheck
-   Check if make uninstall removed all files.
-make uninstall
+genmkfile uninstallcheck
+   Check if genmkfile uninstall removed all files.
+genmkfile uninstall
    Delete all installed files.
-make uninstallsim
-   Simulate what make uninstall would do.
-make deb-chl-bumpup-manual
+genmkfile uninstallsim
+   Simulate what genmkfile uninstall would do.
+genmkfile deb-chl-bumpup-manual
    Manual upstream version number in debian/changelog.
-make deb-uachl-bumpup-manual
-   Combination of make uch and make deb-chl-bumpup.
-make deb-chl-bumpup-major
+genmkfile deb-uachl-bumpup-manual
+   Combination of genmkfile uch and genmkfile deb-chl-bumpup.
+genmkfile deb-chl-bumpup-major
    Major bump upstream version number in debian/changelog.
-make deb-uachl-bumpup-major
-   Combination of make uch and make deb-chl-bumpup.
-make git-tag-show
+genmkfile deb-uachl-bumpup-major
+   Combination of genmkfile uch and genmkfile deb-chl-bumpup.
+genmkfile git-tag-show
    echo the current git tag to stdout.
-make git-tag-sign
+genmkfile git-tag-sign
    git tag (-s) sign latest pkg_version_with_revision from debian/changelog. Only a repository sanity check. Not for security purposes!
-make git-tag-verify
+genmkfile git-tag-verify
    git tag (-v) verify latest pkg_version_with_revision from debian/changelog. Only a repository sanity check. Not for security purposes!
-make git-tag-check
+genmkfile git-tag-check
    Check if current git tag is a signed git tag. Only a repository sanity check. Not for security purposes!
-make git-commit-verify
+genmkfile git-commit-verify
    Check if current git head is a signed git commit. Only a repository sanity check. Not for security purposes!
-make git-verify
+genmkfile git-verify
    Combination of tag-check and commit-verify. Only a repository sanity check. Not for security purposes!
-make git-tag-push
+genmkfile git-tag-push
    git push latest pkg_version_with_revision from debian/changelog. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
-make git-tag-show-latest
+genmkfile git-tag-show-latest
    echo recent git tag to stdout.
-make git-tag-push-latest
+genmkfile git-tag-push-latest
    git push most recent git tag. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
-make reprepro-add
+genmkfile reprepro-add
    Add main deb package using reprepro wrapper (Environment variable make_reprepro_wrapper, that default to 'reprepro'.)
    to repository (Environment variable make_reprepro_codename, that defaults to 'local'.).
-make reprepro-remove
+genmkfile reprepro-remove
    Delete."
 }
 
@@ -850,7 +850,7 @@ make_debinstfile_create() {
 ## Copyright (C) 2020 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
-## This file was generated using genmkfile 'make debinstfile'.
+## This file was generated using 'genmkfile debinstfile'.
 " | tee -a "$make_debian_install_file_relative_path" >/dev/null
 
    local d
@@ -900,7 +900,7 @@ make_uch() {
 }
 
 make_distclean() {
-   echo "$0: ${green}INFO:${reset} (internal) make distclean"
+   echo "$0: ${green}INFO:${reset} (internal) genmkfile distclean"
    make_clean
 }
 
@@ -971,7 +971,7 @@ make_deb-pkg-build_shared() {
       if ! test -f "$make_upstream_tarball_real_path" ; then
          echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') upstream tarball $make_upstream_tarball_real_path does not exist.
 Did you run
-make dist && make debdist && make debdsc
+genmkfile dist && genmkfile debdist && genmkfile debdsc
 beforehand?
 "
          exit 1
@@ -980,7 +980,7 @@ beforehand?
       if ! test -f "$make_debian_tarball_absolute_path" ; then
          echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') debian tarball $make_debian_tarball_absolute_path does not exist.
 Did you run
-make dist && make debdist && make debdsc
+genmkfile dist && genmkfile debdist && genmkfile debdsc
 beforehand?
 "
          exit 1
@@ -989,7 +989,7 @@ beforehand?
       if ! test -f "$make_main_dsc_file" ; then
          echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dsc file $make_main_dsc_file does not exist.
 Did you run
-make dist && make debdist && make debdsc
+genmkfile dist && genmkfile debdist && genmkfile debdsc
 beforehand?
 "
          exit 1
@@ -1062,7 +1062,7 @@ beforehand?
       if ! command -v debuild >/dev/null ; then
          echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') debuild not found. Do you have the 'devscripts' package installed?
 To install all dependencies, try running:
-sudo make deb-all-dep
+sudo genmkfile deb-all-dep
 "
          exit 1
       fi
@@ -1070,7 +1070,7 @@ sudo make deb-all-dep
       if ! dpkg-checkbuilddeps ; then
          echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-checkbuilddeps reported missing build dependencies.
 To install all dependencies, try running:
-sudo make deb-all-dep
+sudo genmkfile deb-all-dep
 "
          exit 1
       fi
@@ -1177,7 +1177,7 @@ make_deb-install() {
    local package
    for package in $make_package_debs_files_list; do
       if [ ! -f "$package" ]; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') File $package does not exist. Have you run \"make deb-pkg-build\" already?"
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') File $package does not exist. Have you run \"genmkfile deb-pkg-build\" already?"
          exit 1
       fi
       echo "sudo dpkg -i '$package'"
