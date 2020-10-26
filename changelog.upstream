@@ -1,3 +1,41 @@
+commit 08c01c40bcfce193c9621fd0769524364492cacf
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 26 08:02:42 2020 -0400
+
+    readme
+
+commit f2512fe8b997496b666adb71b7f43f3a01cb9457
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 26 07:51:08 2020 -0400
+
+    comment
+
+commit 3123aab04dfd397884ba5d9f863476e9f29e4109
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 26 07:50:35 2020 -0400
+
+    Revert "make -> genmkfile"
+    
+    This reverts commit be4db8ecfcba4362ffe48c058554e6bce401fb50.
+
+commit be4db8ecfcba4362ffe48c058554e6bce401fb50
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 26 07:49:20 2020 -0400
+
+    make -> genmkfile
+
+commit 0a5504380e325220293d6ca973f7dd83a71863d0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Oct 26 07:31:51 2020 -0400
+
+    output
+
+commit 57eea6cb0715b086540cab8252bd308a033ff8eb
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Jul 29 12:38:14 2020 -0400
+
+    bumped changelog version
+
 commit f907f20b45cf426d3e932fe72e1160c494ebf3c2
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Jul 29 12:38:04 2020 -0400
