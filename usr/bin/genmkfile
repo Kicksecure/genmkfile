@@ -10,11 +10,11 @@ cd ..
 cd ..
 
 if [ "$GENMKFILE_PATH" = "" ] ; then
-   if [ -f "./packages/genmkfile/usr/share/genmkfile/makefile-full" ]; then
+   if [ -d "./packages/genmkfile/usr/share/genmkfile" ]; then
       GENMKFILE_PATH="./packages/genmkfile/usr/share/genmkfile"
-   elif [ -f "./usr/share/genmkfile/makefile-full" ]; then
+   elif [ -d "./usr/share/genmkfile" ]; then
       GENMKFILE_PATH="./usr/share/genmkfile"
-   elif [ -f "/usr/share/genmkfile/makefile-full" ]; then
+   elif [ -d "/usr/share/genmkfile" ]; then
       GENMKFILE_PATH="/usr/share/genmkfile"
    else
       echo "$0: ERROR: Auto detection of GENMKFILE_PATH failed!"
@@ -23,6 +23,17 @@ fi
 
 GENMKFILE_PATH="$(realpath "$GENMKFILE_PATH")"
 export GENMKFILE_PATH
+
+if [ ! -r "${GENMKFILE_PATH}/makefile-full" ]; then
+   echo "$0: ERROR: Folder '$GENMKFILE_PATH' exists but file '${GENMKFILE_PATH}/makefile-full' does not readable!"
+   echo "$0: ERROR: Running 'ls -la $GENMKFILE_PATH' for debugging..."
+   ls -la "$GENMKFILE_PATH"
+   echo "$0: ERROR: Permission denied error? Try running:"
+   echo ""
+   echo "sudo chmod --recursive o+r '$GENMKFILE_PATH'"
+   echo "sudo chmod o+x '$GENMKFILE_PATH'"
+   echo ""
+fi
 
 popd >/dev/null
 
