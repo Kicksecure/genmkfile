@@ -1,3 +1,17 @@
+commit 2e6e3a98d485761095fa30851f023315ac7ba0f5
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Dec 20 09:06:00 2020 -0500
+
+    hardened-malloc-kicksecure `man` `seccomp` workaround
+    
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/135
+
+commit 112ac79c2b4f0a7af9ce69e85deb61bd3c387378
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Dec 14 01:53:12 2020 -0500
+
+    bumped changelog version
+
 commit 2c3e750905a2c4190da2fb30ef0b39fff17c4b3e
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Dec 14 01:52:55 2020 -0500
