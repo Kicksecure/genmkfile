@@ -1295,7 +1295,7 @@ make_helper() {
                if [ ! -d "$DESTDIR" ]; then
                   mkdir --parents "$DESTDIR"
                fi
-               cp -R "$d" "$DESTDIR"
+               cp --recursive "$d" "$DESTDIR"
                break
             elif [ "$make_installsim_" = "true" ]; then
                if [ ! -d "$DESTDIR" ]; then
@@ -1303,7 +1303,7 @@ make_helper() {
                else
                   echo "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents \"$DESTDIR\""
                fi
-               echo "${green}INFO:${reset} would do: cp -R \"$d\" \"$DESTDIR\""
+               echo "${green}INFO:${reset} would do: cp --recursive \"$d\" \"$DESTDIR\""
                break
             fi
             if [ ! -f "$source_file" ]; then
