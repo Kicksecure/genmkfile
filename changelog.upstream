@@ -1,3 +1,33 @@
+commit 7ec8d899cd2a0ad04d2e6f324b0fb962ee2f31af
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Dec 24 09:19:33 2020 -0500
+
+    Revert "genmkfile install: use `cp` with `--archive`"
+    
+    This reverts commit 3a3fb75c3a32d6c00604fe6fdd91072736bd8ea0.
+
+commit 3a3fb75c3a32d6c00604fe6fdd91072736bd8ea0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Dec 24 09:14:14 2020 -0500
+
+    genmkfile install: use `cp` with `--archive`
+    
+    to use same file permissions in installation folder than in source folder
+    
+    to fix sudo ./usr/bin/genmkfile install
+
+commit cc69916d78632d003eaab4cd1e4e513c0bc0f2ea
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Dec 24 09:13:00 2020 -0500
+
+    refactoring
+
+commit 1aa5a0ccb3af11ace205fa32a9275cc102129f07
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Dec 20 09:08:01 2020 -0500
+
+    bumped changelog version
+
 commit 2e6e3a98d485761095fa30851f023315ac7ba0f5
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Dec 20 09:06:00 2020 -0500
