@@ -962,7 +962,7 @@ Does your key exist in file '~/.gnupg/trustedkeys.gpg'?
 
 To add you could use for example:
 
-gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/Whonix/packages/whonix-repository/usr/share/whonix-repository/whonix.asc
+gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/Whonix/packages/repository-dist/usr/share/repository-dist/derivative-distribution-signing-key.asc
 "
 }
 
