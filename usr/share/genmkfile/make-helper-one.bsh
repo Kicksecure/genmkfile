@@ -1507,6 +1507,7 @@ make_git_tag_push() {
    make_function_run make_git_tag_shared
    local repository
    for repository in $make_git_tag_push_targets; do
+      echo "git push $repository $make_pkg_version_with_revision"
       git push "$repository" "$make_pkg_version_with_revision"
    done
 }
@@ -1524,6 +1525,7 @@ make_git_tag_push_latest() {
    make_git_tag_latest="$(git describe --tags $(git rev-list --tags --max-count=1))"
    local repository
    for repository in $make_git_tag_push_targets; do
+      echo "git push $repository $make_git_tag_latest"
       git push "$repository" "$make_git_tag_latest"
    done
 }
