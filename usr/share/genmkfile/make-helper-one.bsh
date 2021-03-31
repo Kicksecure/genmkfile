@@ -1411,7 +1411,7 @@ make_deb-chl-bumpup() {
       new_revision="1"
       new_changelog_version="$make_epoch:$new_upstream_version-$new_revision"
    elif [ "$make_bump_type" = "manual" ]; then
-      echo "Current version number: $make_pkg_version"
+      echo "Current version number: $make_changelog_version"
       echo "Please enter new version number!"
       read new_changelog_version
    else
