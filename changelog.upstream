@@ -1,3 +1,15 @@
+commit c2c649bc91cddc4fa1884213cc0b6bed14d43f2f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Mar 31 10:54:39 2021 -0400
+
+    change output of genmkfile deb-chl-bumpup-manual
+
+commit 727a7037fa4f0203e3510a0e48dee0e97497b852
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Mar 18 09:03:58 2021 -0400
+
+    bumped changelog version
+
 commit 171f7e4f74875ab5c10eb8c0d022df210c39a62e
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Mar 18 08:57:19 2021 -0400
