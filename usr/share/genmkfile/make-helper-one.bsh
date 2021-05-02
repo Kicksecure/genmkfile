@@ -473,9 +473,8 @@ sudo genmkfile deb-all-dep
 
    make_debian_install_file_relative_path="debian/${make_source_package_name}.install"
 
-   ## Example: grep_output
-   ## Package: anon-shared-packages-dependencies
-   ## Package: anon-shared-packages-recommended
+   ## Example grep_output:
+   ## Package: non-qubes-vm-enhancements-cli
 
    while read -r -d $'\n' grep_line; do
       read -r a package _ <<< "$grep_line"
