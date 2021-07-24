@@ -1,3 +1,45 @@
+commit 69cf59653482699602fb3120fb1927ee074a7c5b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 24 15:34:27 2021 -0400
+
+    improve error handling
+
+commit 2c68f84894608617337fb2fb0c9f37cd17325514
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 24 15:28:45 2021 -0400
+
+    improve support for debian/changelog file without epoch
+
+commit 76a79fb21defa258f51933db9ab1f314852ee6c8
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 24 15:16:31 2021 -0400
+
+    add support for debian/changelog file without epoch
+
+commit 43bedd4677b12f62bed54c6d3aa8781fc673a6d9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 24 12:58:27 2021 -0400
+
+    LKRG v0.9.1 compatibility
+
+commit 13ac082403b6b92fc0680efc14549090c89a58c2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 24 12:52:55 2021 -0400
+
+    refactoring
+
+commit 56611936b5cdef54edd02285eeee0f9786476879
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 24 11:44:37 2021 -0400
+
+    clean up temporary file "debian/$package.dkms.debhelper"
+
+commit 70f2fd541ea96888889b407cd4f37c240916d3d5
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 5 08:33:41 2021 -0400
+
+    bumped changelog version
+
 commit e54b3b2a480149ab534795d9ef32a56b6181c071
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun May 2 08:43:35 2021 -0400
