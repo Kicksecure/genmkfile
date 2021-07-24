@@ -428,16 +428,21 @@ sudo genmkfile deb-all-dep
          make_changelog_version="$second"
          ## Example make_changelog_version:
          ## 3:0.1-1
-         make_pkg_revision="${second#*-}"
+         ## 0.1-1
+         if ! echo "$make_changelog_version" | grep --quiet ":" ; then
+            ## transform 0.1-1 to 0:0.1-1
+            make_changelog_version="0:$make_changelog_version"
+         fi
+         make_pkg_revision="${make_changelog_version#*-}"
          ## Example make_pkg_revision:
          ## 1
-         temp="${second%-*}"
+         temp="${make_changelog_version%-*}"
          ## Example temp:
          ## 3:0.1
          make_pkg_version="${temp#*:}"
          ## Example make_pkg_version:
          ## 0.1
-         make_epoch="${second%:*}"
+         make_epoch="${temp%:*}"
          ## Example make_epoch:
          ## 3
          break
