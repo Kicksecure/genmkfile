@@ -429,10 +429,6 @@ sudo genmkfile deb-all-dep
          ## Example make_changelog_version:
          ## 3:0.1-1
          ## 0.1-1
-         if ! echo "$make_changelog_version" | grep --quiet ":" ; then
-            ## transform 0.1-1 to 0:0.1-1
-            make_changelog_version="0:$make_changelog_version"
-         fi
          make_pkg_revision="${make_changelog_version#*-}"
          ## Example make_pkg_revision:
          ## 1
@@ -442,7 +438,11 @@ sudo genmkfile deb-all-dep
          make_pkg_version="${temp#*:}"
          ## Example make_pkg_version:
          ## 0.1
-         make_epoch="${temp%:*}"
+         if echo "$make_changelog_version" | grep --quiet ":" ; then
+            make_epoch="${temp%:*}"
+         else
+            make_epoch=""
+         fi
          ## Example make_epoch:
          ## 3
          break
@@ -1426,14 +1426,21 @@ make_deb-chl-bumpup() {
       if [ "$version_numbers_by_upstream" = "true" ] ; then
          ## Thanks to:
          ## https://stackoverflow.com/a/4485581
-         new_upstream_version="$(echo "$make_pkg_version" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')"
+         #new_upstream_version="$(echo "$make_pkg_version" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')"
+         new_upstream_version="$make_pkg_version"
+         new_revision="$(bc -l <<< "scale=9 ; $make_pkg_revision + 1")"
       else
          new_upstream_version_without_leading_zero="$(bc -l <<< "scale=9 ; $make_pkg_version + 0.1")"
          new_upstream_version="$(printf '%3.1f\n' "$new_upstream_version_without_leading_zero")"
+         ## Packages by Kicksecure / Whonix always bump package version. Not Debian package revision.
+         new_revision="1"
       fi
 
-      new_revision="1"
-      new_changelog_version="$make_epoch:$new_upstream_version-$new_revision"
+      if [ "$make_epoch" = "" ]; then
+         new_changelog_version="$new_upstream_version-$new_revision"
+      else
+         new_changelog_version="$make_epoch:$new_upstream_version-$new_revision"
+      fi
    elif [ "$make_bump_type" = "manual" ]; then
       echo "Current version number: $make_changelog_version"
       echo "Please enter new version number!"
