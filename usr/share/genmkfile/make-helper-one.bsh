@@ -1151,7 +1151,14 @@ make_lintian() {
       ## See hardened_malloc debian/50hardened-malloc for more information.
       ## https://github.com/Whonix/hardened_malloc/blob/master/debian/50hardened-malloc
       ## https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/135
-      export DEBUILD_LINTIAN_OPTS="--suppress-tags testsuite-autopkgtest-missing --suppress-tags manpage-has-bad-whatis-entry --quiet --pedantic --info --display-info"
+      export DEBUILD_LINTIAN_OPTS="\
+         --suppress-tags testsuite-autopkgtest-missing \
+         --suppress-tags manpage-has-bad-whatis-entry \
+         --quiet \
+         --pedantic \
+         --info \
+         --display-info \
+         "
    fi
    local make_lintian_exit_code="0"
    echo "lintian $genmkfile_lintian_pre_opts $DEBUILD_LINTIAN_OPTS $genmkfile_lintian_post_opts \"$make_main_changes_file\""
