@@ -1,3 +1,19 @@
+commit 2a0d7eb4a9e606a909258281f514aa82b99b6212
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 24 18:54:49 2021 -0400
+
+    Force the inclusion of the original source
+    
+    if Debian package revision number is higher than 1.
+    
+    LKRG package compatibility fix.
+
+commit 480ee2ceaf04e319b816bd340f0017f9a23d8d2e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 24 18:04:47 2021 -0400
+
+    bumped changelog version
+
 commit 69cf59653482699602fb3120fb1927ee074a7c5b
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Jul 24 15:34:27 2021 -0400
