@@ -1428,9 +1428,9 @@ make_deb-chl-bumpup() {
          ## https://stackoverflow.com/a/4485581
          #new_upstream_version="$(echo "$make_pkg_version" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')"
          new_upstream_version="$make_pkg_version"
-         new_revision="$(bc -l <<< "scale=9 ; $make_pkg_revision + 1")"
+         new_revision="$(bc -l <<< "scale=9 ; $make_pkg_revision + 1" 2>&1)"
       else
-         new_upstream_version_without_leading_zero="$(bc -l <<< "scale=9 ; $make_pkg_version + 0.1")"
+         new_upstream_version_without_leading_zero="$(bc -l <<< "scale=9 ; $make_pkg_version + 0.1" 2>&1)"
          new_upstream_version="$(printf '%3.1f\n' "$new_upstream_version_without_leading_zero")"
          ## Packages by Kicksecure / Whonix always bump package version. Not Debian package revision.
          new_revision="1"
@@ -1453,6 +1453,11 @@ make_deb-chl-bumpup() {
 Bumping version from / to...
 $make_changelog_version
 $new_changelog_version"
+
+   if echo "$new_changelog_version" | grep --quiet "error" ; then
+      echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed!" >&2
+      exit 1
+   fi
 
    [ -n "$DEBCHANGE_MSG" ] || DEBCHANGE_MSG="New upstream version (local package)."
 
