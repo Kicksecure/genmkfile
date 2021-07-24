@@ -1049,9 +1049,31 @@ beforehand?
       ## creates $make_main_changes_file
       ##
       ## creates again (overwrites) $make_debian_tarball_file_name
+      ##
+      ## Forces the inclusion of the original source.
+      ## --debbuildopts="-sa" is passed by cowbuilder to pdebuild (which passes
+      ## it to debuild?) which passes it to dpkg-genchanges. In other words,
+      ## results in 'dpkg-genchanges -sa'.
+      ## That is required when make_pkg_revision is higher than 1. In that case
+      ## by default the original source tarball would not be included by Debian
+      ## default. The practice in Debian is not to upload the original source
+      ## tarball if only the Debian package revision version number was
+      ## increased since it would already be in the archive. That however seems
+      ## incompatible with reprepro, which would show the following error:
+      ## ##
+      ## Unable to find pool/main/l/lkrg/lkrg_0.9.1.orig.tar.xz needed by lkrg_0.9.1-3.dsc!
+      ## Perhaps you forgot to give dpkg-buildpackage the '-sa' option,
+      ## or you could try --ignore=missingfile to guess possible files to use.
+      ## There have been errors!
+      ## ##
+      ## Maybe non-ideal. '--debbuildopts="-sa" would only be required' if
+      ## package revision number is higher than 1 and maybe only if there never
+      ## has been package revision number 1 including upstream source tarball
+      ## uploaded beforehand. Good enough.
       sudo \
          $COWBUILDER_PREFIX \
             cowbuilder \
+               --debbuildopts="-sa" \
                --architecture "$target_architecture" \
                $make_cowbuilder_config_file_arg \
                --build "$make_main_dsc_file" \
