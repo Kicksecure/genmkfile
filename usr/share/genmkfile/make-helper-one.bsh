@@ -1179,9 +1179,6 @@ make_lintian() {
       ## https://github.com/Whonix/hardened_malloc/blob/master/debian/50hardened-malloc
       ## https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/135
       ##
-      ## lkrg:
-      ## --suppress-tags newer-standards-version (can be removed in Debian buster)
-      ##
       ## https://github.com/openwall/lkrg/pull/105
       ## --suppress-tags systemd-service-file-missing-documentation-key
       ##
@@ -1190,7 +1187,6 @@ make_lintian() {
       export DEBUILD_LINTIAN_OPTS="\
          --suppress-tags testsuite-autopkgtest-missing \
          --suppress-tags manpage-has-bad-whatis-entry \
-         --suppress-tags newer-standards-version \
          --suppress-tags systemd-service-file-missing-documentation-key \
          --suppress-tags orig-tarball-missing-upstream-signature \
          --quiet \
