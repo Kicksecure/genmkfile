@@ -1194,6 +1194,7 @@ make_lintian() {
          --suppress-tags bad-whatis-entry \
          --suppress-tags systemd-service-file-missing-documentation-key \
          --suppress-tags orig-tarball-missing-upstream-signature \
+         --suppress-tags package-supports-alternative-init-but-no-init.d-script \
          --quiet \
          --pedantic \
          --info \
