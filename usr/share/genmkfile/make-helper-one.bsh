@@ -1178,7 +1178,7 @@ make_lintian() {
    test -f "$make_main_changes_file"
    if [ "$DEBUILD_LINTIAN_OPTS" = "" ]; then
       ## TODO: Debian bullseye
-      ## '--suppress-tags manpage-has-bad-whatis-entry' can maybe get removed.
+      ## '--suppress-tags bad-whatis-entry' can maybe get removed.
       ## `man` `seccomp` workaround.
       ## See hardened_malloc debian/50hardened-malloc for more information.
       ## https://github.com/Whonix/hardened_malloc/blob/master/debian/50hardened-malloc
@@ -1190,8 +1190,8 @@ make_lintian() {
       ## Building from git. Not from tarball.
       ## --suppress-tags orig-tarball-missing-upstream-signature
       export DEBUILD_LINTIAN_OPTS="\
-         --suppress-tags testsuite-autopkgtest-missing \
-         --suppress-tags manpage-has-bad-whatis-entry \
+         --suppress-tags missing-tests-control \
+         --suppress-tags bad-whatis-entry \
          --suppress-tags systemd-service-file-missing-documentation-key \
          --suppress-tags orig-tarball-missing-upstream-signature \
          --quiet \
