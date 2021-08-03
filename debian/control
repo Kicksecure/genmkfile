@@ -5,11 +5,12 @@ Source: genmkfile
 Section: misc
 Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@whonix.org>
-Build-Depends: debhelper (>= 12), devscripts, strip-nondeterminism, perl
+Build-Depends: debhelper (>= 13), debhelper-compat (= 13), devscripts, strip-nondeterminism, perl
 Homepage: https://github.com/Whonix/genmkfile
 Vcs-Browser: https://github.com/Whonix/genmkfile
 Vcs-Git: https://github.com/Whonix/genmkfile.git
-Standards-Version: 4.3.0
+Standards-Version: 4.5.1
+Rules-Requires-Root: no
 
 Package: genmkfile
 Architecture: all
