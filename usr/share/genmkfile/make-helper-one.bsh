@@ -1695,11 +1695,11 @@ else
 fi
 
 if [ "$make_script_was_sourced" = "false" ]; then
-   if [ -f /usr/lib/helper-scripts/pre.bsh ]; then
+   if [ -f /usr/libexec/helper-scripts/pre.bsh ]; then
       ## pre.bsh would `source` the following folders:
       ## /etc/make-helper-one.bsh_pre.d/*.conf
       ## /usr/local/etc/make-helper-one.bsh_pre.d/*.conf
-      source /usr/lib/helper-scripts/pre.bsh
+      source /usr/libexec/helper-scripts/pre.bsh
       true
    fi
 
