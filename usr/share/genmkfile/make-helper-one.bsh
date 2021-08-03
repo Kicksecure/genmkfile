@@ -703,12 +703,16 @@ make_dist() {
    echo "DEBUG manual reproduction:
 cd $(pwd)"
 
+   ## Excluding '/debian' folder from upstream tarball to avoid lintian warning
+   ## 'no-debian-changes'.
+
    echo "DEBUG manual reproduction:
 find \
       '.' \
       -not -path '*/\.git/*' \
       -not -path '*/\.git' \
       -not -name '.gitignore' \
+      -not -path './debian*' \
       -print0 \
          | tar \
             --null \
@@ -729,6 +733,7 @@ find \
       -not -path '*/\.git/*' \
       -not -path '*/\.git' \
       -not -name '.gitignore' \
+      -not -path './debian*' \
       -print0 \
          | tar \
             --null \
