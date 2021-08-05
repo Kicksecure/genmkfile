@@ -1,3 +1,89 @@
+commit 3c7c3729dfcfed919a8cb38010d1ac986004edee
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 4 07:46:43 2021 -0400
+
+    lintian --suppress-tags no-manual-page
+
+commit eee1274f65b58a4d28552c231ad8dcd40173e28f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 12:48:53 2021 -0400
+
+    move /usr/lib/helper-scripts and /usr/lib/curl-scripts to /usr/libexec/helper-scripts as per lintian FHS
+
+commit 98ec32f0e60106b54aebbd916049a29e083848af
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 11:47:33 2021 -0400
+
+    re-generate man pages (generated using "genmkfile manpages")
+
+commit c9d8a4a41ba913fdc009fce0b78f6543b5576eaf
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 11:42:11 2021 -0400
+
+    man page
+
+commit 1116e4fb6c212675d944711e97b226de7182913b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 07:00:38 2021 -0400
+
+    remove `lintian` `--suppress-tags bad-whatis-entry`
+    
+    since no longer needed
+    
+    Was `man` `seccomp` workaround.
+    
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/135
+
+commit fe5827c2f6fe34e005390124b507f71d38183041
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 06:50:55 2021 -0400
+
+    comment
+
+commit 53c58072b174bb45c0c8e9dcba2f0a00c8e5ad80
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 06:50:13 2021 -0400
+
+    `lintian` `--suppress-tags package-supports-alternative-init-but-no-init.d-script`
+
+commit 291db348f2319142a00bf9b270b0f1af4cc7a2aa
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 06:08:36 2021 -0400
+
+    update lintian tag name
+
+commit 45a3bec7a01b34c6fa6ae0db1a5bdf3bfdb04eca
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 06:04:43 2021 -0400
+
+    exclude `/debian` folder from upstream tarball
+    
+    to avoid lintian warning `no-debian-changes`
+
+commit 59133ea297149d417694e12d62fa525879b55fac
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 05:48:20 2021 -0400
+
+    bullseye
+
+commit 2bd259acb073837c5ed856d952c6eec5c878f736
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 1 16:31:33 2021 -0400
+
+    bullseye
+
+commit ecaafc786e6cf6003b3f9ed622320be754cecf25
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 1 16:24:28 2021 -0400
+
+    readme
+
+commit 24a0cd2302406859a942dd1348bf06dff05d3452
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 24 18:57:20 2021 -0400
+
+    bumped changelog version
+
 commit 2a0d7eb4a9e606a909258281f514aa82b99b6212
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Jul 24 18:54:49 2021 -0400
