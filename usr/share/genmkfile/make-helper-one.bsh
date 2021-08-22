@@ -355,7 +355,7 @@ make_parse_cmd() {
 
 make_dependencies_filter_helper() {
    temp="$@"
-   for to_remove in '${shlibs:Depends}' '${misc:Depends}' '${python:Depends}' '|' ; do
+   for to_remove in '${shlibs:Depends}' '${misc:Depends}' '${python:Depends}' '${python3:Depends}' '|' ; do
       temp="${temp//"$to_remove"/""}"
    done
    echo "$temp"
