@@ -1233,8 +1233,8 @@ make_deb-install() {
          echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') File $package does not exist. Have you run \"genmkfile deb-pkg-build\" already?"
          exit 1
       fi
-      echo "sudo dpkg -i '$package'"
-      sudo dpkg -i "$package"
+      echo "sudo apt-get install '$package'"
+      sudo apt-get install "$package"
    done
 }
 
