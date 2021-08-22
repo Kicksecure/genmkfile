@@ -1,3 +1,35 @@
+commit 87258fc755b5744b4ae4233484ce320f73e388f8
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 22 06:20:49 2021 -0400
+
+    genmkfile deb-install: install using `apt-get install` instead of `dpkg -i`
+    
+    for dependency resolution (sdwdate vs time-deamon)
+
+commit c2f34ff8b359eb5a8381a0a63b8fcb321f382c5f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 22 06:15:38 2021 -0400
+
+    output
+
+commit ee706c72978f5a5c9e82fd8378d398aa9a30db73
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 22 06:13:54 2021 -0400
+
+    output
+
+commit ae57c0c32ec1f7e6b57fd0ca9e766e5d7c564a2c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 22 06:07:20 2021 -0400
+
+    update make_dependencies_filter_helper
+
+commit 3a1d8016563d07f5028c4931bf8324d13b12bb22
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Aug 5 16:41:11 2021 -0400
+
+    bumped changelog version
+
 commit 3c7c3729dfcfed919a8cb38010d1ac986004edee
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Aug 4 07:46:43 2021 -0400
