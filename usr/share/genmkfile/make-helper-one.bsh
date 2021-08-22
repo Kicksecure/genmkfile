@@ -927,13 +927,16 @@ make_clean() {
 }
 
 make_deb-shared-dep() {
-   echo "sudo \
+   msg="sudo \
       apt-get \
          ${APTGETOPT[@]} \
          --yes \
          --no-install-recommends \
          install \
          $make_deb_shared_dependencies"
+
+   msg="$(echo "$msg" | sed 's/  */ /g')"
+   echo "$msg"
 
    local apt_get_exit_code="0"
    sudo \
