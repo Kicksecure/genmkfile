@@ -706,7 +706,7 @@ cd $(pwd)"
    ## Excluding '/debian' folder from upstream tarball to avoid lintian warning
    ## 'no-debian-changes'.
 
-   echo "DEBUG manual reproduction:
+   msg="DEBUG manual reproduction:
 find \
       '.' \
       -not -path '*/\.git/*' \
@@ -727,6 +727,9 @@ find \
             -T \
             -
    "
+
+   msg="$(echo "$msg" | sed 's/  */ /g')"
+   echo "$msg"
 
    find \
       '.' \
