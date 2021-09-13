@@ -669,7 +669,13 @@ genmkfile reprepro-add
    Add main deb package using reprepro wrapper (Environment variable make_reprepro_wrapper, that default to 'reprepro'.)
    to repository (Environment variable make_reprepro_codename, that defaults to 'local'.).
 genmkfile reprepro-remove
-   Delete."
+   Delete.
+
+multiple architecture builds examples:
+
+make_use_cowbuilder=true make_cross_build_platform_list='amd64 arm64' genmkfile deb-pkg
+
+make_use_cowbuilder=true make_cross_build_platform_list='amd64' genmkfile deb-pkg"
 }
 
 make_all() {
