@@ -1018,16 +1018,16 @@ beforehand?
 
       true "COWBUILDER_PREFIX: $COWBUILDER_PREFIX"
 
-      if [ ! "$whonix_build_apt_stable_release" = "" ]; then
-         [ -n "$make_cowbuilder_distribution" ] || make_cowbuilder_distribution="$whonix_build_apt_stable_release"
+      if [ ! "$dist_build_apt_stable_release" = "" ]; then
+         [ -n "$make_cowbuilder_distribution" ] || make_cowbuilder_distribution="$dist_build_apt_stable_release"
       else
          [ -n "$make_cowbuilder_distribution" ] || make_cowbuilder_distribution="$(lsb_release --short --codename)"
       fi
 
       ## Whonix build script sets variable `make_cowbuilder_mirror`.
 
-      if [ ! "$whonix_build_apt_sources_mirror" = "" ]; then
-         [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="$whonix_build_apt_sources_mirror"
+      if [ ! "$dist_build_apt_sources_mirror" = "" ]; then
+         [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="$dist_build_apt_sources_mirror"
       else
          ## apt-cacher-ng support
          if [ "$REPO_PROXY" = "http://127.0.0.1:3142" ]; then
