@@ -1606,8 +1606,8 @@ make_reprepro-shared() {
          make_reprepro_codename="$WHONIX_BUILD_APT_CODENAME"
       fi
    fi
-   if [ -x "../whonix-developer-meta-files/debug-steps/reprepro-wrapper" ]; then
-      make_reprepro_wrapper="../whonix-developer-meta-files/debug-steps/reprepro-wrapper"
+   if [ -x "../developer-meta-files/debug-steps/reprepro-wrapper" ]; then
+      make_reprepro_wrapper="../developer-meta-files/debug-steps/reprepro-wrapper"
    else
       make_reprepro_wrapper="reprepro"
    fi
