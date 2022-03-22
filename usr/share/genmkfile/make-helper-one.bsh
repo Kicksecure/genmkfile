@@ -1043,19 +1043,19 @@ beforehand?
       cow_folder="/var/cache/pbuilder/cow.cow_${target_architecture}"
       base_folder="/var/cache/pbuilder/base.cow_${target_architecture}"
 
-      if [ ! "$whonix_build_pbuilder_config_file" = "" ]; then
-         make_cowbuilder_config_file_arg="--configfile $whonix_build_pbuilder_config_file"
+      if [ ! "$dist_build_pbuilder_config_file" = "" ]; then
+         make_cowbuilder_config_file_arg="--configfile $dist_build_pbuilder_config_file"
       fi
 
       ## Using cowbuilder with
       ## --host-arch "$host_architecture" \
-      ## --architecture "$BUILD_TARGET_ARCH" \
+      ## --architecture "$dist_build_target_arch" \
       ## can cause the following build error:
       ## The following packages have unmet dependencies:
       ## builddeps:/build/anon-apps-config_3.0-1.dsc:amd64 : Depends: genmkfile:amd64 but it is not installable
       ##
       ## Test command:
-      ## whonix_build_pbuilder_config_file=/home/user/whonix_binary/pbuilder.conf make_cross_build_platform_list=arm64 make_cowbuilder_dist_folder=~/genmkfile-packages-result make_use_cowbuilder=true genmkfile deb-pkg
+      ## dist_build_pbuilder_config_file=/home/user/whonix_binary/pbuilder.conf make_cross_build_platform_list=arm64 make_cowbuilder_dist_folder=~/genmkfile-packages-result make_use_cowbuilder=true genmkfile deb-pkg
 
       ## COWBUILDER_PREFIX could set variables such as http_proxy.
       ## Whonix build script sets:
@@ -1600,10 +1600,10 @@ make_reprepro-shared() {
    local package package_absolute_path $make_reprepro_codename codename
 
    if [ "$make_reprepro_codename" = "" ]; then
-      if [ "$WHONIX_BUILD_APT_CODENAME" = "" ]; then
+      if [ "$dist_build_apt_codename" = "" ]; then
          make_reprepro_codename="local"
       else
-         make_reprepro_codename="$WHONIX_BUILD_APT_CODENAME"
+         make_reprepro_codename="$dist_build_apt_codename"
       fi
    fi
    if [ -x "../developer-meta-files/debug-steps/reprepro-wrapper" ]; then
