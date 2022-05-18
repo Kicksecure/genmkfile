@@ -28,8 +28,8 @@ true "$0: GENMKFILE_PATH: $GENMKFILE_PATH"
 ## For manual invocation.
 ## Should be set by makefile already.
 if [ "$GENMKFILE_PATH" = "" ] ; then
-   if [ -f "./packages/genmkfile/usr/share/genmkfile/makefile-full" ]; then
-      GENMKFILE_PATH="./packages/genmkfile/usr/share/genmkfile"
+   if [ -f "./packages/Kicksecure/genmkfile/usr/share/genmkfile/makefile-full" ]; then
+      GENMKFILE_PATH="./packages/Kicksecure/genmkfile/usr/share/genmkfile"
    elif [ -f "./usr/share/genmkfile/makefile-full" ]; then
       GENMKFILE_PATH="./usr/share/genmkfile"
    elif [ -f "/usr/share/genmkfile/makefile-full" ]; then

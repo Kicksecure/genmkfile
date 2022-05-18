@@ -12,7 +12,7 @@
 .PHONY: about
 
 GENMKFILE_NAME ?= makefile-full
-GENMKFILE_BOOTSTRAP_ONE ?= ./packages/genmkfile/usr/share/genmkfile
+GENMKFILE_BOOTSTRAP_ONE ?= ./packages/Kicksecure/genmkfile/usr/share/genmkfile
 GENMKFILE_BOOTSTRAP_TWO ?= ./usr/share/genmkfile
 GENMKFILE_ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 GENMKFILE_CURRENT := $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))

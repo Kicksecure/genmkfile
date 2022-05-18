@@ -10,8 +10,8 @@ cd ..
 cd ..
 
 if [ "$GENMKFILE_PATH" = "" ] ; then
-   if [ -d "./packages/genmkfile/usr/share/genmkfile" ]; then
-      GENMKFILE_PATH="./packages/genmkfile/usr/share/genmkfile"
+   if [ -d "./packages/Kicksecure/genmkfile/usr/share/genmkfile" ]; then
+      GENMKFILE_PATH="./packages/Kicksecure/genmkfile/usr/share/genmkfile"
    elif [ -d "./usr/share/genmkfile" ]; then
       GENMKFILE_PATH="./usr/share/genmkfile"
    elif [ -d "/usr/share/genmkfile" ]; then
