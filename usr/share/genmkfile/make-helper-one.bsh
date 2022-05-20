@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## Copyright (C) 2012 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+## Copyright (C) 2012 - 2022 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
 ## genmkfile - make-helper-bsh - version 1.7
@@ -865,7 +865,7 @@ make_debinstfile_create() {
    rm -f "$make_debian_install_file_relative_path"
 
    echo "\
-## Copyright (C) 2020 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+## Copyright (C) 2020 - 2022 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
 ## This file was generated using 'genmkfile debinstfile'.
