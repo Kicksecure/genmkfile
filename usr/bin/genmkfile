@@ -3,6 +3,10 @@
 ## Copyright (C) 2020 - 2022 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
+if [ -o xtrace ]; then
+   export GENMKFILE_DEBUG=1
+fi
+
 MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 pushd "$MYDIR" >/dev/null
