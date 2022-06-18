@@ -11,6 +11,10 @@ fi
 
 set -e
 
+if [ -o xtrace ]; then
+   export GENMKFILE_DEBUG=1
+fi
+
 true "$0: 1: $1"
 true "$0: make_cross_build_platform_list: $make_cross_build_platform_list"
 
