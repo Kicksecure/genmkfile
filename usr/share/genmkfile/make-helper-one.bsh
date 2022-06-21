@@ -1606,10 +1606,8 @@ make_reprepro-shared() {
          make_reprepro_codename="$dist_build_apt_codename"
       fi
    fi
-   if [ -x "../developer-meta-files/debug-steps/reprepro-wrapper" ]; then
-      make_reprepro_wrapper="../developer-meta-files/debug-steps/reprepro-wrapper"
-   elif [ -x "../../kicksecure/developer-meta-files/debug-steps/reprepro-wrapper" ]; then
-      make_reprepro_wrapper="../../kicksecure/developer-meta-files/debug-steps/reprepro-wrapper"
+   if command -v dm-reprepro-wrapper &>/dev/null ;
+      make_reprepro_wrapper="dm-reprepro-wrapper"
    else
       make_reprepro_wrapper="reprepro"
    fi
