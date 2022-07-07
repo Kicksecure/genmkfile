@@ -1,3 +1,19 @@
+commit 12b85953287b2f69e62e6c0a080ef63d3e849854
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jul 7 15:22:06 2022 -0400
+
+    fix `sudo make install`
+    
+    in case the package contains a `/lib` folder
+    
+    use `rsync` instead of `cp`
+
+commit 870368aafc895aa36502aab8bef746c09f9c3978
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 29 07:07:27 2022 -0400
+
+    bumped changelog version
+
 commit afc5fedc853a0ff9da7d3f754fb2038b1d15e4e1
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Jun 24 05:00:50 2022 -0400
