@@ -1,3 +1,15 @@
+commit c0baefc3fd7c9cf157ed8beeb1103c59a9823700
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jul 13 04:48:43 2022 -0400
+
+    Depends: rsync
+
+commit 6aeab92ac06013b4e8983752eb53655143aacdac
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jul 7 17:40:19 2022 -0400
+
+    bumped changelog version
+
 commit 12b85953287b2f69e62e6c0a080ef63d3e849854
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Jul 7 15:22:06 2022 -0400
