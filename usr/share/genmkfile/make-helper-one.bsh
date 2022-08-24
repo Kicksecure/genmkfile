@@ -1621,11 +1621,9 @@ make_reprepro-shared() {
          make_reprepro_codename="$dist_build_apt_codename"
       fi
    fi
-   if command -v dm-reprepro-wrapper &>/dev/null ; then
-      make_reprepro_wrapper="dm-reprepro-wrapper"
-   else
-      make_reprepro_wrapper="reprepro"
-   fi
+
+   [ -n "$make_reprepro_wrapper" ] || make_reprepro_wrapper="dm-reprepro-wrapper"
+   command -v "$make_reprepro_wrapper" 2>/dev/null
 
    if [ "$make_reprepro_codename" = "local" ]; then
       make_reprepro_list_codename="local"
