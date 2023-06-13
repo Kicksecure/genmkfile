@@ -913,6 +913,9 @@ make_manpages() {
 }
 
 make_uch() {
+   if test -f "$PWD/CHANGES" ; then
+      return 0
+   fi
    git log > "$PWD/changelog.upstream"
    test -f "$PWD/changelog.upstream"
 }
