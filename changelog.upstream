@@ -1,3 +1,15 @@
+commit 05972114e399ecba0dfb93533e1dd941461f2dfa
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Jun 13 08:31:20 2023 +0000
+
+    skip make uch if CHANGES file exists
+
+commit 7ca383e5de41cf4455b7061936196e3279c31bb5
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 17:50:55 2023 +0000
+
+    bumped changelog version
+
 commit 70fbb7dd3b5f2e991edf2357f6d84efa54e2057c
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Mon Jun 12 16:22:28 2023 +0000
