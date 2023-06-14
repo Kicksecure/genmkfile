@@ -21,6 +21,19 @@ make_init() {
    [ -n "$GENMKFILE_PATH" ] || GENMKFILE_PATH="/usr/share/genmkfile"
    export GENMKFILE_PATH
 
+   pwd=$(pwd)
+   ## Example pwd:
+   ## ~/derivative-maker/packages/kicksecure/genmkfile
+   dirname_pwd=$(dirname "$pwd")
+   ## Example dirname_pwd:
+   ## ~/derivative-maker/packages/kicksecure
+   parent_folder=$(basename "$dirname_pwd")
+   ## Example parent_folder:
+   ## kicksecure
+   derivative_repository_name="$parent_folder"
+   ## derivative_repository_name is read by dm-reprepro-wrapper
+   export derivative_repository_name
+
    ## No longer in use.
    #pushd "$GENMKFILE_ROOT_DIR" >/dev/null
 
@@ -700,7 +713,6 @@ make_dist() {
    fi
 
    ## Debugging.
-   pwd="$(pwd)"
    test -w "$(pwd)"
    touch "$make_upstream_tarball_real_path"
    test -w "$make_upstream_tarball_real_path"
