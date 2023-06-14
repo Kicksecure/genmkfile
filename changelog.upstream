@@ -1,3 +1,21 @@
+commit fc3353a9dbf366369e37853e2d12ad332d547ce6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 14 11:10:18 2023 +0000
+
+    set `derivative_repository_name`
+
+commit 7adff76afb71745d2c6e627340eab7b32cda26c1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 14 10:47:55 2023 +0000
+
+    output
+
+commit 59f0b9da2c61c22bb3232c10d7fca1cb318f61b5
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 14 09:56:06 2023 +0000
+
+    bumped changelog version
+
 commit 05972114e399ecba0dfb93533e1dd941461f2dfa
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Jun 13 08:31:20 2023 +0000
