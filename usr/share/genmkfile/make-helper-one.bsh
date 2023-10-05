@@ -994,11 +994,16 @@ make_deb-all-dep() {
 make_dpkg_source_verification_sanity_test_help_message() {
    echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-source verification failed!
 
-Does your key exist in file '~/.gnupg/trustedkeys.gpg'?
+To add you could use for example...
 
-To add you could use for example:
+If using gpg (GnuPG):
+- Does your key exist in file '~/.gnupg/trustedkeys.gpg'?
+- to add, run:
+gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/derivative-maker/packages/kicksecure/repository-dist/usr/share/keyrings/derivative.asc
 
-gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/Whonix/packages/kicksecure/repository-dist/usr/share/repository-dist/derivative.asc
+If using sq (Sequoia-PGP):
+- to add, run:
+sudo gpg --no-default-keyring --keyring /usr/share/keyrings/debian-maintainers.gpg --import ~/derivative-maker/packages/kicksecure/repository-dist/usr/share/keyrings/derivative.asc
 "
 }
 
