@@ -1003,6 +1003,9 @@ gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/derivative-maker/p
 
 If using sq (Sequoia-PGP):
 - to add, run:
+1.
+sudo apt install debian-keyring
+2.
 sudo gpg --no-default-keyring --keyring /usr/share/keyrings/debian-maintainers.gpg --import ~/derivative-maker/packages/kicksecure/repository-dist/usr/share/keyrings/derivative.asc
 "
 }
