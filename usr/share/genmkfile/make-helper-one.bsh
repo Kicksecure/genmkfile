@@ -1161,6 +1161,14 @@ sudo genmkfile deb-all-dep
       rm --recursive --force "$temp_dir"
 
       ## Sanity test.
+      echo ""
+      echo dpkg-source \
+         --require-strong-checksums \
+         --require-valid-signature \
+         -x \
+         "$make_main_dsc_file" \
+         "$temp_dir/"
+      echo ""
       dpkg-source \
          --require-strong-checksums \
          --require-valid-signature \
