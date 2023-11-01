@@ -1150,7 +1150,7 @@ sudo genmkfile deb-all-dep
          "$@"
    fi
 
-   echo "make_use_debsign: $make_use_debsign"
+   echo "make_use_debsign: $make_use_debsign | whoami: $(whoami)"
    if [ "$make_use_debsign" = "true" ]; then
       ## For manual use for non-maintainer builds use example:
       #DEBSIGN_KEYID="FFF25C6BEA585C88D96D9AFC2E39FB8D91FDDF6A"
