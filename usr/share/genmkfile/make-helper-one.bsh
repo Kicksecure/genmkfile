@@ -1150,7 +1150,9 @@ sudo genmkfile deb-all-dep
          "$@"
    fi
 
+   echo "make_use_debsign: $make_use_debsign"
    if [ "$make_use_debsign" = "true" ]; then
+      echo debsign $make_debsign_opts "$make_main_changes_file"
       ## clearsign's $make_main_changes_file
       debsign $make_debsign_opts "$make_main_changes_file"
 
