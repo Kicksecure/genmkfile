@@ -1,3 +1,42 @@
+commit b5b3ae36fe183a2c6f525199e2eecdde2dde0bf9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Nov 3 12:01:52 2023 -0400
+
+    add workaround for `libpam-tmpdir` compatibility
+    
+    `--unset=TMPDIR`
+    
+    Setting `TMPDIR` breaks `pbuilder` (which gets called by `cowbuilder`).
+    
+    Installing `libpam-tmpdir` (security-feature) results in these variables being set.
+    
+    In other words:
+    "`sudo apt install libpam-tmpdir` breaks `cowbuilder`"
+    
+    https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=823651
+    
+    https://github.com/Kicksecure/security-misc/pull/147
+    
+    https://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488
+
+commit bd0ae4c2f0d3871fd4ce7c6309641daee7aadab6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Nov 3 11:16:12 2023 -0400
+
+    debugging
+
+commit 2095a518eaef21b131e9b626939e45fdfa9f61d9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Nov 3 11:10:56 2023 -0400
+
+    debugging
+
+commit 15e45195701f97c519f4a70c01dc1a672f36d384
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 1 14:56:24 2023 -0400
+
+    bumped changelog version
+
 commit a5f9cc6b036f6d391bb61e78c33e5574e5e3682f
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Nov 1 14:45:33 2023 -0400
