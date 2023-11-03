@@ -1116,20 +1116,31 @@ beforehand?
       ## package revision number is higher than 1 and maybe only if there never
       ## has been package revision number 1 including upstream source tarball
       ## uploaded beforehand. Good enough.
+      ##
+      ## --unset=TMPDIR
+      ## Setting TMPDIR breaks pbuilder (which gets called by cowbuilder).
+      ## Installing libpam-tmpdir (security-feature) results in these variables being set.
+      ## In other words:
+      ## "`sudo apt install libpam-tmpdir` breaks cowbuilder"
+      ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=823651
+      ## https://github.com/Kicksecure/security-misc/pull/147
+      ## https://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488
       make_log_and_run \
          sudo \
             $COWBUILDER_PREFIX \
-               cowbuilder \
-                  --debbuildopts="-sa" \
-                  --architecture "$target_architecture" \
-                  $make_cowbuilder_config_file_arg \
-                  --build "$make_main_dsc_file" \
-                  --basepath "$base_folder" \
-                  --buildplace "$cow_folder" \
-                  --distribution "$make_cowbuilder_distribution" \
-                  --mirror "$make_cowbuilder_mirror" \
-                  --extrapackages "$make_deb_build_dependencies" \
-                  --buildresult "$DISTDIR"
+               env \
+                  --unset=TMPDIR \
+                     cowbuilder \
+                        --debbuildopts="-sa" \
+                        --architecture "$target_architecture" \
+                        $make_cowbuilder_config_file_arg \
+                        --build "$make_main_dsc_file" \
+                        --basepath "$base_folder" \
+                        --buildplace "$cow_folder" \
+                        --distribution "$make_cowbuilder_distribution" \
+                        --mirror "$make_cowbuilder_mirror" \
+                        --extrapackages "$make_deb_build_dependencies" \
+                        --buildresult "$DISTDIR"
 
    else
       if ! command -v debuild >/dev/null ; then
