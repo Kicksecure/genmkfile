@@ -823,14 +823,15 @@ make_debdsc() {
    pushd "$DISTDIR" >/dev/null
 
    ## Creates make_main_dsc_file.
-   dpkg-source \
-      -c"$make_debian_control_file_absolute_path" \
-      -l"$make_debian_changelog_file_absolute_path" \
-      --format="3.0 (custom)" \
-      --target-format="3.0 (quilt)" \
-      -b / \
-      "$make_upstream_tarball_real_path" \
-      "$make_debian_tarball_absolute_path"
+   make_log_and_run \
+      dpkg-source \
+         -c"$make_debian_control_file_absolute_path" \
+         -l"$make_debian_changelog_file_absolute_path" \
+         --format="3.0 (custom)" \
+         --target-format="3.0 (quilt)" \
+         -b / \
+         "$make_upstream_tarball_real_path" \
+         "$make_debian_tarball_absolute_path"
 
    popd >/dev/null
 
@@ -1541,13 +1542,15 @@ $new_changelog_version"
 
    [ -n "$DEBCHANGE_MSG" ] || DEBCHANGE_MSG="New upstream version (local package)."
 
-   debchange \
-      --newversion "$new_changelog_version" \
-      "$DEBCHANGE_MSG"
+   make_log_and_run \
+      debchange \
+         --newversion "$new_changelog_version" \
+         "$DEBCHANGE_MSG"
 
-   debchange \
-      --release \
-      ""
+   make_log_and_run \
+      debchange \
+         --release \
+         ""
 }
 
 make_deb-uachl-bumpup-manual() {
@@ -1576,13 +1579,13 @@ make_git_tag_show() {
 
 make_git_tag_sign() {
    make_function_run make_git_tag_shared
-   git tag -s "$make_pkg_version_with_revision" -m "."
+   make_log_and_run git tag -s "$make_pkg_version_with_revision" -m "."
    make_function_run make_git_tag_verify
 }
 
 make_git_tag_verify() {
    make_function_run make_git_tag_shared
-   git tag -v "$make_pkg_version_with_revision"
+   make_log_and_run git tag -v "$make_pkg_version_with_revision"
 }
 
 make_git_tag_check() {
@@ -1599,7 +1602,7 @@ make_pkg_version_with_revision $make_pkg_version_with_revision differs from make
 }
 
 make_git_commit_verify() {
-   git verify-commit "$1"
+   make_log_and_run git verify-commit "$1"
 }
 
 make_git_commit_verify_current() {
@@ -1641,8 +1644,7 @@ make_git_tag_push_latest() {
    make_git_tag_latest="$(git describe --tags $(git rev-list --tags --max-count=1))"
    local repository
    for repository in $make_git_tag_push_targets; do
-      echo "git push $repository $make_git_tag_latest"
-      git push "$repository" "$make_git_tag_latest"
+      make_log_and_run git push "$repository" "$make_git_tag_latest"
    done
 }
 
@@ -1672,11 +1674,11 @@ make_reprepro-shared() {
       if [ "$make_reprepro_cmd" = "add" ]; then
          changes_file_absolute_path="$(readlink -f "$make_main_changes_file")"
          test -f "$changes_file_absolute_path"
-         $make_reprepro_wrapper --ignore=wrongdistribution include "$codename" "$changes_file_absolute_path"
+         make_log_and_run $make_reprepro_wrapper --ignore=wrongdistribution include "$codename" "$changes_file_absolute_path"
       else
          for package in $make_package_list; do
-            $make_reprepro_wrapper remove "$codename" "$package"
-            $make_reprepro_wrapper removesrc "$codename" "$package"
+            make_log_and_run $make_reprepro_wrapper remove "$codename" "$package"
+            make_log_and_run $make_reprepro_wrapper removesrc "$codename" "$package"
          done
       fi
    done
