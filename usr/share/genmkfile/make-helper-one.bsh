@@ -15,6 +15,11 @@ if [ "$GENMKFILE_DEBUG" = "1" ]; then
    set -x
 fi
 
+make_log_and_run() {
+   echo "${green}running:${reset} $@"
+   "$@"
+}
+
 make_init() {
    ## For manual invocation.
    ## Should be set by makefile already.
@@ -1110,19 +1115,20 @@ beforehand?
       ## package revision number is higher than 1 and maybe only if there never
       ## has been package revision number 1 including upstream source tarball
       ## uploaded beforehand. Good enough.
-      sudo \
-         $COWBUILDER_PREFIX \
-            cowbuilder \
-               --debbuildopts="-sa" \
-               --architecture "$target_architecture" \
-               $make_cowbuilder_config_file_arg \
-               --build "$make_main_dsc_file" \
-               --basepath "$base_folder" \
-               --buildplace "$cow_folder" \
-               --distribution "$make_cowbuilder_distribution" \
-               --mirror "$make_cowbuilder_mirror" \
-               --extrapackages "$make_deb_build_dependencies" \
-               --buildresult "$DISTDIR"
+      make_log_and_run \
+         sudo \
+            $COWBUILDER_PREFIX \
+               cowbuilder \
+                  --debbuildopts="-sa" \
+                  --architecture "$target_architecture" \
+                  $make_cowbuilder_config_file_arg \
+                  --build "$make_main_dsc_file" \
+                  --basepath "$base_folder" \
+                  --buildplace "$cow_folder" \
+                  --distribution "$make_cowbuilder_distribution" \
+                  --mirror "$make_cowbuilder_mirror" \
+                  --extrapackages "$make_deb_build_dependencies" \
+                  --buildresult "$DISTDIR"
 
    else
       if ! command -v debuild >/dev/null ; then
@@ -1143,11 +1149,12 @@ sudo genmkfile deb-all-dep
 
       ## Using --no-lintian, because debuild does not exist with a non-zero exit
       ## code, should lintian find an error. Therefore running lintian afterwards.
-      debuild \
-         --no-lintian \
-         -sa \
-         $make_debuild_maybe_unsigned_opts \
-         "$@"
+      make_log_and_run \
+         debuild \
+            --no-lintian \
+            -sa \
+            $make_debuild_maybe_unsigned_opts \
+            "$@"
    fi
 
    echo "make_use_debsign: $make_use_debsign | whoami: $(whoami)"
@@ -1156,12 +1163,11 @@ sudo genmkfile deb-all-dep
       #DEBSIGN_KEYID="FFF25C6BEA585C88D96D9AFC2E39FB8D91FDDF6A"
       #export make_debsign_opts="-k$DEBSIGN_KEYID"
 
-      echo debsign $make_debsign_opts "$make_main_changes_file"
       ## clearsign's $make_main_changes_file
-      debsign $make_debsign_opts "$make_main_changes_file"
+      make_log_and_run debsign $make_debsign_opts "$make_main_changes_file"
 
       ## sanity test
-      gpg --verify "$make_main_changes_file"
+      make_log_and_run gpg --verify "$make_main_changes_file"
 
       local temp_dir
       temp_dir="$(mktemp --directory)"
@@ -1170,21 +1176,14 @@ sudo genmkfile deb-all-dep
       rm --recursive --force "$temp_dir"
 
       ## Sanity test.
-      echo ""
-      echo dpkg-source \
-         --require-strong-checksums \
-         --require-valid-signature \
-         -x \
-         "$make_main_dsc_file" \
-         "$temp_dir/"
-      echo ""
-      dpkg-source \
-         --require-strong-checksums \
-         --require-valid-signature \
-         -x \
-         "$make_main_dsc_file" \
-         "$temp_dir/" || \
-            { make_dpkg_source_verification_sanity_test_help_message ; return 1; };
+      make_log_and_run \
+         dpkg-source \
+            --require-strong-checksums \
+            --require-valid-signature \
+            -x \
+            "$make_main_dsc_file" \
+            "$temp_dir/" || \
+               { make_dpkg_source_verification_sanity_test_help_message ; return 1; };
 
       rm --recursive --force "$temp_dir"
    fi
@@ -1279,8 +1278,7 @@ make_deb-install() {
       ## --reinstall is required otherwise apt-get would refuse to install the package with the following error message:
       ## Note, selecting 'systemcheck' instead of '/home/user/derivative-binary/genmkfile-packages-result/systemcheck_25.1-1_all.deb'
       ## systemcheck is already the newest version (3:25.1-1).
-      echo "sudo apt-get --reinstall install '$package'"
-      sudo apt-get --reinstall install "$package"
+      make_log_and_run sudo apt-get --reinstall install "$package"
    done
 }
 
