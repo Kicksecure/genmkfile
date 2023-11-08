@@ -1149,22 +1149,17 @@ beforehand?
       make_log_and_run \
          sudo \
             $COWBUILDER_PREFIX \
-               env \
-                  --unset=TEMP \
-                  --unset=TEMPDIR \
-                  --unset=TMP \
-                  --unset=TMPDIR \
-                     cowbuilder \
-                        --debbuildopts="-sa" \
-                        --architecture "$target_architecture" \
-                        $make_cowbuilder_config_file_arg \
-                        --build "$make_main_dsc_file" \
-                        --basepath "$base_folder" \
-                        --buildplace "$cow_folder" \
-                        --distribution "$make_cowbuilder_distribution" \
-                        --mirror "$make_cowbuilder_mirror" \
-                        --extrapackages "$make_deb_build_dependencies" \
-                        --buildresult "$DISTDIR"
+               cowbuilder \
+                  --debbuildopts="-sa" \
+                  --architecture "$target_architecture" \
+                  $make_cowbuilder_config_file_arg \
+                  --build "$make_main_dsc_file" \
+                  --basepath "$base_folder" \
+                  --buildplace "$cow_folder" \
+                  --distribution "$make_cowbuilder_distribution" \
+                  --mirror "$make_cowbuilder_mirror" \
+                  --extrapackages "$make_deb_build_dependencies" \
+                  --buildresult "$DISTDIR"
 
    else
       if ! command -v debuild >/dev/null ; then
