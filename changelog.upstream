@@ -1,3 +1,31 @@
+commit 204389c8ea0e48ca3ed61176f376221e21e3d28d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 17:51:44 2023 -0500
+
+    better solution for cowbuilder libpam-tmpdir compatibility found
+    
+    https://github.com/Kicksecure/security-misc/pull/147
+
+commit f38e319f9a3bbbf225e901a72ac60297057b493c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 17:50:28 2023 -0500
+
+    comments
+
+commit 8798eede339d48358ed72ea88f9c69fb07a2207a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 17:29:17 2023 -0500
+
+    fix build of hardened-malloc compatibility with cowbuilder and libpam-tmpdir
+    
+    https://github.com/Kicksecure/security-misc/pull/147
+
+commit ad394f4c3f54e831194354c8bf701b4f6a9e8968
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 16:08:39 2023 +0000
+
+    bumped changelog version
+
 commit 112c8f05f0ec48ada5bf77f7c9afac22a34e96d4
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Nov 8 11:04:51 2023 -0500
