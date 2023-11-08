@@ -41,10 +41,6 @@ make_init() {
 
    ## No longer in use.
    #pushd "$GENMKFILE_ROOT_DIR" >/dev/null
-
-   make_function_run make_get_distdir
-   make_function_run make_get_destdir
-   make_function_run make_get_variables
 }
 
 make_deinit() {
@@ -1825,6 +1821,10 @@ if [ "$make_script_was_sourced" = "false" ]; then
 
    make_function_run make_source_overrides_file "$@"
    make_function_run make_source_overrides_folder "$@"
+
+   make_function_run make_get_distdir
+   make_function_run make_get_destdir
+   make_function_run make_get_variables
 
    make_function_run make_parse_cmd "$@"
 
