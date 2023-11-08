@@ -1140,6 +1140,9 @@ beforehand?
       ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=823651
       ## https://github.com/Kicksecure/security-misc/pull/147
       ## https://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488
+      ## Installing libpam-tmpdir inside the grml-debootstrap chroot did fix a similar issue for grml-debootstrap / grub.
+      ## https://github.com/grml/grml-debootstrap/issues/232
+      ## Installing libpam-tmpdir inside the cowbuilder chroot did however not fix this issue.
       make_log_and_run \
          sudo \
             $COWBUILDER_PREFIX \
