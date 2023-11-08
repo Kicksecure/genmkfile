@@ -275,6 +275,12 @@ make_parse_cmd() {
                exit 0
                shift
                ;;
+           deb-uachl-commit-changelog)
+               matched="true"
+               make_function_run make_deb-uachl-commit-changelog
+               exit 0
+               shift
+               ;;
            git-tag-show)
                matched="true"
                make_function_run make_git_tag_show
@@ -1500,6 +1506,14 @@ make_deb-chl-bumpup-major() {
 make_deb-chl-bumpup-manual() {
    make_bump_type="manual"
    make_function_run make_deb-chl-bumpup
+}
+
+make_deb-uachl-commit-changelog() {
+   if test -f changelog.upstream ; then
+      git add changelog.upstream
+   fi
+   git add debian/changelog
+   git commit -m "bumped changelog version"
 }
 
 make_deb-chl-bumpup() {
