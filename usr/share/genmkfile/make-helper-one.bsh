@@ -467,11 +467,16 @@ sudo genmkfile deb-all-dep
       fi
    done < <( dpkg-parsechangelog )
 
-   make_pkg_version_with_revision="${make_pkg_version}-${make_pkg_revision}"
    if [ "$make_pkg_version" = "" ]; then
       echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') variable make_pkg_version is empty."
       exit 1
    fi
+   if [ "$make_pkg_revision" = "" ]; then
+      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') variable make_pkg_revision is empty."
+      exit 1
+   fi
+
+   make_pkg_version_with_revision="${make_pkg_version}-${make_pkg_revision}"
 
    [ -n "$host_architecture" ] || host_architecture="$dpkg_print_architecture"
    [ -n "$target_architecture" ] || target_architecture="$dpkg_print_architecture"
