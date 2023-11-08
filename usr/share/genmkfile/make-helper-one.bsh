@@ -482,11 +482,14 @@ sudo genmkfile deb-all-dep
       exit 1
    fi
 
+   make_pkg_version_with_revision="${make_pkg_version}-${make_pkg_revision}"
+
    if [ "$make_pkg_use_pkg_version_without_revision_for_git_version" = "true" ]; then
       ## used for derivative-maker
-      make_git_tag_version_number="$make_pkg_version_with_revision"
+      make_git_tag_version_number="$make_pkg_version"
    else
-      make_pkg_version_with_revision="${make_pkg_version}-${make_pkg_revision}"
+      ## default for all packages
+      make_git_tag_version_number="$make_pkg_version_with_revision"
    fi
 
    [ -n "$host_architecture" ] || host_architecture="$dpkg_print_architecture"
