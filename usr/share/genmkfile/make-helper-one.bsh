@@ -1629,9 +1629,11 @@ make_git_tag_check() {
    ## dm-bump-derivative-maker-version script overrules this to disable this check.
    [ -n "$make_git_describe_output" ] || make_git_describe_output="$(git describe --always --abbrev=1000000000)"
    if [ ! "$make_git_tag_version_number" = "$make_git_describe_output" ]; then
-      echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed! Current git head is a untagged git tag! $running_as_root_maybe \
+      if [ ! "$make_skip_git_describe_output_check" = "true" ]; then
+         echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed! Current git head is a untagged git tag! $running_as_root_maybe \
 make_git_tag_version_number $make_git_tag_version_number differs from make_git_describe_output $make_git_describe_output" >&2
-      exit 1
+         exit 1
+      fi
    fi
 
    make_function_run make_git_tag_verify
