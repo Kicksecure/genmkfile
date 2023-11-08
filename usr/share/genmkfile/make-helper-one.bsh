@@ -1510,7 +1510,7 @@ make_deb-chl-bumpup() {
       exit 1
    fi
 
-   local new_upstream_version_without_leading_zero new_upstream_version new_changelog_version new_revision
+   local new_upstream_version_without_epoch new_upstream_version new_changelog_version new_revision
 
    if [ "$make_bump_type" = "major" ]; then
       true "make_pkg_version: $make_pkg_version"
@@ -1522,8 +1522,9 @@ make_deb-chl-bumpup() {
          new_upstream_version="$make_pkg_version"
          new_revision="$(bc -l <<< "scale=9 ; $make_pkg_revision + 1" 2>&1)"
       else
-         new_upstream_version_without_leading_zero="$(bc -l <<< "scale=9 ; $make_pkg_version + 0.1" 2>&1)"
-         new_upstream_version="$(printf '%3.1f\n' "$new_upstream_version_without_leading_zero")"
+         #new_upstream_version_without_epoch="$(bc -l <<< "scale=9 ; $make_pkg_version + 0.1" 2>&1)"
+         #new_upstream_version="$(printf '%3.1f\n' "$new_upstream_version_without_epoch")"
+         new_upstream_version=$(/usr/share/genmkfile/version-bump-calculate "$make_pkg_version")
          ## Packages by Kicksecure / Whonix always bump package version. Not Debian package revision.
          new_revision="1"
       fi
