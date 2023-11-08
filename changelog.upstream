@@ -1,3 +1,63 @@
+commit 0406124e77f29874377ba8ebed0ef75d3cad26e7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 10:05:52 2023 -0500
+
+    parse overrides earlier than getting most variables
+
+commit cc4a76de6af65dc984d7dbd82d54a1af5d6081f9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 09:57:49 2023 -0500
+
+    fix
+
+commit 5a88101bff8574bec04ddf5dd1f0df1e56759a8a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 09:52:35 2023 -0500
+
+    make_pkg_use_pkg_version_without_revision_for_git_version
+
+commit dc74c35b40f6733f85cb5f82191c005f69cc42e5
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 09:00:25 2023 -0500
+
+    make_skip_git_describe_output_check
+
+commit 705c09fa53cd871b628f560e96de99f852dae5c4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 08:56:35 2023 -0500
+
+    add `genmkfile deb-uachl-commit-changelog`
+
+commit 530461755744806fbdc4376db14e77868d29239d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 08:49:23 2023 -0500
+
+    allow usage for derivative-maker source code repository
+
+commit 81c9e4b34e62bda6b054e548a0db7792c43d0be4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 08:34:27 2023 -0500
+
+    refactoring
+
+commit 0c1e2db3f95257cd231b532a4fc6ad161635b13e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 08:31:06 2023 -0500
+
+    improve error handling
+
+commit 426eb5fca7b3a9c368a63ed1d338cda3ea069762
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Nov 8 08:28:56 2023 -0500
+
+    improve version number bump calculation
+
+commit 477f13e5a5127bffa4880505dc679a07cf57752e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Nov 3 12:06:28 2023 -0400
+
+    bumped changelog version
+
 commit b5b3ae36fe183a2c6f525199e2eecdde2dde0bf9
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Nov 3 12:01:52 2023 -0400
