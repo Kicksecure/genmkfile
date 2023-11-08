@@ -1132,7 +1132,10 @@ beforehand?
       ## has been package revision number 1 including upstream source tarball
       ## uploaded beforehand. Good enough.
       ##
-      ## --unset=TMPDIR
+      ## --unset=TEMP \
+      ## --unset=TEMPDIR \
+      ## --unset=TMP \
+      ## --unset=TMPDIR \
       ## Setting TMPDIR breaks pbuilder (which gets called by cowbuilder).
       ## Installing libpam-tmpdir (security-feature) results in these variables being set.
       ## In other words:
