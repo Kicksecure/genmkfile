@@ -488,7 +488,7 @@ sudo genmkfile deb-all-dep
       make_git_tag_version_number="$make_pkg_version_with_revision"
    fi
    ## make_git_tag_sign_appendix gets set by dm-bump-derivative-maker-version
-   make_git_tag_version_number=${make_git_tag_version_number}${make_git_tag_sign_appendix}"
+   make_git_tag_version_number="${make_git_tag_version_number}${make_git_tag_sign_appendix}"
 
    [ -n "$host_architecture" ] || host_architecture="$dpkg_print_architecture"
    [ -n "$target_architecture" ] || target_architecture="$dpkg_print_architecture"
