@@ -1,3 +1,23 @@
+commit 202f4447390346891768720ff188868c7d840619
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Nov 26 23:54:25 2023 -0500
+
+    fix
+
+commit 9603d7e122ea80c89bfdcb850c76a642f441b4b3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Nov 26 23:53:05 2023 -0500
+
+    append make_git_tag_sign_appendix if set to make_git_tag_version_number
+    
+    make_git_tag_sign_appendix gets set by dm-bump-derivative-maker-version
+
+commit dfbb67dd2159f79362fa4b24d4bfbe538d7b8fc9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Nov 11 20:14:51 2023 +0000
+
+    bumped changelog version
+
 commit 17203d7ce531ce0d29c23e01d7e706bbdd50f3aa
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Nov 11 14:47:29 2023 -0500
