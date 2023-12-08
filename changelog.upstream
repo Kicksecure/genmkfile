@@ -1,3 +1,41 @@
+commit f72930e5968e7afc70c471d29e5f60887ce5fa1f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Dec 8 02:57:47 2023 -0500
+
+    output
+
+commit 63b7b4b8e4d0b031267d2ed44a8ea6ff3069194b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Dec 8 02:54:23 2023 -0500
+
+    show error message if `genmkfile install` etc. did not actually do anything
+    
+    because for example it was used in a repository without genmkfile layout
+
+commit 94d9f824d99ab7856dbfc8b47c4caf46006fcd5b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Dec 8 02:50:36 2023 -0500
+
+    fix
+
+commit 37c11fe1b19b4f6286eaa5d0faa41f460723ff89
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Dec 8 02:49:23 2023 -0500
+
+    refactoring
+
+commit 663cc72f96c32970d0b55d2bd24cf73819951487
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Dec 8 02:48:43 2023 -0500
+
+    refactoring
+
+commit e23a0ee586aebaf6f03d4a5e32d01bcf0c6cacae
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Nov 27 04:54:51 2023 +0000
+
+    bumped changelog version
+
 commit 202f4447390346891768720ff188868c7d840619
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Nov 26 23:54:25 2023 -0500
