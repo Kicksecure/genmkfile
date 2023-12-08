@@ -1402,7 +1402,7 @@ make_checkout() {
 
 make_helper() {
    shopt -s globstar dotglob nullglob
-   local d source_file file_without_pwd file_with_destdir
+   local source_directory source_file file_without_pwd file_with_destdir
 
    if ! test -d "$DESTDIR" ; then
       echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' does not exist!"
@@ -1422,8 +1422,8 @@ make_helper() {
    #genmkfile_rsync_opts+=" --verbose "
 
    for d in $make_folder_list_for_un_and_install; do
-      if [ -d "$d" ]; then
-         for source_file in "$PWD/$d"/**; do
+      if [ -d "$source_directory" ]; then
+         for source_file in "$PWD/$source_directory"/**; do
             if [ "$make_install_" = "true" ]; then
                if [ ! -d "$DESTDIR" ]; then
                   mkdir --parents "$DESTDIR"
@@ -1431,7 +1431,7 @@ make_helper() {
                ## Not using cp because:
                ## cp --recursive lib /
                ## cp: cannot overwrite non-directory '/lib' with directory 'lib'
-               rsync $genmkfile_rsync_opts "$d" "$DESTDIR"
+               rsync $genmkfile_rsync_opts "$source_directory" "$DESTDIR"
                break
             elif [ "$make_installsim_" = "true" ]; then
                if [ ! -d "$DESTDIR" ]; then
@@ -1439,8 +1439,8 @@ make_helper() {
                else
                   echo "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents \"$DESTDIR\""
                fi
-               echo "${green}INFO:${reset} would do: rsync --dry-run $genmkfile_rsync_opts \"$d\" \"$DESTDIR\""
-               rsync --dry-run $genmkfile_rsync_opts "$d" "$DESTDIR"
+               echo "${green}INFO:${reset} would do: rsync --dry-run $genmkfile_rsync_opts \"$source_directory\" \"$DESTDIR\""
+               rsync --dry-run $genmkfile_rsync_opts "$source_directory" "$DESTDIR"
                break
             fi
             if [ ! -f "$source_file" ]; then
