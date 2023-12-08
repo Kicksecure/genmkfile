@@ -1455,7 +1455,7 @@ make_helper() {
          file_with_destdir="${DESTDIR}${file_without_pwd}"
          if [ "$make_uninstallcheck_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
-               echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') file $file_with_destdir still installed."
+               echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') file $file_with_destdir still installed."
                local still_installed="true"
             fi
          elif [ "$make_installcheck_" = "true" ]; then
@@ -1469,7 +1469,7 @@ make_helper() {
                rm "$file_with_destdir"
             fi
          else
-            echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') error 2 in $FUNCNAME!"
+            echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') error 2 in $FUNCNAME!"
             exit 1
          fi
       done
@@ -1479,7 +1479,7 @@ make_helper() {
       exit 1
    fi
    if [ "$counter" = "0" ]; then
-      echo "${red}${bold}ERROR:${reset} Nothing done."
+      echo "$0: ${red}${bold}ERROR:${reset} Nothing done."
       exit 1
    fi
 }
