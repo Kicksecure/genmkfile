@@ -1421,7 +1421,7 @@ make_helper() {
    #genmkfile_rsync_opts+=" --progress "
    #genmkfile_rsync_opts+=" --verbose "
 
-   for d in $make_folder_list_for_un_and_install; do
+   for source_directory in $make_folder_list_for_un_and_install; do
       if [ ! -d "$source_directory" ]; then
          continue
       fi
