@@ -1,3 +1,15 @@
+commit 9f834b528e1186c21855c44cd0141e486fda1276
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Dec 21 10:37:57 2023 -0500
+
+    fix: allow `make_install_hook_post` to implement copying
+
+commit 260f1d97283111c0909b69a8bd787e7191b04fe3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Dec 8 08:03:38 2023 +0000
+
+    bumped changelog version
+
 commit f72930e5968e7afc70c471d29e5f60887ce5fa1f
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Dec 8 02:57:47 2023 -0500
