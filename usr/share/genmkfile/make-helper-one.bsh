@@ -1402,7 +1402,7 @@ make_checkout() {
 
 make_helper() {
    shopt -s globstar dotglob nullglob
-   local source_directory source_file file_without_pwd file_with_destdir counter
+   local source_directory source_file file_without_pwd file_with_destdir
 
    if ! test -d "$DESTDIR" ; then
       echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' does not exist!"
@@ -1421,14 +1421,16 @@ make_helper() {
    #genmkfile_rsync_opts+=" --progress "
    #genmkfile_rsync_opts+=" --verbose "
 
-   counter=0
+   ## Cannot be `local` so hooks can increase it.
+   #local genmkfile_file_has_been_copied
+   [ -n "$genmkfile_file_has_been_copied" ] || genmkfile_file_has_been_copied=false
 
    for source_directory in $make_folder_list_for_un_and_install; do
       if [ ! -d "$source_directory" ]; then
          continue
       fi
       for source_file in "$PWD/$source_directory"/**; do
-         counter=$(( counter + 1 ))
+         genmkfile_file_has_been_copied=true
          if [ "$make_install_" = "true" ]; then
             if [ ! -d "$DESTDIR" ]; then
                mkdir --parents "$DESTDIR"
@@ -1478,8 +1480,8 @@ make_helper() {
    if [ "$still_installed" = "true" ]; then
       exit 1
    fi
-   if [ "$counter" = "0" ]; then
-      echo "$0: ${red}${bold}ERROR:${reset} Nothing done."
+   if [ "$genmkfile_file_has_been_copied" = "false" ]; then
+      echo "$0: ${red}${bold}ERROR:${reset} Nothing has been copied."
       exit 1
    fi
 }
