@@ -1618,6 +1618,13 @@ make_git_tag_shared() {
    if [ "$make_git_tag_shared_done" = "true" ]; then
       return 0
    fi
+   if [ "$package" = "derivative-maker" ]; then
+      ## make_git_tag_sign_appendix gets set by dm-bump-derivative-maker-version
+      if [ "$make_git_tag_sign_appendix" = "" ]; then
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') package is '$package' but variable make_git_tag_sign_appendix is empty."
+         exit 1
+      fi
+   fi
    [ -n "$make_git_tag_push_targets" ] || make_git_tag_push_targets="origin"
    command -v git >/dev/null
    make_git_tag_shared_done="true"
