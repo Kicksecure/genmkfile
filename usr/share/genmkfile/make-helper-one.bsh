@@ -1222,7 +1222,10 @@ sudo genmkfile deb-all-dep
    fi
 
    for package in $make_package_debs_files_list; do
-      test -f "$package"
+      if ! test -f "$package" ; then
+         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') File '$package' does not exist."
+         exit 1
+      fi
       echo "$0: ${green}INFO:${reset} You can find your deb file here: ${bold}$package${reset}"
    done
 
