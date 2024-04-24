@@ -15,6 +15,10 @@ if [ "$GENMKFILE_DEBUG" = "1" ]; then
    set -x
 fi
 
+grep_no_comments() {
+   grep "$@" | grep --invert-match "^#"
+}
+
 make_log_and_run() {
    echo "${green}running:${reset} $@"
    "$@"
@@ -504,7 +508,7 @@ sudo genmkfile deb-all-dep
 
    local grep_line a package
 
-   grep_line="$(grep "Source:" "$make_debian_control_file_absolute_path")"
+   grep_line="$(grep_no_comments "^Source:" "$make_debian_control_file_absolute_path")"
    read -r a package _ <<< "$grep_line"
    make_source_package_name="$package"
    ## Source package name may or may not match binary package name.
@@ -526,7 +530,7 @@ sudo genmkfile deb-all-dep
          continue
       fi
       make_package_list="$make_package_list $package"
-   done < <( grep "Package:" "$make_debian_control_file_absolute_path" )
+   done < <( grep_no_comments "^Package:" "$make_debian_control_file_absolute_path" )
 
    true "make_package_list: $make_package_list"
    true "make_package_debs_files_list: $make_package_debs_files_list"
@@ -871,7 +875,7 @@ make_debinstfile() {
       return 0
    fi
 
-   if cat "$make_debian_install_file_relative_path" | grep -q nogenmkfile ; then
+   if cat "$make_debian_install_file_relative_path" | grep_no_comments --quiet nogenmkfile ; then
       return 0
    fi
 
@@ -1589,7 +1593,7 @@ Bumping version from / to...
 $make_changelog_version
 $new_changelog_version"
 
-   if echo "$new_changelog_version" | grep --quiet "error" ; then
+   if echo "$new_changelog_version" | grep_no_comments --quiet "error" ; then
       echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed!" >&2
       exit 1
    fi
@@ -1786,8 +1790,8 @@ make_source_overrides_folder() {
                   continue
                fi
                ## Skipping files such as .dpkg-old and .dpkg-dist.
-               if ( echo "$i" | grep -q ".dpkg-" ); then
-                  true "skip $i"
+               if echo "$i" | grep --quiet ".dpkg-" ; then
+                  true "skip: $i"
                   continue
                fi
                bash -n "$i"
