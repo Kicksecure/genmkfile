@@ -1,3 +1,23 @@
+commit d4a326b2739713917aa7eef04aff76599c1b112e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 24 18:24:12 2024 -0400
+
+    grep improvements
+
+commit e6d87f402c2bd29a94aa6f39497cfda65ca8cfc4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 24 18:22:30 2024 -0400
+
+    fix parsing in case of commented out debian/control files
+    
+    and other grep related improvements
+
+commit 452118c9de20967a5ecf8dbbc6ba3ff43f0db499
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 24 22:10:02 2024 +0000
+
+    bumped changelog version
+
 commit c78b5a4a8245b41203f1ba1b83d77b38f92ff1b1
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Apr 24 18:09:40 2024 -0400
