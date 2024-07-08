@@ -1107,6 +1107,14 @@ beforehand?
       ## Test command:
       ## dist_build_pbuilder_config_file=/home/user/derivative-binary/pbuilder.conf make_cross_build_platform_list=arm64 make_cowbuilder_dist_folder=~/genmkfile-packages-result make_use_cowbuilder=true genmkfile deb-pkg
 
+      ## Not using '--mirror' results in cowbuilder automatically passing to pbuilder:
+      ## --mirror http://you-have-broken-debconf-configuration.example.com/
+      ## Not using '--distribution' results in cowbuilder automatically passing to pbuilder:
+      ## --distribution sid
+
+      ## W: --override-config is not set; not updating apt.conf Read the manpage for details.
+      ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1075960
+
       ## COWBUILDER_PREFIX could set variables such as http_proxy.
       ## Whonix build script sets:
       ## COWBUILDER_PREFIX+=" env http_proxy=${REPO_PROXY}"
