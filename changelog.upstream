@@ -1,3 +1,20 @@
+commit d47795cbcb28d1374ed562caee3a24d8c7015870
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 14 05:03:45 2024 -0400
+
+    fix: allow "downgrades" by using --allow-downgrades
+    
+    if installing using genmkfile
+    
+    this is because if the same version was already installed from the repository,
+    APT will consider it a "downgrade" if re-installing locally.
+
+commit 065910920421b8b0a2410cec0170545f07580706
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jul 13 14:57:17 2024 +0000
+
+    bumped changelog version
+
 commit 1f21810f4d6efabc923b38f28aa1bed83a76577b
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Mon Jul 8 09:49:14 2024 -0400
