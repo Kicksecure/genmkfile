@@ -1,3 +1,20 @@
+commit bf0aa7b1c369c83c2b01ec14117868b710e3ff85
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 28 06:59:04 2024 -0400
+
+    fix
+    
+    calamares-settings-debian comes with debian/install by upstream default.
+    If file debian/calamares-settings-debian.install was created, that would result in debian/install
+    being ignored and in an empty package. Therefore, if debian/install already exists, do not
+    automatically create a debian/package-name.install file.
+
+commit b63a6d361469506d44578f4b0ebc24daf154695f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 14 09:07:43 2024 +0000
+
+    bumped changelog version
+
 commit d47795cbcb28d1374ed562caee3a24d8c7015870
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Aug 14 05:03:45 2024 -0400
