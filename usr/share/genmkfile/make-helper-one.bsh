@@ -515,6 +515,7 @@ sudo genmkfile deb-all-dep
    make_package_list="$make_source_package_name"
    make_package_debs_files_list=""
 
+   make_debian_non_package_specific_install_file_relative_path="debian/install"
    make_debian_install_file_relative_path="debian/${make_source_package_name}.install"
 
    ## Example grep_output:
@@ -869,6 +870,14 @@ make_undebdist() {
 
 make_debinstfile() {
    local line d missing
+
+   ## calamares-settings-debian comes with debian/install by upstream default.
+   ## If file debian/calamares-settings-debian.install was created, that would result in debian/install
+   ## being ignored and in an empty package. Therefore, if debian/install already exists, do not
+   ## automatically create a debian/package-name.install file.
+   if test -f "$make_debian_non_package_specific_install_file_relative_path" ; then
+      return 0
+   fi
 
    if ! test -f "$make_debian_install_file_relative_path" ; then
       make_debinstfile_create
