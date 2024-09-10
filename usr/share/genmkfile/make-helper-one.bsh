@@ -1765,6 +1765,18 @@ make_reprepro-shared() {
          for package in $make_package_list; do
             make_log_and_run $make_reprepro_wrapper remove "$make_reprepro_codename_item" "$package"
             make_log_and_run $make_reprepro_wrapper removesrc "$make_reprepro_codename_item" "$package"
+            ## Avoid the following issue during the next package "include".
+            # File "pool/main/a/anon-apt-sources-list/anon-apt-sources-list_6.5-1.dsc" is already registered with different checksums!
+            # md5 expected: e6645bc3ef5cbb3769b8be0a008f8b01, got: 3142ef469a2bcab118dd772da437a80b
+            # sha1 expected: 154a00a18c2d60d4d10148abab5ce809e85cbe86, got: b6da54d5d481180adf5298cd031e7381bf7253ba
+            # sha256 expected: c5312451a92bda546a4d8e4331f835fecf1dbc07ebf99f21d67eab9e5082967d, got: 6a2f2d3aaba452659385a7727c246e45dfbb76af40a98278912a3a1d3c8563c8
+            # There have been errors!'
+            make_log_and_run $make_reprepro_wrapper deleteunreferenced
+            ## Results in:
+            # deleting and forgetting pool/main/a/anon-apt-sources-list/anon-apt-sources-list_6.5-1.debian.tar.xz
+            # deleting and forgetting pool/main/a/anon-apt-sources-list/anon-apt-sources-list_6.5-1.dsc
+            # deleting and forgetting pool/main/a/anon-apt-sources-list/anon-apt-sources-list_6.5-1_all.deb
+            # deleting and forgetting pool/main/a/anon-apt-sources-list/anon-apt-sources-list_6.5.orig.tar.xz
          done
       fi
    done
