@@ -1741,6 +1741,9 @@ make_git_tag_push_latest() {
 make_reprepro-shared() {
    local package package_absolute_path make_reprepro_codename codename
 
+   ## global dist_build_apt_codename
+   ## Can be set by derivative-maker.
+
    if [ "$make_reprepro_codename" = "" ]; then
       if [ "$dist_build_apt_codename" = "" ]; then
          make_reprepro_codename="local"
