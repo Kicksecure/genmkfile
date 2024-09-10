@@ -1744,12 +1744,10 @@ make_reprepro-shared() {
    ## global dist_build_apt_codename
    ## Can be set by derivative-maker.
 
-   if [ "$make_reprepro_codename" = "" ]; then
-      if [ "$dist_build_apt_codename" = "" ]; then
-         make_reprepro_codename="local"
-      else
-         make_reprepro_codename="$dist_build_apt_codename"
-      fi
+   if [ "$dist_build_apt_codename" = "" ]; then
+      make_reprepro_codename="local"
+   else
+      make_reprepro_codename="$dist_build_apt_codename"
    fi
 
    [ -n "$make_reprepro_wrapper" ] || make_reprepro_wrapper="dm-reprepro-wrapper"
