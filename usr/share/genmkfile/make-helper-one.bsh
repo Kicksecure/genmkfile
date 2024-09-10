@@ -1739,7 +1739,7 @@ make_git_tag_push_latest() {
 }
 
 make_reprepro-shared() {
-   local package package_absolute_path make_reprepro_codename make_reprepro_codename_list codename
+   local package package_absolute_path make_reprepro_codename make_reprepro_codename_list make_reprepro_codename_item
 
    ## global dist_build_apt_codename
    ## Can be set by derivative-maker.
@@ -1761,17 +1761,17 @@ make_reprepro-shared() {
       make_reprepro_codename_list="local $make_reprepro_codename"
    fi
 
-   for codename in $make_reprepro_codename_list; do
-      reprepro_codename="$codename"
+   for make_reprepro_codename_item in $make_reprepro_codename_list; do
+      reprepro_codename="$make_reprepro_codename_item"
       export reprepro_codename
       if [ "$make_reprepro_cmd" = "add" ]; then
          changes_file_absolute_path="$(readlink -f "$make_main_changes_file")"
          test -f "$changes_file_absolute_path"
-         make_log_and_run $make_reprepro_wrapper --ignore=wrongdistribution include "$codename" "$changes_file_absolute_path"
+         make_log_and_run $make_reprepro_wrapper --ignore=wrongdistribution include "$make_reprepro_codename_item" "$changes_file_absolute_path"
       else
          for package in $make_package_list; do
-            make_log_and_run $make_reprepro_wrapper remove "$codename" "$package"
-            make_log_and_run $make_reprepro_wrapper removesrc "$codename" "$package"
+            make_log_and_run $make_reprepro_wrapper remove "$make_reprepro_codename_item" "$package"
+            make_log_and_run $make_reprepro_wrapper removesrc "$make_reprepro_codename_item" "$package"
          done
       fi
    done
