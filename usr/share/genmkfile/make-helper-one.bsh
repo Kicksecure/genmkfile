@@ -1756,12 +1756,12 @@ make_reprepro-shared() {
    command -v "$make_reprepro_wrapper" 2>/dev/null
 
    if [ "$make_reprepro_codename" = "local" ]; then
-      make_reprepro_list_codename="local"
+      make_reprepro_codename_list="local"
    else
-      make_reprepro_list_codename="local $make_reprepro_codename"
+      make_reprepro_codename_list="local $make_reprepro_codename"
    fi
 
-   for codename in $make_reprepro_list_codename; do
+   for codename in $make_reprepro_codename_list; do
       reprepro_codename="$codename"
       export reprepro_codename
       if [ "$make_reprepro_cmd" = "add" ]; then
