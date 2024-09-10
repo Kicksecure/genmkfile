@@ -707,7 +707,7 @@ genmkfile git-tag-push-latest
    git push most recent git tag. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
 genmkfile reprepro-add
    Add main deb package using reprepro wrapper (Environment variable make_reprepro_wrapper, that default to 'reprepro'.)
-   to repository (Environment variable make_reprepro_codename, that defaults to 'local'.).
+   to repository (Environment variable dist_build_apt_codename, that defaults to 'local'.).
 genmkfile reprepro-remove
    Delete.
 
@@ -1739,24 +1739,18 @@ make_git_tag_push_latest() {
 }
 
 make_reprepro-shared() {
-   local package package_absolute_path make_reprepro_codename make_reprepro_codename_list make_reprepro_codename_item
+   local package package_absolute_path make_reprepro_codename_list make_reprepro_codename_item
 
    ## global dist_build_apt_codename
    ## Can be set by derivative-maker.
 
-   if [ "$dist_build_apt_codename" = "" ]; then
-      make_reprepro_codename="local"
-   else
-      make_reprepro_codename="$dist_build_apt_codename"
-   fi
-
    [ -n "$make_reprepro_wrapper" ] || make_reprepro_wrapper="dm-reprepro-wrapper"
    command -v "$make_reprepro_wrapper" 2>/dev/null
 
-   if [ "$make_reprepro_codename" = "local" ]; then
+   if [ "$dist_build_apt_codename" = "local" ]; then
       make_reprepro_codename_list="local"
    else
-      make_reprepro_codename_list="local $make_reprepro_codename"
+      make_reprepro_codename_list="local $dist_build_apt_codename"
    fi
 
    for make_reprepro_codename_item in $make_reprepro_codename_list; do
