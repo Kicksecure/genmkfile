@@ -1,3 +1,84 @@
+commit e4e3ce7eb6f3e3d06513ab03ca9b904850a11643
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 14:39:56 2024 -0400
+
+    reprepro deleteunreferenced
+
+commit af2a8c6dd5222755f9058036354308f4c94aa143
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:57:12 2024 -0400
+
+    fix multiple repository usage
+
+commit 6fa17c9db782e55986afbc6af772cccb69e79d4d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:47:52 2024 -0400
+
+    code simplification
+
+commit 4312381b95e889798bc3646f46d0d3dd1025c34b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:44:59 2024 -0400
+
+    code simplification
+
+commit 05901f76825766f46b0a838e7a6fd50eddb75a43
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:39:08 2024 -0400
+
+    cleanup
+
+commit 5ccea4351f15c37bc94410b6a5a17fdd68883725
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:25:32 2024 -0400
+
+    refactoring
+
+commit 70cbbca0850b8fac10c84ef72e17531f54149f45
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:23:45 2024 -0400
+
+    local
+
+commit b8aa62bdadf84b218f6487076ac52f7b2741e7d7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:23:25 2024 -0400
+
+    refactoring
+
+commit 4761368ae1795a5a0d5e5f860d8bcb4f6207e723
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:21:52 2024 -0400
+
+    comment
+
+commit e57c683e82c6b2146d8381f75f4e0872f0c7468f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:21:01 2024 -0400
+
+    Revert "fix, `make_reprepro_codename` is not a local variable"
+    
+    This reverts commit b651f7fa951f1ef9e4d681098e19aae6d1731ef8.
+
+commit b651f7fa951f1ef9e4d681098e19aae6d1731ef8
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:19:09 2024 -0400
+
+    fix, `make_reprepro_codename` is not a local variable
+    can be a global variable
+
+commit 1b53ca1e56e51378ae6776ed6eaa69a84a64e360
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 13:17:01 2024 -0400
+
+    fix
+
+commit f809abe63cfdd1cfa09068816a8503ce000a6e7a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 28 11:01:08 2024 +0000
+
+    bumped changelog version
+
 commit bf0aa7b1c369c83c2b01ec14117868b710e3ff85
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Aug 28 06:59:04 2024 -0400
