@@ -1762,8 +1762,6 @@ make_reprepro-shared() {
    fi
 
    for make_reprepro_codename_item in $make_reprepro_codename_list; do
-      reprepro_codename="$make_reprepro_codename_item"
-      export reprepro_codename
       if [ "$make_reprepro_cmd" = "add" ]; then
          changes_file_absolute_path="$(readlink -f "$make_main_changes_file")"
          test -f "$changes_file_absolute_path"
