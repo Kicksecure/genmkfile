@@ -1,3 +1,21 @@
+commit 6a9e444a078b2bb74e24c10c66bde5c235dd661d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Dec 31 15:38:16 2024 -0500
+
+    add support for packages without revision numbers
+
+commit 5734f73331b0f5aa3810a7af3dce831300db3791
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Dec 31 15:23:25 2024 -0500
+
+    debugging
+
+commit 70de0f8e549c7f03b2a38a30eae799c1a4256a93
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Dec 31 18:32:38 2024 +0000
+
+    bumped changelog version
+
 commit b45a018b998885e04589ebaf4f100f4dd6ce7dcc
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Dec 31 13:26:16 2024 -0500
