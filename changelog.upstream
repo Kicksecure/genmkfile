@@ -1,3 +1,15 @@
+commit 728c51695b2aeb02476918627fd242b9a18522b6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Dec 31 02:06:02 2024 -0500
+
+    fail closed by default when lintian is installed and lintian produces warnings
+
+commit 4f7cdc6663e048a36aa78a65727037db1e5bdd8a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 10 18:43:02 2024 +0000
+
+    bumped changelog version
+
 commit e4e3ce7eb6f3e3d06513ab03ca9b904850a11643
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Sep 10 14:39:56 2024 -0400
