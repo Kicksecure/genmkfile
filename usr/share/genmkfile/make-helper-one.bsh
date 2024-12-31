@@ -1269,15 +1269,15 @@ sudo genmkfile deb-all-dep
 }
 
 make_lintian_on_warning() {
-   if [ "$make_use_lintian" = "true" ]; then
-      echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') lintian warning. Failing closed."
+   if [ "$make_lintian_fail_open_versus_closed" = "open" ]; then
+      echo "$0: ${red}WARNING:${reset} lintian warning. make_lintian_fail_open_versus_closed=open - Therefore, failing open."
+   else
+      echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') lintian warning. make_lintian_fail_open_versus_closed is not set to 'open' - Therefore, failing closed."
       if [ "$make_lintian_exit_code" = "0" ]; then
          exit 1
       else
          exit "$make_lintian_exit_code"
       fi
-   else
-      echo "$0: ${red}WARNING:${reset} lintian warning. Failing open."
    fi
 }
 
