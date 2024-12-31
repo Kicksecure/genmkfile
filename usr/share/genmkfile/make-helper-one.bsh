@@ -438,14 +438,21 @@ sudo genmkfile deb-all-dep
    make_deb_runtime_dependencies="$(make_dependencies_filter_helper "$make_deb_runtime_dependencies")"
 
    while read -r -d $'\n' dpkg_line; do
+      true "dpkg_line: $dpkg_line"
       ## Example dpkg_line:
       ## Version: 0.1-1
+      ## Example dpkg_line:
+      ## Version: 1:20240810
       read -r first second _ <<< "$dpkg_line"
       ## Example first:
       ## Version:
       ## Example second:
       ## 3:0.1-1
+      ## Example second:
+      ## 1:20240810
       first="${first,,}"
+      true "first: $first"
+      true "second: $second"
       ## Example first:
       ## version
       if [ "$first" = "version:" ]; then
@@ -523,6 +530,10 @@ sudo genmkfile deb-all-dep
 
    while read -r -d $'\n' grep_line; do
       read -r a package _ <<< "$grep_line"
+      true "package: $package"
+      true "make_pkg_version: $make_pkg_version"
+      true "make_pkg_revision: $make_pkg_revision"
+      true "binary_package_architecture: $binary_package_architecture"
       ## Example architecture independent "all" package: anon-apt-sources-list_3.4-1_all.deb
       temp="${package}_${make_pkg_version}-${make_pkg_revision}_${binary_package_architecture}.deb"
       temp="${DISTDIR}/$temp"
