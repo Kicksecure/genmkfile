@@ -1556,12 +1556,12 @@ make_helper() {
                   if test -x "$source_fso" ; then
                      if ! [ "$fso_with_destdir_stat" = "755" ]; then
                         printf "%s\n" "executable file: chmod -- 755 '$file_with_destdir'"
-                        echo chmod -- 755 "$file_with_destdir"
+                        chmod -- 755 "$file_with_destdir"
                      fi
                   else
                      if ! [ "$fso_with_destdir_stat" = "644" ]; then
                         printf "%s\n" "non-executable file: chmod -- 644 '$file_with_destdir'"
-                        echo chmod -- 644 "$file_with_destdir"
+                        chmod -- 644 "$file_with_destdir"
                      fi
                   fi
                fi
