@@ -1483,9 +1483,9 @@ make_helper() {
             if [ ! -d "$DESTDIR" ]; then
                mkdir --parents -- "$DESTDIR"
             fi
-            ## Not using cp because:
-            ## cp --recursive lib /
-            ## cp: cannot overwrite non-directory '/lib' with directory 'lib'
+            ## Not using 'cp' because:
+            #cp --recursive lib /
+            # > cp: cannot overwrite non-directory '/lib' with directory 'lib'
             rsync $genmkfile_rsync_opts -- "$source_directory" "$DESTDIR"
             break
          elif [ "$make_installsim_" = "true" ]; then
