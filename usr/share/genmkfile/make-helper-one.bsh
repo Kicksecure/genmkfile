@@ -616,7 +616,7 @@ make_get_distdir() {
 
       if ! test -d "$make_cowbuilder_dist_folder" ; then
          echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
-mkdir -p $make_cowbuilder_dist_folder"
+mkdir -p -- $make_cowbuilder_dist_folder"
          exit 1
       fi
    fi
@@ -960,7 +960,7 @@ make_manpages() {
       base_name="${i##*/}"
       filename_without_ronn_file_extension="${base_name%.*}"
 
-      mkdir --parents "$PWD/auto-generated-man-pages/$source_folder"
+      mkdir --parents -- "$PWD/auto-generated-man-pages/$source_folder"
 
       true "${bold}${cyan}${green}INFO:${reset} Creating man page $PWD/auto-generated-man-pages/$filename_without_ronn_file_extension ${reset}"
 
@@ -1479,7 +1479,7 @@ make_helper() {
          genmkfile_file_has_been_copied=true
          if [ "$make_install_" = "true" ]; then
             if [ ! -d "$DESTDIR" ]; then
-               mkdir --parents "$DESTDIR"
+               mkdir --parents -- "$DESTDIR"
             fi
             ## Not using cp because:
             ## cp --recursive lib /
@@ -1488,9 +1488,9 @@ make_helper() {
             break
          elif [ "$make_installsim_" = "true" ]; then
             if [ ! -d "$DESTDIR" ]; then
-               echo "${green}INFO:${reset} would do: mkdir --parents \"$DESTDIR\""
+               echo "${green}INFO:${reset} would do: mkdir --parents -- \"$DESTDIR\""
             else
-               echo "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents \"$DESTDIR\""
+               echo "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents -- \"$DESTDIR\""
             fi
             echo "${green}INFO:${reset} would do: rsync --dry-run $genmkfile_rsync_opts \"$source_directory\" \"$DESTDIR\""
             rsync --dry-run $genmkfile_rsync_opts "$source_directory" "$DESTDIR"
