@@ -20,7 +20,7 @@ grep_no_comments() {
 }
 
 make_log_and_run() {
-   echo "${green}running:${reset} $@"
+   printf "%s\n" "${green}running:${reset} $@"
    "$@"
 }
 
@@ -352,7 +352,7 @@ make_parse_cmd() {
                break
                ;;
            -*)
-               echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') unknown option: $1" >&2
+               printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') unknown option: $1" >&2
                exit 1
                ;;
            *)
@@ -382,7 +382,7 @@ make_dependencies_filter_helper() {
    for to_remove in '${shlibs:Depends}' '${misc:Depends}' '${python:Depends}' '${python3:Depends}' '|' ; do
       temp="${temp//"$to_remove"/""}"
    done
-   echo "$temp"
+   printf "%s\n" "$temp"
 }
 
 make_get_variables() {
@@ -490,7 +490,7 @@ sudo genmkfile deb-all-dep
    done < <( dpkg-parsechangelog )
 
    if [ "$make_pkg_version" = "" ]; then
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') variable make_pkg_version is empty."
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') variable make_pkg_version is empty."
       exit 1
    fi
 
@@ -607,33 +607,33 @@ make_get_distdir() {
 
    if [ "$make_use_cowbuilder" = "true" ]; then
       if [ "$make_cowbuilder_dist_folder" = "" ]; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_use_cowbuilder=$make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set! For example:"
-         echo "make_use_cowbuilder=$make_use_cowbuilder make_cowbuilder_dist_folder=~/genmkfile-packages-result"
+         printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_use_cowbuilder=$make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set! For example:"
+         printf "%s\n" "make_use_cowbuilder=$make_use_cowbuilder make_cowbuilder_dist_folder=~/genmkfile-packages-result"
          exit 1
       else
          DISTDIR="$make_cowbuilder_dist_folder"
       fi
 
       if ! test -d "$make_cowbuilder_dist_folder" ; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
+         printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
 mkdir -p -- $make_cowbuilder_dist_folder"
          exit 1
       fi
    fi
 
    if ! test -d "$DISTDIR" ; then
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
       exit 1
    fi
    if ! test -w "$DISTDIR" ; then
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
       exit 1
    fi
 }
 
 make_help() {
    set +x
-   echo "\
+   printf "%s\n" "\
 genmkfile help
    Show this help.
 genmkfile dist
@@ -704,7 +704,7 @@ genmkfile deb-chl-bumpup-major
 genmkfile deb-uachl-bumpup-major
    Combination of genmkfile uch and genmkfile deb-chl-bumpup.
 genmkfile git-tag-show
-   echo the current git tag to stdout.
+   printf "%s\n" the current git tag to stdout.
 genmkfile git-tag-sign
    git tag (-s) sign latest pkg_version_with_revision from debian/changelog. Only a repository sanity check. Not for security purposes!
 genmkfile git-tag-verify
@@ -718,7 +718,7 @@ genmkfile git-verify
 genmkfile git-tag-push
    git push latest pkg_version_with_revision from debian/changelog. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
 genmkfile git-tag-show-latest
-   echo recent git tag to stdout.
+   printf "%s\n" recent git tag to stdout.
 genmkfile git-tag-push-latest
    git push most recent git tag. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
 genmkfile reprepro-add
@@ -747,11 +747,11 @@ make_dist() {
    ## (Important for 'corridor' package.)
 
    if ! test -d "$DISTDIR" ; then
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
       exit 1
    fi
    if ! test -w "$DISTDIR" ; then
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
       exit 1
    fi
 
@@ -761,7 +761,7 @@ make_dist() {
    test -w "$make_upstream_tarball_real_path"
    safe-rm -f -- "$make_upstream_tarball_real_path"
 
-   echo "DEBUG manual reproduction:
+   printf "%s\n" "DEBUG manual reproduction:
 cd $(pwd)"
 
    ## Excluding '/debian' folder from upstream tarball to avoid lintian warning
@@ -789,8 +789,8 @@ find \
             -
    "
 
-   msg="$(echo "$msg" | sed 's/  */ /g')"
-   echo "$msg"
+   msg="$(printf "%s\n" "$msg" | sed 's/  */ /g')"
+   printf "%s\n" "$msg"
 
    find \
       '.' \
@@ -850,11 +850,11 @@ make_undist() {
 
 make_debdsc() {
    if ! test -d "$DISTDIR" ; then
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
       exit 1
    fi
    if ! test -w "$DISTDIR" ; then
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
       exit 1
    fi
 
@@ -928,7 +928,7 @@ make_debinstfile() {
 make_debinstfile_create() {
    safe-rm -f -- "$make_debian_install_file_relative_path"
 
-   echo "\
+   printf "%s\n" "\
 ## Copyright (C) 2020 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
@@ -938,7 +938,7 @@ make_debinstfile_create() {
    local d
    for d in $make_folder_list_for_un_and_install; do
       if [ -d "$d" ]; then
-         echo "${d}/*" | tee -a "$make_debian_install_file_relative_path" >/dev/null
+         printf "%s\n" "${d}/*" | tee -a "$make_debian_install_file_relative_path" >/dev/null
       fi
    done
 }
@@ -946,7 +946,7 @@ make_debinstfile_create() {
 make_test() {
    ## Automatically run by debhelper. To prevent debhelper from failing,
    ## implemented a dummy function here.
-   echo "${green}INFO:${reset} $FUNCNAME not implemented"
+   printf "%s\n" "${green}INFO:${reset} $FUNCNAME not implemented"
 }
 
 make_manpages() {
@@ -985,7 +985,7 @@ make_uch() {
 }
 
 make_distclean() {
-   echo "$0: ${green}INFO:${reset} (internal) genmkfile distclean"
+   printf "%s\n" "$0: ${green}INFO:${reset} (internal) genmkfile distclean"
    make_clean
 }
 
@@ -994,10 +994,10 @@ make_clean() {
       make -f "$PWD/Makefile_orig" clean
    else
       if make --dry-run clean &>/dev/null ; then
-         echo "$0: ${green}INFO:${reset} (internal) make clean"
+         printf "%s\n" "$0: ${green}INFO:${reset} (internal) make clean"
          make clean
       else
-         echo "$0: ${green}INFO:${reset} no target 'make clean', ok."
+         printf "%s\n" "$0: ${green}INFO:${reset} no target 'make clean', ok."
       fi
    fi
 }
@@ -1013,8 +1013,8 @@ make_deb-shared-dep() {
          -- \
          $make_deb_shared_dependencies"
 
-   msg="$(echo "$msg" | sed 's/  */ /g')"
-   echo "$msg"
+   msg="$(printf "%s\n" "$msg" | sed 's/  */ /g')"
+   printf "%s\n" "$msg"
 
    local apt_get_exit_code="0"
    sudo \
@@ -1048,7 +1048,7 @@ make_deb-all-dep() {
 
 
 make_dpkg_source_verification_sanity_test_help_message() {
-   echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-source verification failed!
+   printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-source verification failed!
 
 To add you could use for example...
 
@@ -1069,7 +1069,7 @@ sudo gpg --no-default-keyring --keyring /usr/share/keyrings/debian-maintainers.g
 make_deb-pkg-build_shared() {
    if [ "$make_use_cowbuilder" = "true" ]; then
       if ! test -f "$make_upstream_tarball_real_path" ; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') upstream tarball $make_upstream_tarball_real_path does not exist.
+         printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') upstream tarball $make_upstream_tarball_real_path does not exist.
 Did you run
 genmkfile dist && genmkfile debdist && genmkfile debdsc
 beforehand?
@@ -1078,7 +1078,7 @@ beforehand?
       fi
 
       if ! test -f "$make_debian_tarball_absolute_path" ; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') debian tarball $make_debian_tarball_absolute_path does not exist.
+         printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') debian tarball $make_debian_tarball_absolute_path does not exist.
 Did you run
 genmkfile dist && genmkfile debdist && genmkfile debdsc
 beforehand?
@@ -1087,7 +1087,7 @@ beforehand?
       fi
 
       if ! test -f "$make_main_dsc_file" ; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dsc file $make_main_dsc_file does not exist.
+         printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dsc file $make_main_dsc_file does not exist.
 Did you run
 genmkfile dist && genmkfile debdist && genmkfile debdsc
 beforehand?
@@ -1206,7 +1206,7 @@ beforehand?
 
    else
       if ! command -v debuild >/dev/null ; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') debuild not found. Do you have the 'devscripts' package installed?
+         printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') debuild not found. Do you have the 'devscripts' package installed?
 To install all dependencies, try running:
 sudo genmkfile deb-all-dep
 "
@@ -1214,7 +1214,7 @@ sudo genmkfile deb-all-dep
       fi
 
       if ! dpkg-checkbuilddeps ; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-checkbuilddeps reported missing build dependencies.
+         printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-checkbuilddeps reported missing build dependencies.
 To install all dependencies, try running:
 sudo genmkfile deb-all-dep
 "
@@ -1231,7 +1231,7 @@ sudo genmkfile deb-all-dep
             "$@"
    fi
 
-   echo "make_use_debsign: $make_use_debsign | whoami: $(whoami)"
+   printf "%s\n" "make_use_debsign: $make_use_debsign | whoami: $(whoami)"
    if [ "$make_use_debsign" = "true" ]; then
       ## For manual use for non-maintainer builds use example:
       #DEBSIGN_KEYID="FFF25C6BEA585C88D96D9AFC2E39FB8D91FDDF6A"
@@ -1264,33 +1264,33 @@ sudo genmkfile deb-all-dep
 
    for package in $make_package_debs_files_list; do
       if ! test -f "$package" ; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') File '$package' does not exist."
+         printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') File '$package' does not exist."
          exit 1
       fi
-      echo "$0: ${green}INFO:${reset} You can find your deb file here: ${bold}$package${reset}"
+      printf "%s\n" "$0: ${green}INFO:${reset} You can find your deb file here: ${bold}$package${reset}"
    done
 
    if [ "$make_use_lintian" = "false" ]; then
-      echo "$0: ${green}INFO:${reset} make_use_lintian=false - skipping lintian."
+      printf "%s\n" "$0: ${green}INFO:${reset} make_use_lintian=false - skipping lintian."
    elif [ "$make_use_lintian" = "true" ]; then
-      echo "$0: ${green}INFO:${reset} make_use_lintian=true - running lintian..."
+      printf "%s\n" "$0: ${green}INFO:${reset} make_use_lintian=true - running lintian..."
       make_function_run make_lintian
    else
-      echo "$0: ${green}INFO:${reset} make_use_lintian='' - Autodetecting if lintian is installed..."
+      printf "%s\n" "$0: ${green}INFO:${reset} make_use_lintian='' - Autodetecting if lintian is installed..."
       if command -v lintian &>/dev/null ; then
-         echo "$0: ${green}INFO:${reset} lintian auto detected, using it..."
+         printf "%s\n" "$0: ${green}INFO:${reset} lintian auto detected, using it..."
          make_function_run make_lintian
       else
-         echo "$0: ${green}INFO:${reset} lintian not installed, skipping."
+         printf "%s\n" "$0: ${green}INFO:${reset} lintian not installed, skipping."
       fi
    fi
 }
 
 make_lintian_on_warning() {
    if [ "$make_lintian_fail_open_versus_closed" = "open" ]; then
-      echo "$0: ${red}WARNING:${reset} lintian warning. make_lintian_fail_open_versus_closed=open - Therefore, failing open."
+      printf "%s\n" "$0: ${red}WARNING:${reset} lintian warning. make_lintian_fail_open_versus_closed=open - Therefore, failing open."
    else
-      echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') lintian warning. make_lintian_fail_open_versus_closed is not set to 'open' - Therefore, failing closed."
+      printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') lintian warning. make_lintian_fail_open_versus_closed is not set to 'open' - Therefore, failing closed."
       if [ "$make_lintian_exit_code" = "0" ]; then
          exit 1
       else
@@ -1321,22 +1321,22 @@ make_lintian() {
          "
    fi
    local make_lintian_exit_code="0"
-   echo "lintian $genmkfile_lintian_pre_opts $DEBUILD_LINTIAN_OPTS $genmkfile_lintian_post_opts \"$make_main_changes_file\""
+   printf "%s\n" "lintian $genmkfile_lintian_pre_opts $DEBUILD_LINTIAN_OPTS $genmkfile_lintian_post_opts \"$make_main_changes_file\""
    lintian_output="$(lintian $genmkfile_lintian_pre_opts $DEBUILD_LINTIAN_OPTS $genmkfile_lintian_post_opts "$make_main_changes_file" 2>&1 || { make_lintian_exit_code="$?" ; true; };)"
    if [ ! "" = "$lintian_output" ]; then
       if ! test -o xtrace ; then
-         echo "$0: ${green}INFO:${reset} lintian exit code: $make_lintian_exit_code"
-         echo "$0: ${green}INFO:${reset} lintian output:"
-         echo "################################################################################"
-         echo "$lintian_output"
-         echo "################################################################################"
+         printf "%s\n" "$0: ${green}INFO:${reset} lintian exit code: $make_lintian_exit_code"
+         printf "%s\n" "$0: ${green}INFO:${reset} lintian output:"
+         printf "%s\n" "################################################################################"
+         printf "%s\n" "$lintian_output"
+         printf "%s\n" "################################################################################"
       fi
       make_lintian_on_warning
    fi
    if [ ! "$make_lintian_exit_code" = "0" ] ; then
       make_lintian_on_warning
    else
-      echo "$0: ${green}INFO:${reset} lintian ok."
+      printf "%s\n" "$0: ${green}INFO:${reset} lintian ok."
    fi
 }
 
@@ -1349,7 +1349,7 @@ make_deb-install() {
    local package
    for package in $make_package_debs_files_list; do
       if [ ! -f "$package" ]; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') File $package does not exist. Have you run \"genmkfile deb-pkg-build\" already?"
+         printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') File $package does not exist. Have you run \"genmkfile deb-pkg-build\" already?"
          exit 1
       fi
       ## --reinstall is required otherwise apt-get would refuse to install the package with the following error message:
@@ -1449,11 +1449,11 @@ make_helper() {
    local source_directory source_file file_without_pwd file_with_destdir
 
    if ! test -d "$DESTDIR" ; then
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' does not exist!"
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' does not exist!"
       exit 1
    fi
    if ! test -w "$DESTDIR" ; then
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' is not writeable!"
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' is not writeable!"
       exit 1
    fi
 
@@ -1490,11 +1490,11 @@ make_helper() {
             break
          elif [ "$make_installsim_" = "true" ]; then
             if [ ! -d "$DESTDIR" ]; then
-               echo "${green}INFO:${reset} would do: mkdir --parents -- \"$DESTDIR\""
+               printf "%s\n" "${green}INFO:${reset} would do: mkdir --parents -- \"$DESTDIR\""
             else
-               echo "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents -- \"$DESTDIR\""
+               printf "%s\n" "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents -- \"$DESTDIR\""
             fi
-            echo "${green}INFO:${reset} would do: rsync --dry-run $genmkfile_rsync_opts \"$source_directory\" \"$DESTDIR\""
+            printf "%s\n" "${green}INFO:${reset} would do: rsync --dry-run $genmkfile_rsync_opts \"$source_directory\" \"$DESTDIR\""
             rsync --dry-run $genmkfile_rsync_opts "$source_directory" "$DESTDIR"
             break
          fi
@@ -1505,21 +1505,21 @@ make_helper() {
          file_with_destdir="${DESTDIR}${file_without_pwd}"
          if [ "$make_uninstallcheck_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
-               echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') file $file_with_destdir still installed."
+               printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') file $file_with_destdir still installed."
                local still_installed="true"
             fi
          elif [ "$make_installcheck_" = "true" ]; then
             diff "$source_file" "$file_with_destdir"
          elif [ "$make_uninstallsim_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
-               echo "${green}INFO:${reset} would do: safe-rm -- \"$file_with_destdir\""
+               printf "%s\n" "${green}INFO:${reset} would do: safe-rm -- \"$file_with_destdir\""
             fi
          elif [ "$make_uninstall_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
                safe-rm -- "$file_with_destdir"
             fi
          else
-            echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') error 2 in $FUNCNAME!"
+            printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') error 2 in $FUNCNAME!"
             exit 1
          fi
       done
@@ -1529,7 +1529,7 @@ make_helper() {
       exit 1
    fi
    if [ "$genmkfile_file_has_been_copied" = "false" ]; then
-      echo "$0: ${red}${bold}ERROR:${reset} Nothing has been copied."
+      printf "%s\n" "$0: ${red}${bold}ERROR:${reset} Nothing has been copied."
       exit 1
    fi
 }
@@ -1589,11 +1589,11 @@ make_deb-chl-bumpup() {
       ## Otherwise e-mail address in debian/changelog would default to
       ## user@host.localdomain and then lintian would complain and exit with
       ## failure code.
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
       exit 1
    fi
    if [ "$DEBFULLNAME" = "" ]; then
-      echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+      printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
       exit 1
    fi
 
@@ -1605,7 +1605,7 @@ make_deb-chl-bumpup() {
       if [ "$version_numbers_by_upstream" = "true" ] ; then
          ## Thanks to:
          ## https://stackoverflow.com/a/4485581
-         #new_upstream_version="$(echo "$make_pkg_version" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')"
+         #new_upstream_version="$(printf "%s\n" "$make_pkg_version" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')"
          new_upstream_version="$make_pkg_version"
          new_revision="$(bc -l <<< "scale=9 ; $make_pkg_revision + 1" 2>&1)"
       else
@@ -1622,8 +1622,8 @@ make_deb-chl-bumpup() {
          new_changelog_version="$make_epoch:$new_upstream_version-$new_revision"
       fi
    elif [ "$make_bump_type" = "manual" ]; then
-      echo "Current version number: $make_changelog_version"
-      echo "Please enter new version number!"
+      printf "%s\n" "Current version number: $make_changelog_version"
+      printf "%s\n" "Please enter new version number!"
       read new_changelog_version
    else
       true "make_bump_type $make_bump_type is neither major nor manual!"
@@ -1634,8 +1634,8 @@ Bumping version from / to...
 $make_changelog_version
 $new_changelog_version"
 
-   if echo "$new_changelog_version" | grep_no_comments --quiet -- "error" ; then
-      echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed!" >&2
+   if printf "%s\n" "$new_changelog_version" | grep_no_comments --quiet -- "error" ; then
+      printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed!" >&2
       exit 1
    fi
 
@@ -1669,7 +1669,7 @@ make_git_tag_shared() {
    if [ "$package" = "derivative-maker" ]; then
       ## make_git_tag_sign_appendix gets set by dm-bump-derivative-maker-version
       if [ "$make_git_tag_sign_appendix" = "" ]; then
-         echo "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') package is '$package' but variable make_git_tag_sign_appendix is empty."
+         printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') package is '$package' but variable make_git_tag_sign_appendix is empty."
          exit 1
       fi
    fi
@@ -1680,7 +1680,7 @@ make_git_tag_shared() {
 
 make_git_tag_show() {
    make_function_run make_git_tag_shared
-   echo "$make_git_tag_version_number"
+   printf "%s\n" "$make_git_tag_version_number"
 }
 
 make_git_tag_sign() {
@@ -1703,14 +1703,14 @@ make_git_tag_check() {
    [ -n "$make_git_describe_output" ] || make_git_describe_output="$(git describe --always --abbrev=1000000000)"
    if [ ! "$make_git_tag_version_number" = "$make_git_describe_output" ]; then
       if [ ! "$make_skip_git_describe_output_check" = "true" ]; then
-         echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed! Current git head is a untagged git tag! $running_as_root_maybe \
+         printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed! Current git head is a untagged git tag! $running_as_root_maybe \
 make_git_tag_version_number $make_git_tag_version_number differs from make_git_describe_output $make_git_describe_output" >&2
          exit 1
       fi
    fi
 
    make_function_run make_git_tag_verify
-   echo "$0: ${green}INFO:${reset} Ok, current git head is a signed git tag."
+   printf "%s\n" "$0: ${green}INFO:${reset} Ok, current git head is a signed git tag."
 }
 
 make_git_commit_verify() {
@@ -1722,23 +1722,23 @@ make_git_commit_verify_current() {
    local make_git_commit_verify_return_code="0"
    make_function_run make_git_commit_verify "HEAD" || { make_git_commit_verify_return_code="$?" ; true; };
    if [ ! "$make_git_commit_verify_return_code" = "0" ]; then
-      echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed! Current git head commit is unsigned! $running_as_root_maybe" >&2
+      printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed! Current git head commit is unsigned! $running_as_root_maybe" >&2
       exit 1
    fi
-   echo "$0: ${green}INFO:${reset} Ok, current git head commit is signed."
+   printf "%s\n" "$0: ${green}INFO:${reset} Ok, current git head commit is signed."
 }
 
 make_git_verify() {
    make_function_run make_git_commit_verify_current
    make_function_run make_git_tag_check
-   echo "$0: ${green}INFO:${reset} Ok, current git head is a signed git commit and a signed git tag."
+   printf "%s\n" "$0: ${green}INFO:${reset} Ok, current git head is a signed git commit and a signed git tag."
 }
 
 make_git_tag_push() {
    make_function_run make_git_tag_shared
    local repository
    for repository in $make_git_tag_push_targets; do
-      echo "git push $repository $make_git_tag_version_number"
+      printf "%s\n" "git push $repository $make_git_tag_version_number"
       git push "$repository" "$make_git_tag_version_number"
    done
 }
@@ -1747,7 +1747,7 @@ make_git_tag_show_latest() {
    make_function_run make_git_tag_shared
    ## Thanks to kilianc - http://stackoverflow.com/a/7979255/2605155
    make_git_tag_latest="$(git describe --tags $(git rev-list --tags --max-count=1))"
-   echo "$make_git_tag_latest"
+   printf "%s\n" "$make_git_tag_latest"
 }
 
 make_git_tag_push_latest() {
@@ -1839,7 +1839,7 @@ make_source_overrides_folder() {
                   continue
                fi
                ## Skipping files such as .dpkg-old and .dpkg-dist.
-               if echo "$i" | grep --quiet ".dpkg-" ; then
+               if printf "%s\n" "$i" | grep --quiet ".dpkg-" ; then
                   true "skip: $i"
                   continue
                fi
@@ -1888,9 +1888,9 @@ if [ "$make_script_was_sourced" = "false" ]; then
 
    temp="$@"
    if [ "$temp" = "" ]; then
-      echo "$0: ${green}INFO:${reset} called without parameters."
+      printf "%s\n" "$0: ${green}INFO:${reset} called without parameters."
    else
-      echo "$0: ${green}INFO:${reset} $@"
+      printf "%s\n" "$0: ${green}INFO:${reset} $@"
    fi
 
    set -e
