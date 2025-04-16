@@ -1,3 +1,149 @@
+commit cddd0a4a23be2d237db5d2f0d9a82dd0b1d07cb4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 18:45:40 2025 -0400
+
+    fix
+
+commit f33b15e5316a777b972b79907f7260152ec7a09c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 18:43:32 2025 -0400
+
+    fix
+
+commit 839fedb6b4983dae499fe3dcf1a1dbcae20d59b4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 16:07:08 2025 -0400
+
+    fix
+
+commit cd472ef5e9c1066a51f66825c7c8fee1f5fbc2cd
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 16:06:22 2025 -0400
+
+    verbose
+
+commit f2188dcbb8da5542f5efa3ded7c700472768d08e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 15:59:37 2025 -0400
+
+    refactoring
+
+commit fdb1c0d44f188767b13e2b5982c68d0de185efc4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 15:41:06 2025 -0400
+
+    fix also permissions for folders and non-executable files
+
+commit 3c5a3e2f7e890310c16d11023b433aaf3e9cbf59
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 14:39:40 2025 -0400
+
+    fix
+
+commit 858f38de3cb72bb581d0ca5dad2f4cf179ebebb1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 14:37:14 2025 -0400
+
+    refactoring
+
+commit 6d6bafb1c2eb34bd34a8d6ba9feac586fe0e6edb
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 14:35:26 2025 -0400
+
+    fix: `umask 027` compatibility with source folder when using `genmkfile install`
+    
+    set `chmod 755` on target files if source file is executable
+
+commit 478cee5b104f9048f675275e9a63c26ecca392aa
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 14:07:52 2025 -0400
+
+    refactoring
+
+commit 90ffb2e29bf6035bb2f92af029471919d3be045a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 14:03:01 2025 -0400
+
+    refactoring
+
+commit 2eb55b3142fd471ff58be79342515a6bfebbc468
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:51:53 2025 -0400
+
+    Depends: moreutils, safe-rm
+
+commit 80b9e78ca8ad4702417485d74b3aefe1fcb50ca7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:50:44 2025 -0400
+
+    refactoring
+
+commit f4d87680c507179e736a61a6b8b2aa9f3e62f038
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:43:12 2025 -0400
+
+    comment
+
+commit 4b94f906eb2afbc50708371caefbfeab18c173eb
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:42:45 2025 -0400
+
+    end-of-options
+
+commit 1d258f72779d422df626df931f20149f3f34b4cd
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:41:22 2025 -0400
+
+    end-of-options
+
+commit 4eaecc2bcfa1276cde9376bd065acecea9855b56
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:40:55 2025 -0400
+
+    printf
+
+commit f20d2fe6a2ee017a6f90cda335542f19c9937b13
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:38:43 2025 -0400
+
+    end-of-options
+
+commit fd95ff6c00bca7c46998515172cd1384db0aab4b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:37:47 2025 -0400
+
+    end-of-options
+
+commit bc6be02a8e511db8be94732d1bbaa93a458b7c03
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:36:56 2025 -0400
+
+    safe-rm
+
+commit b663564dce58db882d64a20e0c4e8e9d0ca78f71
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:35:22 2025 -0400
+
+    end-of-options
+
+commit 9e39bb2dac5a6e0474edba47a357f8492ea9dbb4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 13:33:05 2025 -0400
+
+    comments
+
+commit 246a1736c8b5344408a3780a521de55704f6d483
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 16 12:55:55 2025 -0400
+
+    quotes
+
+commit 65a974f0492a5e64ae07aac77a0d1ae5e0398f31
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jan 23 16:19:32 2025 +0000
+
+    bumped changelog version
+
 commit 24c7a6fee5ea5a477da8525e03468c5d94abb502
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Jan 23 11:10:20 2025 -0500
