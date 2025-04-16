@@ -30,13 +30,13 @@ make_init() {
    [ -n "$GENMKFILE_PATH" ] || GENMKFILE_PATH="/usr/share/genmkfile"
    export GENMKFILE_PATH
 
-   pwd=$(pwd)
+   pwd="$(pwd)"
    ## Example pwd:
    ## ~/derivative-maker/packages/kicksecure/genmkfile
-   dirname_pwd=$(dirname "$pwd")
+   dirname_pwd="$(dirname "$pwd")"
    ## Example dirname_pwd:
    ## ~/derivative-maker/packages/kicksecure
-   parent_folder=$(basename "$dirname_pwd")
+   parent_folder="$(basename "$dirname_pwd")"
    ## Example parent_folder:
    ## kicksecure
    derivative_repository_name="$parent_folder"
@@ -1605,7 +1605,7 @@ make_deb-chl-bumpup() {
       else
          #new_upstream_version_without_epoch="$(bc -l <<< "scale=9 ; $make_pkg_version + 0.1" 2>&1)"
          #new_upstream_version="$(printf '%3.1f\n' "$new_upstream_version_without_epoch")"
-         new_upstream_version=$(/usr/share/genmkfile/version-bump-calculate "$make_pkg_version")
+         new_upstream_version="$(/usr/share/genmkfile/version-bump-calculate "$make_pkg_version")"
          ## Packages by Kicksecure / Whonix always bump package version. Not Debian package revision.
          new_revision="1"
       fi
