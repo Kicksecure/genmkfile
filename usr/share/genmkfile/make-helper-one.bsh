@@ -1503,11 +1503,16 @@ make_helper() {
                rsync "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
                rsync_done=true
             fi
+            ## Need to check first if it is a file...
             if test -f "$source_fso" ; then
-               source_fso_stat="$(stat -c "%a" "$file_with_destdir")"
-               if ! [ "$source_fso_stat" = "755" ]; then
-                  chmod -- 755 "$file_with_destdir"
-                  printf "%s\n" "chmod -- 755 '$file_with_destdir'"
+               ## ...before checking if it is an executable.
+               ## Because folders can also have executable bit.
+               if test -x "$source_fso" ; then
+                  source_fso_stat="$(stat -c "%a" "$file_with_destdir")"
+                  if ! [ "$source_fso_stat" = "755" ]; then
+                     chmod -- 755 "$file_with_destdir"
+                     printf "%s\n" "chmod -- 755 '$file_with_destdir'"
+                  fi
                fi
             fi
          elif [ "$make_installsim_" = "true" ]; then
