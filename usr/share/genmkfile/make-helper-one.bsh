@@ -1476,10 +1476,18 @@ make_helper() {
    #local genmkfile_file_has_been_copied
    [ -n "$genmkfile_file_has_been_copied" ] || genmkfile_file_has_been_copied=false
 
+   if [ ! -d "$DESTDIR" ]; then
+      printf "%s\n" "${green}INFO:${reset} would create DESTDIR '$DESTDIR': mkdir --parents -- '$DESTDIR'"
+   else
+      printf "%s\n" "${green}INFO:${reset} No need to run, because folder DESTDIR '$DESTDIR' already exists: mkdir --parents -- '$DESTDIR'"
+   fi
+
    for source_directory in $make_folder_list_for_un_and_install; do
       if [ ! -d "$source_directory" ]; then
          continue
       fi
+      local rsync_done
+      rsync_done=""
       for source_file in "$PWD/$source_directory"/**; do
          genmkfile_file_has_been_copied=true
          file_without_pwd="${source_file#$PWD}"
@@ -1488,32 +1496,37 @@ make_helper() {
             if [ ! -d "$DESTDIR" ]; then
                mkdir --parents -- "$DESTDIR"
             fi
-            ## Not using 'cp' because:
-            #cp --recursive lib /
-            # > cp: cannot overwrite non-directory '/lib' with directory 'lib'
-            rsync "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
-            break
-         elif [ "$make_installsim_" = "true" ]; then
-            if [ ! -d "$DESTDIR" ]; then
-               printf "%s\n" "${green}INFO:${reset} would do: mkdir --parents -- \"$DESTDIR\""
-            else
-               printf "%s\n" "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents -- \"$DESTDIR\""
+            if [ ! "$rsync_done" = "true" ]; then
+               ## Not using 'cp' because:
+               #cp --recursive lib /
+               # > cp: cannot overwrite non-directory '/lib' with directory 'lib'
+               rsync "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
+               rsync_done=true
             fi
-            ## use '[*]' to trat as single line and avoid newlines in output
-            printf "%s\n" "${green}INFO:${reset} would do: rsync --dry-run ${genmkfile_rsync_opts[*]} -- \"$source_directory\" \"$DESTDIR\""
-            rsync --dry-run "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
-            break
-         fi
-         if [ ! -f "$source_file" ]; then
-            continue
-         fi
-         if [ "$make_uninstallcheck_" = "true" ]; then
+            if test -f "$source_file" ; then
+               source_file_stat="$(stat -c "%a" "$file_with_destdir")"
+               if ! [ "$source_file_stat" = "755" ]; then
+                  chmod -- 755 "$file_with_destdir"
+                  printf "%s\n" "chmod -- 755 '$file_with_destdir'"
+               fi
+            fi
+         elif [ "$make_installsim_" = "true" ]; then
+            if [ ! "$rsync_done" = "true" ]; then
+               ## use '[*]' to trat as single line and avoid newlines in output
+               printf "%s\n" "${green}INFO:${reset} would do: rsync --dry-run ${genmkfile_rsync_opts[*]} -- \"$source_directory\" \"$DESTDIR\""
+               rsync --dry-run "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
+               rsync_done=true
+            fi
+            ## chmod cannot be simulated because actually no file gets copied.
+         elif [ "$make_uninstallcheck_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
                printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') file $file_with_destdir still installed."
                local still_installed="true"
             fi
          elif [ "$make_installcheck_" = "true" ]; then
-            diff "$source_file" "$file_with_destdir"
+            if test -f "$source_file" ; then
+               diff -- "$source_file" "$file_with_destdir"
+            fi
          elif [ "$make_uninstallsim_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
                printf "%s\n" "${green}INFO:${reset} would do: safe-rm -- \"$file_with_destdir\""
