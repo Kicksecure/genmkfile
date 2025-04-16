@@ -20,7 +20,7 @@ grep_no_comments() {
 }
 
 make_log_and_run() {
-   printf "%s\n" "${green}running:${reset} $@"
+   printf "%s\n" "${green}running:${reset} $*"
    "$@"
 }
 
