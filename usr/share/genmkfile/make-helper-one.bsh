@@ -1447,7 +1447,7 @@ make_checkout() {
 
 make_helper() {
    shopt -s globstar dotglob nullglob
-   local source_directory source_file file_without_pwd file_with_destdir
+   local source_directory source_fso file_without_pwd file_with_destdir
 
    if ! test -d "$DESTDIR" ; then
       printf "%s\n" "${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' does not exist!"
@@ -1488,9 +1488,9 @@ make_helper() {
       fi
       local rsync_done
       rsync_done=""
-      for source_file in "$PWD/$source_directory"/**; do
+      for source_fso in "$PWD/$source_directory"/**; do
          genmkfile_file_has_been_copied=true
-         file_without_pwd="${source_file#$PWD}"
+         file_without_pwd="${source_fso#$PWD}"
          file_with_destdir="${DESTDIR}${file_without_pwd}"
          if [ "$make_install_" = "true" ]; then
             if [ ! -d "$DESTDIR" ]; then
@@ -1503,9 +1503,9 @@ make_helper() {
                rsync "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
                rsync_done=true
             fi
-            if test -f "$source_file" ; then
-               source_file_stat="$(stat -c "%a" "$file_with_destdir")"
-               if ! [ "$source_file_stat" = "755" ]; then
+            if test -f "$source_fso" ; then
+               source_fso_stat="$(stat -c "%a" "$file_with_destdir")"
+               if ! [ "$source_fso_stat" = "755" ]; then
                   chmod -- 755 "$file_with_destdir"
                   printf "%s\n" "chmod -- 755 '$file_with_destdir'"
                fi
@@ -1524,8 +1524,8 @@ make_helper() {
                local still_installed="true"
             fi
          elif [ "$make_installcheck_" = "true" ]; then
-            if test -f "$source_file" ; then
-               diff -- "$source_file" "$file_with_destdir"
+            if test -f "$source_fso" ; then
+               diff -- "$source_fso" "$file_with_destdir"
             fi
          elif [ "$make_uninstallsim_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
