@@ -1651,8 +1651,8 @@ make_deb-uachl-commit-changelog() {
    if test -f changelog.upstream ; then
       git add -- changelog.upstream
    fi
-   git add debian/changelog
-   git commit -m -- "bumped changelog version"
+   git add -- debian/changelog
+   git commit -m "bumped changelog version"
 }
 
 make_deb-chl-bumpup() {
