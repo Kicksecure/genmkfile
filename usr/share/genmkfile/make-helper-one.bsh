@@ -1445,6 +1445,28 @@ make_checkout() {
    git fetch
 }
 
+in_array() {
+   local needle item
+   needle="$1"
+   for item in "$@"; do
+      if [ "$item" = "$needle" ]; then
+         return 0
+      fi
+   done
+   return 1
+}
+
+array_match() {
+   local needle item
+   needle="$1"
+   for item in "$@"; do
+      if printf "%s\n" "$item" | grep --quiet --fixed-strings -- "$needle" ; then
+         return 0
+      fi
+   done
+   return 1
+}
+
 make_helper() {
    shopt -s globstar dotglob nullglob
    local source_directory source_fso file_without_pwd file_with_destdir
@@ -1476,10 +1498,16 @@ make_helper() {
    #local genmkfile_file_has_been_copied
    [ -n "$genmkfile_file_has_been_copied" ] || genmkfile_file_has_been_copied=false
 
-   if [ ! -d "$DESTDIR" ]; then
-      printf "%s\n" "${green}INFO:${reset} would create DESTDIR '$DESTDIR': mkdir --parents -- '$DESTDIR'"
-   else
-      printf "%s\n" "${green}INFO:${reset} No need to run, because folder DESTDIR '$DESTDIR' already exists: mkdir --parents -- '$DESTDIR'"
+   folder_permission_skip_list=()
+   folder_permission_skip_list+=("/etc/sudoers.d")
+   folder_permission_skip_list+=("/usr/src")
+
+   if [ "$make_installsim_" = "true" ]; then
+      if [ ! -d "$DESTDIR" ]; then
+         printf "%s\n" "${green}INFO:${reset} would create DESTDIR '$DESTDIR': mkdir --parents -- '$DESTDIR'"
+      else
+         printf "%s\n" "${green}INFO:${reset} No need to run, because folder DESTDIR '$DESTDIR' already exists: mkdir --parents -- '$DESTDIR'"
+      fi
    fi
 
    for source_directory in $make_folder_list_for_un_and_install; do
@@ -1491,7 +1519,10 @@ make_helper() {
       for source_fso in "$PWD/$source_directory"/**; do
          genmkfile_file_has_been_copied=true
          file_without_pwd="${source_fso#$PWD}"
-         file_with_destdir="${DESTDIR}${file_without_pwd}"
+         ## Issue: starts with double '//'
+         #file_with_destdir="${DESTDIR}${file_without_pwd}"
+         ## New: single '/'
+         file_with_destdir="${DESTDIR%/}/${file_without_pwd#/}"
          if [ "$make_install_" = "true" ]; then
             if [ ! -d "$DESTDIR" ]; then
                mkdir --parents -- "$DESTDIR"
@@ -1504,14 +1535,32 @@ make_helper() {
                rsync_done=true
             fi
             ## Need to check first if it is a file...
-            if test -f "$source_fso" ; then
-               ## ...before checking if it is an executable.
-               ## Because folders can also have executable bit.
-               if test -x "$source_fso" ; then
-                  source_fso_stat="$(stat -c "%a" "$file_with_destdir")"
-                  if ! [ "$source_fso_stat" = "755" ]; then
-                     chmod -- 755 "$file_with_destdir"
-                     printf "%s\n" "chmod -- 755 '$file_with_destdir'"
+            ## ...before checking if it is an executable.
+            ## Because folders can also have executable bit.
+            fso_with_destdir_stat="$(stat -c "%a" "$file_with_destdir")"
+            #echo "source_fso: $source_fso"
+            if test -d "$source_fso" ; then
+                  if ! [ "$fso_with_destdir_stat" = "755" ]; then
+                     if [ "$DESTDIR" = "/" ]; then
+                        if ! in_array "$source_fso" "${folder_permission_skip_list[@]}"; then
+                           printf "%s\n" "chmod change on folder might(!) be required: chmod -- 755 '$file_with_destdir'"
+                           ## Not safe due to folders such as '/etc/sudoers.d' which have chmod '700' as per Debian default.
+                           #chmod -- 755 "$file_with_destdir"
+                        fi
+                     fi
+                  fi
+            elif test -f "$source_fso" ; then
+               if ! array_match "$source_fso" "${folder_permission_skip_list[@]}"; then
+                  if test -x "$source_fso" ; then
+                     if ! [ "$fso_with_destdir_stat" = "755" ]; then
+                        printf "%s\n" "executable file: chmod -- 755 '$file_with_destdir'"
+                        echo chmod -- 755 "$file_with_destdir"
+                     fi
+                  else
+                     if ! [ "$fso_with_destdir_stat" = "644" ]; then
+                        printf "%s\n" "non-executable file: chmod -- 644 '$file_with_destdir'"
+                        echo chmod -- 644 "$file_with_destdir"
+                     fi
                   fi
                fi
             fi
