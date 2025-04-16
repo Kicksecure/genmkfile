@@ -1482,6 +1482,8 @@ make_helper() {
       fi
       for source_file in "$PWD/$source_directory"/**; do
          genmkfile_file_has_been_copied=true
+         file_without_pwd="${source_file#$PWD}"
+         file_with_destdir="${DESTDIR}${file_without_pwd}"
          if [ "$make_install_" = "true" ]; then
             if [ ! -d "$DESTDIR" ]; then
                mkdir --parents -- "$DESTDIR"
@@ -1505,8 +1507,6 @@ make_helper() {
          if [ ! -f "$source_file" ]; then
             continue
          fi
-         file_without_pwd="${source_file#$PWD}"
-         file_with_destdir="${DESTDIR}${file_without_pwd}"
          if [ "$make_uninstallcheck_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
                printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') file $file_with_destdir still installed."
