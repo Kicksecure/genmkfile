@@ -1585,11 +1585,11 @@ make_helper() {
             fi
          elif [ "$make_uninstallsim_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
-               printf "%s\n" "${green}INFO:${reset} would do: safe-rm -- \"$file_with_destdir\""
+               printf "%s\n" "${green}INFO:${reset} would do: safe-rm --verbose -- \"$file_with_destdir\""
             fi
          elif [ "$make_uninstall_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
-               safe-rm -- "$file_with_destdir"
+               safe-rm --verbose -- "$file_with_destdir"
             fi
          else
             printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') error 2 in $FUNCNAME!"
