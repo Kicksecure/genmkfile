@@ -933,12 +933,12 @@ make_debinstfile_create() {
 ## See the file COPYING for copying conditions.
 
 ## This file was generated using 'genmkfile debinstfile'.
-" | tee -a "$make_debian_install_file_relative_path" >/dev/null
+" | sponge -a -- "$make_debian_install_file_relative_path"
 
    local d
    for d in $make_folder_list_for_un_and_install; do
       if [ -d "$d" ]; then
-         printf "%s\n" "${d}/*" | tee -a "$make_debian_install_file_relative_path" >/dev/null
+         printf "%s\n" "${d}/*" | sponge -a -- "$make_debian_install_file_relative_path"
       fi
    done
 }
@@ -969,6 +969,7 @@ make_manpages() {
          --date=2020-01-01 \
          --manual="$make_source_package_name Manual" \
          --organization="$make_source_package_name" \
+         -- \
          < "$i" \
          > "$PWD/auto-generated-man-pages/$filename_without_ronn_file_extension"
 
@@ -980,7 +981,7 @@ make_uch() {
    if test -f "$PWD/CHANGES" ; then
       return 0
    fi
-   git log > "$PWD/changelog.upstream"
+   git log | sponge -- "$PWD/changelog.upstream"
    test -f "$PWD/changelog.upstream"
 }
 
@@ -1576,10 +1577,10 @@ make_deb-chl-bumpup-manual() {
 
 make_deb-uachl-commit-changelog() {
    if test -f changelog.upstream ; then
-      git add changelog.upstream
+      git add -- changelog.upstream
    fi
    git add debian/changelog
-   git commit -m "bumped changelog version"
+   git commit -m -- "bumped changelog version"
 }
 
 make_deb-chl-bumpup() {
@@ -1691,7 +1692,7 @@ make_git_tag_sign() {
 
 make_git_tag_verify() {
    make_function_run make_git_tag_shared
-   make_log_and_run git tag -v "$make_git_tag_version_number"
+   make_log_and_run git tag -v -- "$make_git_tag_version_number"
 }
 
 make_git_tag_check() {
@@ -1714,7 +1715,7 @@ make_git_tag_version_number $make_git_tag_version_number differs from make_git_d
 }
 
 make_git_commit_verify() {
-   make_log_and_run git verify-commit "$1"
+   make_log_and_run git verify-commit -- "$1"
 }
 
 make_git_commit_verify_current() {
@@ -1738,8 +1739,8 @@ make_git_tag_push() {
    make_function_run make_git_tag_shared
    local repository
    for repository in $make_git_tag_push_targets; do
-      printf "%s\n" "git push $repository $make_git_tag_version_number"
-      git push "$repository" "$make_git_tag_version_number"
+      printf "%s\n" "git push -- $repository $make_git_tag_version_number"
+      git push "$repository" -- "$make_git_tag_version_number"
    done
 }
 
@@ -1753,10 +1754,10 @@ make_git_tag_show_latest() {
 make_git_tag_push_latest() {
    make_function_run make_git_tag_shared
    ## Thanks to kilianc - http://stackoverflow.com/a/7979255/2605155
-   make_git_tag_latest="$(git describe --tags $(git rev-list --tags --max-count=1))"
+   make_git_tag_latest="$(git describe --tags -- "$(git rev-list --tags --max-count=1)")"
    local repository
    for repository in $make_git_tag_push_targets; do
-      make_log_and_run git push "$repository" "$make_git_tag_latest"
+      make_log_and_run git push -- "$repository" "$make_git_tag_latest"
    done
 }
 
