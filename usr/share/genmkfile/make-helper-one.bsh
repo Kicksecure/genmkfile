@@ -1458,17 +1458,19 @@ make_helper() {
       exit 1
    fi
 
-   ## Does not work.
-   #genmkfile_rsync_opts+=" --chmod=o+r "
-   #genmkfile_rsync_opts+=" --executability "
+   genmkfile_rsync_opts=()
 
-   genmkfile_rsync_opts+=" --recursive " ## recurse into directories
-   genmkfile_rsync_opts+=" --keep-dirlinks " ## treat symlinked dir on receiver as dir
-   genmkfile_rsync_opts+=" --links " ## copy symlinks as symlinks
-   genmkfile_rsync_opts+=" --hard-links " ## preserve hard links
-   genmkfile_rsync_opts+=" --safe-links " ## ignore symlinks that point outside the tree
-   #genmkfile_rsync_opts+=" --progress "
-   #genmkfile_rsync_opts+=" --verbose "
+   ## Does not work.
+   #genmkfile_rsync_opts+=("--chmod=o+r")
+   #genmkfile_rsync_opts+=("--executability")
+
+   genmkfile_rsync_opts+=("--recursive") ## recurse into directories
+   genmkfile_rsync_opts+=("--keep-dirlinks") ## treat symlinked dir on receiver as dir
+   genmkfile_rsync_opts+=("--links") ## copy symlinks as symlinks
+   genmkfile_rsync_opts+=("--hard-links") ## preserve hard links
+   genmkfile_rsync_opts+=("--safe-links") ## ignore symlinks that point outside the tree
+   #genmkfile_rsync_opts+=("--progress")
+   #genmkfile_rsync_opts+=("--verbose")
 
    ## Cannot be `local` so hooks can increase it.
    #local genmkfile_file_has_been_copied
@@ -1487,7 +1489,7 @@ make_helper() {
             ## Not using 'cp' because:
             #cp --recursive lib /
             # > cp: cannot overwrite non-directory '/lib' with directory 'lib'
-            rsync $genmkfile_rsync_opts -- "$source_directory" "$DESTDIR"
+            rsync "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
             break
          elif [ "$make_installsim_" = "true" ]; then
             if [ ! -d "$DESTDIR" ]; then
@@ -1495,8 +1497,9 @@ make_helper() {
             else
                printf "%s\n" "${green}INFO:${reset} No need to run, because folder already exists: mkdir --parents -- \"$DESTDIR\""
             fi
-            printf "%s\n" "${green}INFO:${reset} would do: rsync --dry-run $genmkfile_rsync_opts -- \"$source_directory\" \"$DESTDIR\""
-            rsync --dry-run $genmkfile_rsync_opts -- "$source_directory" "$DESTDIR"
+            ## use '[*]' to trat as single line and avoid newlines in output
+            printf "%s\n" "${green}INFO:${reset} would do: rsync --dry-run ${genmkfile_rsync_opts[*]} -- \"$source_directory\" \"$DESTDIR\""
+            rsync --dry-run "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
             break
          fi
          if [ ! -f "$source_file" ]; then
