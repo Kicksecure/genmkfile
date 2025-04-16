@@ -16,7 +16,7 @@ if [ "$GENMKFILE_DEBUG" = "1" ]; then
 fi
 
 grep_no_comments() {
-   grep "$@" | grep --invert-match "^#"
+   grep "$@" | grep --invert-match -- "^#"
 }
 
 make_log_and_run() {
@@ -1839,7 +1839,7 @@ make_source_overrides_folder() {
                   continue
                fi
                ## Skipping files such as .dpkg-old and .dpkg-dist.
-               if printf "%s\n" "$i" | grep --quiet ".dpkg-" ; then
+               if printf "%s\n" "$i" | grep --quiet -- ".dpkg-" ; then
                   true "skip: $i"
                   continue
                fi
