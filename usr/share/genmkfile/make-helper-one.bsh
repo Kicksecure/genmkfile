@@ -33,10 +33,10 @@ make_init() {
    pwd="$(pwd)"
    ## Example pwd:
    ## ~/derivative-maker/packages/kicksecure/genmkfile
-   dirname_pwd="$(dirname "$pwd")"
+   dirname_pwd="$(dirname -- "$pwd")"
    ## Example dirname_pwd:
    ## ~/derivative-maker/packages/kicksecure
-   parent_folder="$(basename "$dirname_pwd")"
+   parent_folder="$(basename -- "$dirname_pwd")"
    ## Example parent_folder:
    ## kicksecure
    derivative_repository_name="$parent_folder"
@@ -759,7 +759,7 @@ make_dist() {
    test -w "$(pwd)"
    touch "$make_upstream_tarball_real_path"
    test -w "$make_upstream_tarball_real_path"
-   rm -f "$make_upstream_tarball_real_path"
+   rm -f -- "$make_upstream_tarball_real_path"
 
    echo "DEBUG manual reproduction:
 cd $(pwd)"
@@ -845,7 +845,7 @@ make_debdist() {
 }
 
 make_undist() {
-   rm --force "$make_upstream_tarball_relative_path"
+   rm --force -- "$make_upstream_tarball_relative_path"
 }
 
 make_debdsc() {
@@ -877,11 +877,11 @@ make_debdsc() {
 }
 
 make_undebdsc() {
-   rm --force "$make_main_dsc_file"
+   rm --force -- "$make_main_dsc_file"
 }
 
 make_undebdist() {
-   rm --force "$make_debian_tarball_absolute_path"
+   rm --force -- "$make_debian_tarball_absolute_path"
 }
 
 make_debinstfile() {
@@ -926,7 +926,7 @@ make_debinstfile() {
 }
 
 make_debinstfile_create() {
-   rm -f "$make_debian_install_file_relative_path"
+   rm -f -- "$make_debian_install_file_relative_path"
 
    echo "\
 ## Copyright (C) 2020 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
@@ -1245,7 +1245,7 @@ sudo genmkfile deb-all-dep
       temp_dir="$(mktemp --directory)"
       ## Required, otherwise:
       ## dpkg-source: error: unpack target exists: /tmp/tmp.n1V3KXmMtI
-      rm --recursive --force "$temp_dir"
+      rm --recursive --force -- "$temp_dir"
 
       ## Sanity test.
       make_log_and_run \
@@ -1257,7 +1257,7 @@ sudo genmkfile deb-all-dep
             "$temp_dir/" || \
                { make_dpkg_source_verification_sanity_test_help_message ; return 1; };
 
-      rm --recursive --force "$temp_dir"
+      rm --recursive --force -- "$temp_dir"
    fi
 
    for package in $make_package_debs_files_list; do
@@ -1367,24 +1367,24 @@ make_deb-purge() {
 
 make_deb-clean() {
    if [ -d "debian/tmp" ]; then
-      rm --recursive "debian/tmp"
+      rm --recursive -- "debian/tmp"
    fi
    if [ -d "deb_dist" ]; then
-      rm --recursive "deb_dist"
+      rm --recursive -- "deb_dist"
    fi
    if [ -d "debian/.debhelper" ]; then
-      rm --recursive "debian/.debhelper"
+      rm --recursive -- "debian/.debhelper"
    fi
    if [ -f "debian/autoreconf.after" ]; then
-      rm "debian/autoreconf.after"
+      rm -- "debian/autoreconf.after"
    fi
    if [ -f "debian/autoreconf.before" ]; then
-      rm "debian/autoreconf.before"
+      rm -- "debian/autoreconf.before"
    fi
    local to_delete package
    for package in $make_package_list; do
       if [ -d "debian/$package" ]; then
-         rm --recursive "debian/$package"
+         rm --recursive -- "debian/$package"
       fi
       for to_delete in \
          "debian/$package.debhelper.log" \
@@ -1398,7 +1398,7 @@ make_deb-clean() {
          "debian/debhelper-build-stamp"
       do
          if [ -e "$to_delete" ]; then
-            rm "$to_delete"
+            rm -- "$to_delete"
          fi
       done
    done
@@ -1425,12 +1425,12 @@ make_deb-cleanup() {
          "${DISTDIR}/${package}_"*-*"_source.${package}.upload"
       do
          if [ -e "$to_delete" ]; then
-            rm "$to_delete"
+            rm -- "$to_delete"
          fi
       done
    done
    if [ -f "$make_upstream_tarball_relative_path" ]; then
-      rm "$make_upstream_tarball_relative_path"
+      rm -- "$make_upstream_tarball_relative_path"
    fi
 }
 
@@ -1510,11 +1510,11 @@ make_helper() {
             diff "$source_file" "$file_with_destdir"
          elif [ "$make_uninstallsim_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
-               echo "${green}INFO:${reset} would do: rm \"$file_with_destdir\""
+               echo "${green}INFO:${reset} would do: rm -- \"$file_with_destdir\""
             fi
          elif [ "$make_uninstall_" = "true" ]; then
             if [ -f "$file_with_destdir" ]; then
-               rm "$file_with_destdir"
+               rm -- "$file_with_destdir"
             fi
          else
             echo "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') error 2 in $FUNCNAME!"
