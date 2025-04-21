@@ -1,3 +1,9 @@
+genmkfile (3:15.7-1) unstable; urgency=medium
+
+  * New upstream version (local package).
+
+ -- Patrick Schleizer <adrelanos@whonix.org>  Mon, 21 Apr 2025 18:42:54 +0000
+
 genmkfile (3:15.6-1) unstable; urgency=medium
 
   * New upstream version (local package).
