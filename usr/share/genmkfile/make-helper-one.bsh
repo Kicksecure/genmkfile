@@ -1008,7 +1008,7 @@ make_clean() {
 make_deb-shared-dep() {
    msg="sudo \
       apt-get \
-         ${APTGETOPT[@]} \
+         "${APTGETOPT[@]}" \
          --yes \
          --no-install-recommends \
          --allow-downgrades \
@@ -1022,7 +1022,7 @@ make_deb-shared-dep() {
    local apt_get_exit_code="0"
    sudo \
       apt-get \
-         ${APTGETOPT[@]} \
+         "${APTGETOPT[@]}" \
          --yes \
          --no-install-recommends \
          --allow-downgrades \
