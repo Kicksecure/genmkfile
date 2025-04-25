@@ -1,3 +1,21 @@
+commit 723b1f092652258a8430723a4c0917ce13190f15
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Apr 25 02:00:37 2025 -0400
+
+    fix
+
+commit 99c29b9b93540227b855694300fa164f35bf5677
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Apr 25 01:24:30 2025 -0400
+
+    fix `genmkfile install` permissions
+
+commit 7a2f094616b61ad8c0c8e061423bb275f0151258
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Apr 21 18:42:54 2025 +0000
+
+    bumped changelog version
+
 commit 2dbaab34da556cd33bb1b10494dda0ec8a085932
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Mon Apr 21 14:39:15 2025 -0400
