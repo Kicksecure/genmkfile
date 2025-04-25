@@ -1450,22 +1450,32 @@ make_checkout() {
 in_array() {
    local needle item
    needle="$1"
+   shift
+   true "in_array: @: |$@|"
    for item in "$@"; do
+      true "in_array: item: $item"
       if [ "$item" = "$needle" ]; then
+         true "in_array: found"
          return 0
       fi
    done
+   true "in_array: not found"
    return 1
 }
 
 array_match() {
    local needle item
    needle="$1"
+   shift
+   true "array_match: @: |$@|"
    for item in "$@"; do
-      if printf "%s\n" "$item" | grep --quiet --fixed-strings -- "$needle" ; then
+      true "item: $item"
+      if printf "%s\n" "$needle" | grep --quiet --fixed-strings -- "$item" ; then
+         true "array_match: found"
          return 0
       fi
    done
+   true "array_match: not found"
    return 1
 }
 
@@ -1544,7 +1554,9 @@ make_helper() {
             if test -d "$source_fso" ; then
                   if ! [ "$fso_with_destdir_stat" = "755" ]; then
                      if [ "$DESTDIR" = "/" ]; then
+                        true "calling...: in_array |$source_fso| |${folder_permission_skip_list[@]}|"
                         if ! in_array "$source_fso" "${folder_permission_skip_list[@]}"; then
+                           true "in_array did not match, therefore continuing..."
                            printf "%s\n" "chmod change on folder might(!) be required: chmod -- 755 '$file_with_destdir'"
                            ## Not safe due to folders such as '/etc/sudoers.d' which have chmod '700' as per Debian default.
                            #chmod -- 755 "$file_with_destdir"
@@ -1552,7 +1564,9 @@ make_helper() {
                      fi
                   fi
             elif test -f "$source_fso" ; then
+               true "calling...: array_match |$source_fso| |${folder_permission_skip_list[@]}|"
                if ! array_match "$source_fso" "${folder_permission_skip_list[@]}"; then
+                  true "array_match did not match, therefore continuing..."
                   if test -x "$source_fso" ; then
                      if ! [ "$fso_with_destdir_stat" = "755" ]; then
                         printf "%s\n" "executable file: chmod -- 755 '$file_with_destdir'"
