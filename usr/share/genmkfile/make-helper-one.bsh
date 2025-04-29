@@ -1557,7 +1557,7 @@ make_helper() {
                         true "calling...: in_array |$file_without_pwd| |${folder_permission_skip_list[@]}|"
                         if ! in_array "$file_without_pwd" "${folder_permission_skip_list[@]}"; then
                            true "in_array did not match, therefore continuing..."
-                           printf "%s\n" "$0: INFO: chmod change on folder might(!) be required: chmod -- 755 '$file_with_destdir'"
+                           printf "%s\n" "$0: INFO: chmod change on folder might(!) be required, consider running the following command: chmod -- 755 '$file_with_destdir'"
                            ## Not safe due to folders such as '/etc/sudoers.d' which have chmod '700' as per Debian default.
                            #chmod -- 755 "$file_with_destdir"
                         fi
@@ -1569,12 +1569,12 @@ make_helper() {
                   true "array_match did not match, therefore continuing..."
                   if test -x "$source_fso" ; then
                      if ! [ "$fso_with_destdir_stat" = "755" ]; then
-                        printf "%s\n" "$0: INFO: executable file: chmod -- 755 '$file_with_destdir'"
+                        printf "%s\n" "$0: INFO: executable file found, running command...: chmod -- 755 '$file_with_destdir'"
                         chmod -- 755 "$file_with_destdir"
                      fi
                   else
                      if ! [ "$fso_with_destdir_stat" = "644" ]; then
-                        printf "%s\n" "$0: INFO: non-executable file: chmod -- 644 '$file_with_destdir'"
+                        printf "%s\n" "$0: INFO: non-executable file found, running command...: chmod -- 644 '$file_with_destdir'"
                         chmod -- 644 "$file_with_destdir"
                      fi
                   fi
