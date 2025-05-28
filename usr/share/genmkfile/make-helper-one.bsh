@@ -1977,7 +1977,7 @@ if [ "$make_script_was_sourced" = "false" ]; then
    if [ "$temp" = "" ]; then
       printf "%s\n" "$0: ${green}INFO:${reset} called without parameters."
    else
-      printf "%s\n" "$0: ${green}INFO:${reset} $@"
+      printf "%s\n" "$0: ${green}INFO:${reset} $*"
    fi
 
    set -e
