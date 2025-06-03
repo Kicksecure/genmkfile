@@ -1358,7 +1358,16 @@ make_deb-install() {
       ## --reinstall is required otherwise apt-get would refuse to install the package with the following error message:
       ## Note, selecting 'systemcheck' instead of '/home/user/derivative-binary/genmkfile-packages-result/systemcheck_25.1-1_all.deb'
       ## systemcheck is already the newest version (3:25.1-1).
-      make_log_and_run sudo apt-get --yes --no-install-recommends --allow-downgrades --reinstall install -- "$package"
+      make_log_and_run sudo \
+         apt-get \
+            "${APTGETOPT[@]}" \
+            --yes \
+            --no-install-recommends \
+            --allow-downgrades \
+            --reinstall \
+            install \
+            -- \
+            "$package"
    done
 }
 
@@ -1982,6 +1991,10 @@ if [ "$make_script_was_sourced" = "false" ]; then
 
    set -e
    set -o pipefail
+
+   if [ -n "${APTGETOPT_SERIALIZED:-}" ]; then
+      mapfile -t APTGETOPT <<< "$APTGETOPT_SERIALIZED"
+   fi
 
    make_function_run make_init
 
