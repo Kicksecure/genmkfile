@@ -1,3 +1,22 @@
+commit 1ccbb42c2bc6ebf62126e5639603ccab21dbd396
+Merge: 8b61c64 e4360e0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jun 12 06:53:13 2025 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/docker'
+
+commit e4360e085f1aca90f8081affaf02fa775dbffdc1
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Tue Jun 3 17:40:36 2025 -0500
+
+    Respect APTGETOPT_SERIALIZED from environment when installing packages
+
+commit 8b61c64cc75fb043e183105bb15eec0b27375011
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 28 12:09:45 2025 +0000
+
+    bumped changelog version
+
 commit 79a21b2770e1f5673d90587e921b92b17e37c4d4
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed May 28 08:01:41 2025 -0400
