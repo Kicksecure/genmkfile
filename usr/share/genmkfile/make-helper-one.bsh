@@ -1111,12 +1111,11 @@ beforehand?
       if [ ! "$dist_build_apt_sources_mirror" = "" ]; then
          [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="$dist_build_apt_sources_mirror"
       else
-         ## apt-cacher-ng support
-         if [ "$REPO_PROXY" = "http://127.0.0.1:3142" ]; then
-            [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="http://HTTPS///deb.debian.org/debian"
-         fi
-         if [ "$REPO_PROXY" = "http://127.0.0.1:3142/" ]; then
-            [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="http://HTTPS///deb.debian.org/debian"
+         ## approx caching proxy support
+         if [ "$APPROX_PROXY_ENABLE" = "yes" ]; then
+            ## TODO: Use the derivative-maker specific proxy at port 9977, or
+            ## the system-wide proxy at port 9999?
+            [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="http://127.0.0.1:9977/debian"
          fi
          [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="https://deb.debian.org/debian"
       fi
@@ -1147,11 +1146,12 @@ beforehand?
       ## W: --override-config is not set; not updating apt.conf Read the manpage for details.
       ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1075960
 
+      ## TODO: REPO_PROXY is no longer used, update this comment.
       ## COWBUILDER_PREFIX could set variables such as http_proxy.
       ## Whonix build script sets:
       ## COWBUILDER_PREFIX+=" env http_proxy=${REPO_PROXY}"
       ## which results in:
-      ## sudo env http_proxy=http://127.0.0.1:3142 cowbuilder [...]
+      ## sudo env http_proxy=http://127.0.0.1:9977 cowbuilder [...]
       ##
       ## creates $make_main_changes_file
       ##
