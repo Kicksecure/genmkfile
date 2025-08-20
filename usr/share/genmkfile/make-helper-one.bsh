@@ -1253,14 +1253,16 @@ sudo genmkfile deb-all-dep
       safe-rm --recursive --force -- "$temp_dir"
 
       ## Sanity test.
-      make_log_and_run \
-         dpkg-source \
-            --require-strong-checksums \
-            --require-valid-signature \
-            -x \
-            "$make_main_dsc_file" \
-            "$temp_dir/" || \
-               { make_dpkg_source_verification_sanity_test_help_message ; return 1; };
+      ## Broken under Trixie, disabled. See:
+      ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1110172
+      #make_log_and_run \
+      #   dpkg-source \
+      #      --require-strong-checksums \
+      #      --require-valid-signature \
+      #      -x \
+      #      "$make_main_dsc_file" \
+      #      "$temp_dir/" || \
+      #         { make_dpkg_source_verification_sanity_test_help_message ; return 1; };
 
       safe-rm --recursive --force -- "$temp_dir"
    fi
@@ -1311,11 +1313,12 @@ make_lintian() {
       ## Building from git. Not from tarball.
       ## https://forums.whonix.org/t/end-to-end-signed-debs-debsign-debsig-and-dpkg-sig/3446
       ## --suppress-tags orig-tarball-missing-upstream-signature
+      ##
+      ## Removed '--suppress-tags package-supports-alternative-init-but-no-init.d-script' for Trixie, tag no longer exists.
       export DEBUILD_LINTIAN_OPTS="\
          --suppress-tags missing-tests-control \
          --suppress-tags systemd-service-file-missing-documentation-key \
          --suppress-tags orig-tarball-missing-upstream-signature \
-         --suppress-tags package-supports-alternative-init-but-no-init.d-script \
          --suppress-tags no-manual-page \
          --quiet \
          --pedantic \
