@@ -1255,6 +1255,7 @@ sudo genmkfile deb-all-dep
       ## Sanity test.
       ## Broken under Trixie, disabled. See:
       ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1110172
+      ## TODO: consider re-enabling in Debian forky
       #make_log_and_run \
       #   dpkg-source \
       #      --require-strong-checksums \
