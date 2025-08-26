@@ -1500,9 +1500,12 @@ make_helper() {
       printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' does not exist!"
       exit 1
    fi
-   if ! test -w "$DESTDIR" ; then
-      printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' is not writeable!"
-      exit 1
+
+   if [ ! "$make_installcheck_" = "true" ]; then
+      if ! test -w "$DESTDIR" ; then
+         printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' is not writeable!"
+         exit 1
+      fi
    fi
 
    genmkfile_rsync_opts=()
