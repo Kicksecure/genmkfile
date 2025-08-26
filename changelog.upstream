@@ -1,3 +1,52 @@
+commit 990eba14dc0f80fadd084aacc207f355ca7a94f8
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 26 05:04:18 2025 -0400
+
+    re-generate man pages (generated using "genmkfile manpages")
+
+commit 58037c3bf1c9866b7dac1961efb4781e9d2e5bc1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 26 04:30:16 2025 -0400
+
+    fix: running `genmkfile installcheck` as non-root
+
+commit 63b32754833a312b6758e524f8ad73064f8a7412
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 20 07:21:37 2025 -0400
+
+    comment
+
+commit b3e4bade43cccfc12ef4cfb12ea86470272c36d6
+Merge: 8aa13dd ef45c94
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 20 07:20:34 2025 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 8aa13dd1662d7bbccc596c3a9aa4d41997a51d0c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 20 06:57:25 2025 -0400
+
+    bumped Standards-Version
+
+commit d854fb268619fb1ff7dfbc76d89d7330a9cc6ac9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Aug 20 06:25:31 2025 -0400
+
+    readme
+
+commit ef45c94af1913e58145d21d8dca926e0000cb273
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Tue Aug 5 22:57:59 2025 -0500
+
+    Port to Trixie.
+
+commit 3e7feb806a78ec27ff109a353e7dfc669b63bfd9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jun 14 11:50:09 2025 +0000
+
+    bumped changelog version
+
 commit 5ac67a792e0e22f8dcfc88f3a7b85ea1f5716f67
 Merge: 7a87a69 6873e33
 Author: Patrick Schleizer <adrelanos@whonix.org>
