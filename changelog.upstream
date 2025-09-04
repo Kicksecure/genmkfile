@@ -1,3 +1,22 @@
+commit e80612a46e7d10a0dfd73edb35c4fab1e93ead32
+Merge: 201995d 6e223ae
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 4 09:28:10 2025 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 6e223ae9de25ff8fb4e4fb3253921c9ee225f7ff
+Author: Aaron Rainbolt <arraybolt3@ubuntu.com>
+Date:   Tue Sep 2 18:32:59 2025 -0500
+
+    Make deb-cleanup work with dh_clean
+
+commit 201995d9b2180cc1e1e0e59e4331c7a8d281fe1a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 2 15:14:30 2025 +0000
+
+    bumped changelog version
+
 commit 53b0c1100b306df304b37df2ef9dda79614c139b
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Aug 30 14:14:55 2025 +0000
