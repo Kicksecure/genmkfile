@@ -1383,6 +1383,13 @@ make_deb-purge() {
    sudo apt-get --yes purge -- "$make_source_package_name"
 }
 
+make_dh_clean() {
+  ## TODO: Executes arbitrary code from the working directory, is this safe?
+  if [ -x debian/rules ]; then
+    debian/rules clean
+  fi
+}
+
 make_deb-clean() {
    if [ -d "debian/tmp" ]; then
       safe-rm --recursive -- "debian/tmp"
@@ -1427,6 +1434,7 @@ make_deb-cleanup() {
    make_function_run make_undebdist
    make_function_run make_undebdsc
    make_function_run make_clean
+   make_function_run make_dh_clean
    make_function_run make_deb-clean
    local to_delete package
    for package in $make_package_list; do
