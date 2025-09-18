@@ -860,7 +860,7 @@ make_debinstfile() {
 
 make_debinstfile_create() {
    local temp_dir new_file filename_without_hash cleaned_filename_without_hash pkg_name \
-   temp_deb_install_file real_deb_instal_file
+   temp_deb_install_file real_deb_instal_file destination_directory
    local -a find_cmd
    local -A delete_yet
 
@@ -885,6 +885,7 @@ make_debinstfile_create() {
             filename_without_dot="${file_name#./}"
             filename_without_hash="${file_name%%#*}"
             cleaned_filename_without_hash="${filename_without_hash/#.\//\/}"
+            destination_directory="${cleaned_filename_without_hash%/*}"
             pkg_name="${file_name#*#}"
             temp_deb_install_file="${temp_dir}/${pkg_name}.install"
 
@@ -899,7 +900,7 @@ make_debinstfile_create() {
 " | sponge -a -- "$temp_deb_install_file"
             fi
 
-            printf "%s\n" "${filename_without_dot} ${cleaned_filename_without_hash}" | sponge -a -- "$temp_deb_install_file"
+            printf "%s\n" "${filename_without_dot} ${destination_directory}" | sponge -a -- "$temp_deb_install_file"
          done
 
         for new_file in "$temp_dir"/*.install; do
