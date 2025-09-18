@@ -849,52 +849,89 @@ make_debinstfile() {
       return 0
    fi
 
-   if ! test -f "$make_debian_install_file_relative_path" ; then
-      make_debinstfile_create
-      return 0
-   fi
-
-   if cat -- "$make_debian_install_file_relative_path" | grep_no_comments --quiet -- "nogenmkfile" ; then
-      return 0
-   fi
-
-   for d in "${make_folder_list_for_un_and_install[@]}"; do
-      if [ ! -d "$d" ]; then
-         continue
+   if test -f "$make_debian_install_file_relative_path" ; then
+      if grep --quiet -- "nogenmkfile" "$make_debian_install_file_relative_path" ; then
+         return 0
       fi
-      missing=yes
-      while read -r -d $'\n' line; do
-         if [ "$line" = "${d}/*" ]; then
-            missing=no
-            break
-         fi
-      done < "$make_debian_install_file_relative_path"
-      if [ "$missing" = "yes" ]; then
-         break
-      fi
-   done
-
-   if [ "$missing" = "yes" ]; then
-      make_debinstfile_create
    fi
+
+   make_debinstfile_create
 }
 
 make_debinstfile_create() {
-   safe-rm -f -- "$make_debian_install_file_relative_path"
+   local temp_dir new_file filename_without_hash cleaned_filename_without_hash pkg_name \
+   temp_deb_install_file real_deb_instal_file
+   local -a find_cmd
+   local -A delete_yet
 
-   printf "%s\n" "\
+   set -x
+
+   temp_dir="$(mktemp --directory)"
+
+   find_cmd+=(find)
+   find_cmd+=(.)
+   find_cmd+=(-not -path '*/\.git/*')
+   find_cmd+=(-not -path '*/\.git')
+   find_cmd+=(-not -name '.gitignore')
+   find_cmd+=(-not -path './debian*')
+   find_cmd+=(-iname '*#*')
+
+   if "${find_cmd[@]}" | grep --fixed-strings -- '#' >/dev/null; then
+      true "multi-package hash filename found: yes"
+      find_cmd+=(-print0)
+
+      "${find_cmd[@]}" | \
+         while IFS= read -r -d '' file_name; do
+            filename_without_hash="${file_name%%#*}"
+            cleaned_filename_without_hash="${filename_without_hash/#.\//\/}"
+            pkg_name="${file_name#*#}"
+            temp_deb_install_file="${temp_dir}/${pkg_name}.install"
+
+            if [ -z "${delete_yet[$pkg_name]}" ]; then
+                safe-rm -f -- "$temp_deb_install_file"
+                delete_yet["${pkg_name}"]=true
+                printf "%s\n" "\
 ## Copyright (C) 2020 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
 ## This file was generated using 'genmkfile debinstfile'.
-" | sponge -a -- "$make_debian_install_file_relative_path"
+" | sponge -a -- "$temp_deb_install_file"
+            fi
 
-   local d
-   for d in "${make_folder_list_for_un_and_install[@]}"; do
-      if [ -d "$d" ]; then
-         printf "%s\n" "${d}/*" | sponge -a -- "$make_debian_install_file_relative_path"
+            printf "%s\n" "${cleaned_filename_without_hash}" | sponge -a -- "$temp_deb_install_file"
+         done
+
+        for new_file in "$temp_dir"/*.install; do
+            real_deb_instal_file="debian/$(basename "$new_file")"
+            if [ -f "$real_deb_instal_file" ]; then
+                if cmp -s "$new_file" "$real_deb_instal_file"; then
+                    continue
+                fi
+            fi
+            cp -- "$new_file" "$real_deb_instal_file"
+        done
+
+   else
+      true "multi-package hash filename found: no"
+      temp_deb_install_file="${temp_dir}/pkg.install"
+      real_deb_instal_file="$make_debian_install_file_relative_path"
+      printf "%s\n" "\
+## Copyright (C) 2020 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
+## See the file COPYING for copying conditions.
+
+## This file was generated using 'genmkfile debinstfile'.
+" | sponge -a -- "$temp_deb_install_file"
+      local d
+      for d in "${make_folder_list_for_un_and_install[@]}"; do
+         if [ -d "$d" ]; then
+            printf "%s\n" "${d}/*" | sponge -a -- "$temp_deb_install_file"
+         fi
+      done
+      if cmp -s "$temp_deb_install_file" "$real_deb_instal_file"; then
+         return 0
       fi
-   done
+      cp -- "$temp_deb_install_file" "$real_deb_instal_file"
+   fi
 }
 
 make_test() {
@@ -1198,12 +1235,11 @@ sudo genmkfile deb-all-dep
       ## sanity test
       make_log_and_run gpg --verify "$make_main_changes_file"
 
-      local temp_dir
-      temp_dir="$(mktemp --directory)"
+      #local temp_dir
+      #temp_dir="$(mktemp --directory)"
       ## Required, otherwise:
       ## dpkg-source: error: unpack target exists: /tmp/tmp.n1V3KXmMtI
-      safe-rm --recursive --force -- "$temp_dir"
-
+      #safe-rm --recursive --force -- "$temp_dir"
       ## Sanity test.
       ## Broken under Trixie, disabled. See:
       ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1110172
@@ -1216,8 +1252,7 @@ sudo genmkfile deb-all-dep
       #      "$make_main_dsc_file" \
       #      "$temp_dir/" || \
       #         { make_dpkg_source_verification_sanity_test_help_message ; return 1; };
-
-      safe-rm --recursive --force -- "$temp_dir"
+      #safe-rm --recursive --force -- "$temp_dir"
    fi
 
    for package in $make_package_debs_files_list; do
