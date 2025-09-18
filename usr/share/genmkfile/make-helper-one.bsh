@@ -49,12 +49,6 @@ make_init() {
    #pushd "$GENMKFILE_ROOT_DIR" >/dev/null
 }
 
-make_deinit() {
-   ## No longer in use.
-   #popd >/dev/null
-   true
-}
-
 make_parse_cmd() {
    ## Thanks to:
    ## http://mywiki.wooledge.org/BashFAQ/035
@@ -1982,6 +1976,4 @@ if [ "$make_script_was_sourced" = "false" ]; then
    make_function_run make_get_variables
 
    make_function_run make_parse_cmd "$@"
-
-   make_function_run make_deinit
 fi
