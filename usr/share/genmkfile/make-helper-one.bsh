@@ -882,6 +882,7 @@ make_debinstfile_create() {
 
       "${find_cmd[@]}" | \
          while IFS= read -r -d '' file_name; do
+            filename_without_dot="${file_name#./}"
             filename_without_hash="${file_name%%#*}"
             cleaned_filename_without_hash="${filename_without_hash/#.\//\/}"
             pkg_name="${file_name#*#}"
@@ -898,7 +899,7 @@ make_debinstfile_create() {
 " | sponge -a -- "$temp_deb_install_file"
             fi
 
-            printf "%s\n" "${cleaned_filename_without_hash}" | sponge -a -- "$temp_deb_install_file"
+            printf "%s\n" "${filename_without_dot} ${cleaned_filename_without_hash}" | sponge -a -- "$temp_deb_install_file"
          done
 
         for new_file in "$temp_dir"/*.install; do
