@@ -16,6 +16,8 @@ if [ "$GENMKFILE_DEBUG" = "1" ]; then
 fi
 
 grep_no_comments() {
+   ## Not using end-of-options ("--") for the first invocation of 'grep',
+   ## because it is up to the caller of this function to use it or not.
    grep "$@" | grep --invert-match -- "^#"
 }
 
