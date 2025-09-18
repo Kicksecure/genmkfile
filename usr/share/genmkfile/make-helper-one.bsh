@@ -168,22 +168,22 @@ make_parse_cmd() {
            deb-clean)
                matched="true"
                make_function_run make_deb-clean
-               shift
+               exit 0
                ;;
            deb-cleanup)
                matched="true"
                make_function_run make_deb-cleanup
-               shift
+               exit 0
                ;;
            lintian)
                matched="true"
                make_function_run make_lintian
-               shift
+               exit 0
                ;;
            dput-ubuntu-ppa)
                matched="true"
                make_function_run make_dput-ubuntu-ppa
-               shift
+               exit 0
                ;;
            clean)
                matched="true"
