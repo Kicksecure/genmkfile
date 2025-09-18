@@ -1264,7 +1264,10 @@ make_lintian_on_warning() {
 }
 
 make_lintian() {
-   test -f "$make_main_changes_file"
+   if ! test -f "$make_main_changes_file" ; then
+      printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_main_changes_file '$make_main_changes_file' does not exist."
+      exit 1
+   fi
    if [ "$DEBUILD_LINTIAN_OPTS" = "" ]; then
       ## https://github.com/openwall/lkrg/pull/105
       ## --suppress-tags systemd-service-file-missing-documentation-key
