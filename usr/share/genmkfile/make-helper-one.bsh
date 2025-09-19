@@ -864,8 +864,6 @@ make_debinstfile_create() {
    local -a find_cmd
    local -A delete_yet
 
-   set -x
-
    temp_dir="$(mktemp --directory)"
 
    find_cmd+=(find)
