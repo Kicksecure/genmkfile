@@ -1443,6 +1443,7 @@ make_deb-cleanup() {
          "${DISTDIR}/${package}-dbgsym_"*-*_*".deb" \
          "${DISTDIR}/${package}_"*-*_*".buildinfo" \
          "${DISTDIR}/${package}_"*-*".debian.tar.xz" \
+         "${DISTDIR}/${package}_"*-*".orig.tar.xz" \
          "${DISTDIR}/${package}_"*-*".dsc" \
          "${DISTDIR}/${package}_"*-*_*".build" \
          "${DISTDIR}/${package}_"*-*_*".changes" \
