@@ -51,6 +51,10 @@ make_init() {
    genmkfile_temp_dir="$(mktemp --directory)"
 }
 
+make_deinit() {
+   safe-rm -r -f -- "$genmkfile_temp_dir"
+}
+
 make_parse_cmd() {
    ## Thanks to:
    ## http://mywiki.wooledge.org/BashFAQ/035
@@ -2014,4 +2018,5 @@ if [ "$make_script_was_sourced" = "false" ]; then
    make_function_run make_get_variables
 
    make_function_run make_parse_cmd "$@"
+   make_function_run make_deinit
 fi
