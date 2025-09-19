@@ -64,242 +64,242 @@ make_parse_cmd() {
            help)
                matched="true"
                make_function_run make_help
-               exit 0
+               shift
                ;;
            all)
                matched="true"
                make_function_run make_all "$@"
-               exit 0
+               shift
                ;;
            dist)
                matched="true"
                make_function_run make_dist
-               exit 0
+               shift
                ;;
            test)
                matched="true"
                make_function_run make_test
-               exit 0
+               shift
                ;;
            undist)
                matched="true"
                make_function_run make_undist
-               exit 0
+               shift
                ;;
            debdist)
                matched="true"
                make_function_run make_debdist
-               exit 0
+               shift
                ;;
            undebdist)
                matched="true"
                make_function_run make_undebdist
-               exit 0
+               shift
                ;;
            debdsc)
                matched="true"
                make_function_run make_debdsc
-               exit 0
+               shift
                ;;
            undebdsc)
                matched="true"
                make_function_run make_undebdsc
-               exit 0
+               shift
                ;;
            debinstfile)
                matched="true"
                make_function_run make_debinstfile
-               exit 0
+               shift
                ;;
            manpages)
                matched="true"
                make_function_run make_manpages
-               exit 0
+               shift
                ;;
            uch)
                matched="true"
                make_function_run make_uch
-               exit 0
+               shift
                ;;
            install)
                matched="true"
                make_function_run make_install
-               exit 0
+               shift
                ;;
            deb-build-dep)
                matched="true"
                make_function_run make_deb-build-dep
-               exit 0
+               shift
                ;;
            deb-run-dep)
                matched="true"
                make_function_run make_deb-run-dep
-               exit 0
+               shift
                ;;
            deb-all-dep)
                matched="true"
                make_function_run make_deb-all-dep
-               exit 0
+               shift
                ;;
            deb-pkg-build)
                matched="true"
                make_function_run make_deb-pkg-build
-               exit 0
+               shift
                ;;
            deb-install)
                matched="true"
                make_function_run make_deb-install
-               exit 0
+               shift
                ;;
            deb-remove)
                matched="true"
                make_function_run make_deb-remove
-               exit 0
+               shift
                ;;
            deb-purge)
                matched="true"
                make_function_run make_deb-purge
-               exit 0
+               shift
                ;;
            deb-clean)
                matched="true"
                make_function_run make_deb-clean
-               exit 0
+               shift
                ;;
            deb-cleanup)
                matched="true"
                make_function_run make_deb-cleanup
-               exit 0
+               shift
                ;;
            lintian)
                matched="true"
                make_function_run make_lintian
-               exit 0
+               shift
                ;;
            dput-ubuntu-ppa)
                matched="true"
                make_function_run make_dput-ubuntu-ppa
-               exit 0
+               shift
                ;;
            clean)
                matched="true"
                make_function_run make_clean
-               exit 0
+               shift
                ;;
            distclean)
                matched="true"
                make_function_run make_distclean
-               exit 0
+               shift
                ;;
            checkout)
                matched="true"
                make_function_run make_checkout
-               exit 0
+               shift
                ;;
            installcheck)
                matched="true"
                make_function_run make_installcheck
-               exit 0
+               shift
                ;;
            installsim)
                matched="true"
                make_function_run make_installsim
-               exit 0
+               shift
                ;;
            uninstallcheck)
                matched="true"
                make_function_run make_uninstallcheck
-               exit 0
+               shift
                ;;
            uninstall)
                matched="true"
                make_function_run make_uninstall
-               exit 0
+               shift
                ;;
            uninstallsim)
                matched="true"
                make_function_run make_uninstallsim
-               exit 0
+               shift
                ;;
            deb-chl-bumpup-major)
                matched="true"
                make_function_run make_deb-chl-bumpup-major
-               exit 0
+               shift
                ;;
            deb-chl-bumpup-manual)
                matched="true"
                make_function_run make_deb-chl-bumpup-manual
-               exit 0
+               shift
                ;;
            deb-uachl-bumpup-major)
                matched="true"
                make_function_run make_deb-uachl-bumpup-major
-               exit 0
+               shift
                ;;
            deb-uachl-bumpup-manual)
                matched="true"
                make_function_run make_deb-uachl-bumpup-manual
-               exit 0
+               shift
                ;;
            deb-uachl-commit-changelog)
                matched="true"
                make_function_run make_deb-uachl-commit-changelog
-               exit 0
+               shift
                ;;
            git-tag-show)
                matched="true"
                make_function_run make_git_tag_show
-               exit 0
+               shift
                ;;
            git-tag-sign)
                matched="true"
                make_function_run make_git_tag_sign
-               exit 0
+               shift
                ;;
            git-tag-verify)
                matched="true"
                make_function_run make_git_tag_verify
-               exit 0
+               shift
                ;;
            git-tag-check)
                matched="true"
                make_function_run make_git_tag_check
-               exit 0
+               shift
                ;;
            git-commit-verify)
                matched="true"
                make_function_run make_git_commit_verify_current
-               exit 0
+               shift
                ;;
            git-verify)
                matched="true"
                make_function_run make_git_verify
-               exit 0
+               shift
                ;;
            git-tag-push)
                matched="true"
                make_function_run make_git_tag_push
-               exit 0
+               shift
                ;;
            git-tag-show-latest)
                matched="true"
                make_function_run make_git_tag_show_latest
-               exit 0
+               shift
                ;;
            git-tag-push-latest)
                matched="true"
                make_function_run make_git_tag_push_latest
-               exit 0
+               shift
                ;;
            reprepro-add)
                matched="true"
                make_function_run make_reprepro-add
-               exit 0
+               shift
                ;;
            reprepro-remove)
                matched="true"
                make_function_run make_reprepro-remove
-               exit 0
+               shift
                ;;
            --)
                shift
