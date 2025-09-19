@@ -306,6 +306,7 @@ make_parse_cmd() {
                shift
                ;;
            --)
+               true "$0: end-of-options"
                shift
                break
                ;;
@@ -314,6 +315,7 @@ make_parse_cmd() {
                exit 1
                ;;
            *)
+               true "$0: positional parameter: $@"
                break
                ;;
        esac
@@ -2019,4 +2021,6 @@ if [ "$make_script_was_sourced" = "false" ]; then
 
    make_function_run make_parse_cmd "$@"
    make_function_run make_deinit
+
+   true "$0: END"
 fi
