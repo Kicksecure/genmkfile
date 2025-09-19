@@ -1430,13 +1430,13 @@ make_deb-clean() {
 }
 
 make_deb-cleanup() {
+   local to_delete package
    make_function_run make_undist
    make_function_run make_undebdist
    make_function_run make_undebdsc
    make_function_run make_clean
    make_function_run make_dh_clean
    make_function_run make_deb-clean
-   local to_delete package
    for package in $make_package_list; do
       for to_delete in \
          "${DISTDIR}/${package}_"*-*_*".deb" \
