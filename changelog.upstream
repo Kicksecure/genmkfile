@@ -1,3 +1,111 @@
+commit 79f36941eddd5a0e34a80f657a964e355eea223a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Sep 19 11:47:33 2025 -0400
+
+    local
+
+commit 3725704a2a3dc80b7673878368e2ca0565b7b04c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Sep 19 11:45:24 2025 -0400
+
+    debugging
+
+commit 8e358a641b51a66624ffa0c3b9d44e983f32ad0d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Sep 19 11:40:44 2025 -0400
+
+    delete genmkfile temporary directory at the end
+
+commit 206a1696156756f1d1147aee7ac0cbe20281c162
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Sep 19 11:38:53 2025 -0400
+
+    refactoring
+
+commit 71cc9866390051bab348bb5653be54023620d219
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Sep 19 11:34:21 2025 -0400
+
+    refactoring
+
+commit 16358367dfdddaa056ae86cceeedf0b43e5b4c94
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Sep 19 11:32:50 2025 -0400
+
+    lower debugging
+
+commit f20b22751f5d0cfcaf6fb3c7f39d185a6f661129
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Sep 19 10:54:47 2025 -0400
+
+    fix
+
+commit 35d6db7c3ea97a6ffcf0f2113c046d1b6456cc57
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Sep 19 10:34:17 2025 -0400
+
+    fix
+
+commit 45450720a8d28d6f756855f4fccf687583c09028
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 18 10:39:00 2025 -0400
+
+    fix
+
+commit c846e8cbaec62ca2a32472dfa418067b67ee4881
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 18 10:28:40 2025 -0400
+
+    fix
+
+commit 4cbe00e46d1fe2b4a3f1da7ca8ea9aae036c7523
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 18 09:59:16 2025 -0400
+
+    add feature to auto-generate `debian/*.instal` files based on `#` ("hash") in filenames
+
+commit 56f34fe8ef0d9a9416bee96346b9aa6ff1df4f8b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 18 09:47:52 2025 -0400
+
+    genmkfile debinstfile
+
+commit e145af0f67aa7b1edc72a7ff23801cd1cb58e69a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 18 08:12:01 2025 -0400
+
+    cleanup
+
+commit 30e7729cf2b450ecad008d9cff2ed7545d0eb283
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 18 08:11:09 2025 -0400
+
+    improved error handling
+
+commit aa414a328d438a5e5171e98f8303733254a457f7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 18 08:09:16 2025 -0400
+
+    fix
+
+commit 4644932e77673aca9253d25578262f24a77587d6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 18 08:07:19 2025 -0400
+
+    cleanup
+
+commit 2392e5e3d19e57e84c35577a335f1f93ce3490bd
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 18 08:04:31 2025 -0400
+
+    comment
+
+commit e96152600f4020f533ed5e1442276dbd5443ab55
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Sep 4 13:34:06 2025 +0000
+
+    bumped changelog version
+
 commit e80612a46e7d10a0dfd73edb35c4fab1e93ead32
 Merge: 201995d 6e223ae
 Author: Patrick Schleizer <adrelanos@whonix.org>
