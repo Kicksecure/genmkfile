@@ -900,6 +900,7 @@ make_debinstfile_create() {
 
 ## This file was generated using 'genmkfile debinstfile'.
 " | sponge -a -- "$temp_deb_install_file"
+                chmod -- +x "$temp_deb_install_file"
             fi
 
             printf "%s\n" "${filename_without_dot} => ${cleaned_filename_without_hash}" | sponge -a -- "$temp_deb_install_file"
