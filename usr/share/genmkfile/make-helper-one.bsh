@@ -1005,6 +1005,8 @@ make_clean() {
 }
 
 make_deb-shared-dep() {
+  ## TODO: check if sudo is available.
+
    msg="sudo \
       apt-get \
          "${APTGETOPT[@]}" \

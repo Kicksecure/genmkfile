@@ -15,7 +15,7 @@ Rules-Requires-Root: no
 Package: genmkfile
 Architecture: all
 Depends: make, dpkg-dev, devscripts, moreutils, safe-rm,
- strip-nondeterminism, sudo, perl, rsync, python3, ${misc:Depends}
+ strip-nondeterminism, perl, rsync, python3, ${misc:Depends}
 Description: Generic Makefile
  Makes packaging simpler. No more need to manually maintain
  'make install' targets or distribution specific install files such as
