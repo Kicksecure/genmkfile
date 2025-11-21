@@ -1,3 +1,15 @@
+commit 0ba428825d8696f9c220b028171efc88d3c11338
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Nov 21 08:42:05 2025 -0500
+
+    check for empty directories
+
+commit fe7eafaf84d0135a32c35021c45cd844376648c3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Nov 1 08:15:52 2025 +0000
+
+    bumped changelog version
+
 commit 91d728acb0da0b7c7817adc69e2a7033b06ef24e
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Nov 1 03:35:29 2025 -0400
