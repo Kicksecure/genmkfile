@@ -704,6 +704,8 @@ make_all() {
 }
 
 make_dist() {
+   local empty_directories
+
    #find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
    ## No longer using --transform because that does not work with symlinks.
@@ -723,6 +725,14 @@ make_dist() {
    touch "$make_upstream_tarball_real_path"
    test -w "$make_upstream_tarball_real_path"
    safe-rm -f -- "$make_upstream_tarball_real_path"
+
+   empty_directories="$(find "." -not -ipath '*.git*' -type d -empty)"
+
+   if ! [ "${empty_directories}"  = "" ]; then
+      printf "%s\n" "${red}${bold}$0: ERROR:${reset} Empty directory found! empty_directories:
+'${empty_directories}'"
+      exit 1
+   fi
 
    printf "%s\n" "$0: DEBUG manual reproduction:
 cd $(pwd)"
