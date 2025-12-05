@@ -728,7 +728,7 @@ make_dist() {
 
    empty_directories="$(find "." -not -ipath '*.git*' -type d -empty)"
 
-   if ! [ "${empty_directories}"  = "" ]; then
+   if ! [ "${empty_directories}" = "" ]; then
       printf "%s\n" "${red}${bold}$0: ERROR:${reset} Empty directory found! empty_directories:
 '${empty_directories}'"
       exit 1
