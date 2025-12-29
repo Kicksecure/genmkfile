@@ -895,7 +895,7 @@ make_debinstfile_create() {
       true "multi-package hash filename found: yes"
       find_cmd+=(-print0)
 
-      "${find_cmd[@]}" | \
+      "${find_cmd[@]}" | LC_ALL='C' sort -z | \
          while IFS= read -r -d '' file_name; do
             filename_without_dot="${file_name#./}"
             filename_without_hash="${file_name%%#*}"
