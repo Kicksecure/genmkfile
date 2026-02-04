@@ -11,6 +11,20 @@
 
 #set -x
 
+## Code duplication. Copied from
+## helper-scripts/usr/libexec/helper-scripts/check_runtime.bsh.
+##
+## Because check_runtime.bsh cannot be sourced here (the build host may not
+## have helper-scripts installed).
+was_executed() {
+  local caller_bash_source_zero="${1}"
+  if [[ "${caller_bash_source_zero}" == "${0}" ]] \
+    || [[ "${caller_bash_source_zero}" == "$(command -v "${0}")" ]]; then
+    return 0
+  fi
+  return 1
+}
+
 if [ "$GENMKFILE_DEBUG" = "1" ]; then
    set -x
 fi
@@ -1995,13 +2009,7 @@ make_function_run() {
    fi
 }
 
-if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
-   make_script_was_sourced="true"
-else
-   make_script_was_sourced="false"
-fi
-
-if [ "$make_script_was_sourced" = "false" ]; then
+if was_executed "${BASH_SOURCE[0]}"; then
    if [ -f /usr/libexec/helper-scripts/pre.bsh ]; then
       ## pre.bsh would `source` the following folders:
       ## /etc/make-helper-one.bsh_pre.d/*.conf
