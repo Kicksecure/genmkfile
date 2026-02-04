@@ -1029,7 +1029,9 @@ make_clean() {
 }
 
 make_deb-shared-dep() {
-  ## TODO: check if sudo is available.
+   local msg apt_get_exit_code
+
+   ## TODO: check if sudo is available.
 
    msg="sudo \
       apt-get \
@@ -1044,7 +1046,7 @@ make_deb-shared-dep() {
    msg="$(printf "%s\n" "$msg" | sed 's/  */ /g')"
    printf "%s\n" "$msg"
 
-   local apt_get_exit_code="0"
+   apt_get_exit_code="0"
    sudo \
       apt-get \
          "${APTGETOPT[@]}" \
