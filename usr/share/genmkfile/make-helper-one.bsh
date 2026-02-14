@@ -1078,11 +1078,12 @@ make_deb-all-dep() {
 
 
 make_dpkg_source_verification_sanity_test_help_message() {
+   ## TODO: Debian forky. Port to sequoia-gpg.
    printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-source verification failed!
 
 To add you could use for example...
 
-If using gpg (GnuPG):
+If using OpenPGP (GnuPG / 'gpg'):
 - Does your key exist in file '~/.gnupg/trustedkeys.gpg'?
 - to add, run:
 gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/derivative-maker/packages/kicksecure/repository-dist/usr/share/keyrings/derivative.asc
@@ -1264,14 +1265,15 @@ sudo genmkfile deb-all-dep
    printf "%s\n" "$0: INFO: make_use_debsign: $make_use_debsign | whoami: $(whoami)"
    if [ "$make_use_debsign" = "true" ]; then
       ## For manual use for non-maintainer builds use example:
-      #DEBSIGN_KEYID="FFF25C6BEA585C88D96D9AFC2E39FB8D91FDDF6A"
+      #export DEBSIGN_KEYID="FFF25C6BEA585C88D96D9AFC2E39FB8D91FDDF6A"
       #export make_debsign_opts="-k$DEBSIGN_KEYID"
 
       ## clearsign's $make_main_changes_file
       make_log_and_run debsign $make_debsign_opts "$make_main_changes_file"
 
       ## sanity test
-      make_log_and_run gpg --verify "$make_main_changes_file"
+      #make_log_and_run gpg --verify "$make_main_changes_file"
+      make_log_and_run sq verify --signer "$DEBSIGN_KEYID" --cleartext "$make_main_changes_file"
 
       #local genmkfile_temp_dir
       #genmkfile_temp_dir="$(mktemp --directory)"
