@@ -25,6 +25,191 @@ was_executed() {
   return 1
 }
 
+## Code duplication. Copied from
+## helper-scripts/usr/libexec/helper-scripts/deb822-extract.bsh.
+##
+## Because deb822-extract.bsh cannot be sourced here (the build host may not
+## have helper-scripts installed).
+deb822_extract() {
+  local deb822_extract_input_file deb822_extract_output_var \
+    deb822_extract_desired_field_list deb822_extract_constraint_key_list \
+    deb822_extract_constraint_regex_list deb822_extract_stanza_line \
+    deb822_extract_key_list deb822_extract_key deb822_extract_val \
+    deb822_extract_val_list deb822_extract_last_idx deb822_extract_constraint \
+    deb822_extract_constraint_key deb822_extract_constraint_regex
+
+  ## Process arguments
+  deb822_extract_input_file="${1:-}"
+  deb822_extract_output_var="${2:-}"
+  IFS=',' read -r -a deb822_extract_desired_field_list <<< "${3:-}"
+  shift 3
+  if ! [ -f "${deb822_extract_input_file}" ]; then
+    return 1
+  fi
+  if [ -z "${deb822_extract_output_var}" ]; then
+    return 2
+  fi
+  if [[ "${deb822_extract_output_var}" =~ ^deb822_extract ]]; then
+    return 2
+  fi
+  if (( ${#deb822_extract_desired_field_list[@]} == 0 )); then
+    return 2
+  fi
+  for deb822_extract_desired_field \
+    in "${deb822_extract_desired_field_list[@]}"; do
+    if [ -z "${deb822_extract_desired_field}" ]; then
+      return 2
+    fi
+  done
+
+  ## From the output of 'help declare':
+  ##
+  ##   -n        make NAME a reference to the variable named by its value
+  ##
+  ## This will therefore make deb822_extract_output_var into an array
+  ## (assuming an array was passed in), and modifications made to it
+  ## will be propagated to the passed-in list.
+  declare -n deb822_extract_output_var
+
+  deb822_extract_constraint_key_list=()
+  deb822_extract_constraint_regex_list=()
+
+  ## Process constraints into key / regex lists
+  for deb822_extract_constraint in "$@"; do
+    if [[ "${deb822_extract_constraint}" != *'|'* ]]; then
+      return 2
+    fi
+    deb822_extract_constraint_key="${deb822_extract_constraint%%|*}"
+    if [ -z "${deb822_extract_constraint_key}" ]; then
+      return 2
+    fi
+    deb822_extract_constraint_regex="${deb822_extract_constraint#*|}"
+
+    deb822_extract_constraint_key_list+=( "${deb822_extract_constraint_key}" )
+    deb822_extract_constraint_regex_list+=(
+      "${deb822_extract_constraint_regex}"
+    )
+  done
+  if (( ${#deb822_extract_constraint_key_list[@]} == 0 )); then
+    return 2
+  fi
+
+  ## Break the input file into chunks.
+  deb822_extract_key_list=()
+  deb822_extract_val_list=()
+  while IFS= read -r deb822_extract_stanza_line; do
+    ## Process a loaded stanza once a blank line is hit.
+    if [ -z "${deb822_extract_stanza_line}" ]; then
+      deb822_extract_one
+      deb822_extract_key_list=()
+      deb822_extract_val_list=()
+      continue
+    fi
+    if [ "${deb822_extract_stanza_line:0:1}" = '#' ]; then
+      ## Skip comments
+      continue
+    fi
+    if [ "${deb822_extract_stanza_line:0:1}" = ' ' ]; then
+      ## One-space-indented lines are part of the last recorded value.
+      if (( ${#deb822_extract_val_list[@]} == 0 )); then
+        return 3
+      fi
+      ## This technically will try to grab one character past the end of
+      ## deb822_extract_val, but in practice Bash simply returns the rest of
+      ## the string.
+      deb822_extract_val="${deb822_extract_stanza_line:1:${#deb822_extract_stanza_line}}"
+      deb822_extract_last_idx=$(( ${#deb822_extract_val_list[@]} - 1 ))
+      deb822_extract_val_list[deb822_extract_last_idx]+=$'\n'"${deb822_extract_val}"
+    else
+      ## Lines with no leading spaces are (the start of) key/value pairs.
+      if ! [[ "${deb822_extract_stanza_line}" = *:* ]]; then
+        return 3
+      fi
+      deb822_extract_key="${deb822_extract_stanza_line%%:*}"
+      deb822_extract_val="${deb822_extract_stanza_line#*:}"
+      if [ -z "${deb822_extract_key}" ]; then
+        return 3
+      fi
+      if [ "${deb822_extract_val:0:1}" = ' ' ]; then
+        deb822_extract_val="${deb822_extract_val:1:${#deb822_extract_val}}"
+      fi
+      deb822_extract_key_list+=( "${deb822_extract_key}" )
+      deb822_extract_val_list+=( "${deb822_extract_val}" )
+    fi
+  done < "${deb822_extract_input_file}"
+
+  ## Process the last stanza in the file.
+  deb822_extract_one
+}
+deb822_extract_one() {
+  local deb822_extract_constraint_idx deb822_extract_regex_mismatch \
+    deb822_extract_stanza_idx deb822_extract_found_key \
+    deb822_extract_desired_field
+  ## This function also inherits the local variables from deb822_extract.
+
+  ## Ignore empty stanzas, this can happen if there's an extra trailing
+  ## newline in the file or multiple newlines in a row.
+  if (( ${#deb822_extract_key_list[@]} == 0 )); then
+    return
+  fi
+
+  ## Check each constraint against the current stanza. If a key is missing, or
+  ## the regex in the constraint doesn't match the corresponding value, skip
+  ## the stanza.
+  deb822_extract_regex_mismatch='false'
+  for deb822_extract_constraint_idx \
+    in "${!deb822_extract_constraint_key_list[@]}"; do
+    deb822_extract_constraint_key="${deb822_extract_constraint_key_list[deb822_extract_constraint_idx]}"
+    deb822_extract_found_key='false'
+
+    for deb822_extract_stanza_idx in "${!deb822_extract_key_list[@]}"; do
+      deb822_extract_key="${deb822_extract_key_list[deb822_extract_stanza_idx]}"
+      if [ "${deb822_extract_key}" != "${deb822_extract_constraint_key}" ]; then
+        continue
+      fi
+
+      deb822_extract_found_key='true'
+      ## It would have been more intuitive to load
+      ## deb822_extract_constraint_regex in the outer loop, but it's only ever
+      ## needed here and the loop isn't going to run again at this point, so
+      ## it's more efficient to load it here.
+      deb822_extract_constraint_regex="${deb822_extract_constraint_regex_list[deb822_extract_constraint_idx]}"
+      deb822_extract_val="${deb822_extract_val_list[deb822_extract_stanza_idx]}"
+      if ! [[ "${deb822_extract_val}" \
+        =~ ${deb822_extract_constraint_regex} ]]; then
+        deb822_extract_regex_mismatch='true'
+      fi
+      break
+    done
+
+    if [ "${deb822_extract_regex_mismatch}" = 'true' ] \
+      || [ "${deb822_extract_found_key}" = 'false' ]; then
+      return
+    fi
+  done
+
+  ## If we got this far, the stanza matches, and we can load the requested
+  ## fields into the output array.
+  for deb822_extract_desired_field \
+    in "${deb822_extract_desired_field_list[@]}"; do
+    deb822_extract_found_key='false'
+
+    for deb822_extract_stanza_idx in "${!deb822_extract_key_list[@]}"; do
+      deb822_extract_key="${deb822_extract_key_list[deb822_extract_stanza_idx]}"
+      if [ "${deb822_extract_desired_field}" = "${deb822_extract_key}" ]; then
+        deb822_extract_val="${deb822_extract_val_list[deb822_extract_stanza_idx]}"
+        deb822_extract_found_key='true'
+        deb822_extract_output_var+=( "${deb822_extract_val}" )
+        break
+      fi
+    done
+
+    if [ "${deb822_extract_found_key}" = 'false' ]; then
+      deb822_extract_output_var+=( '' )
+    fi
+  done
+}
+
 if [ "$GENMKFILE_DEBUG" = "1" ]; then
    set -x
 fi
@@ -390,7 +575,6 @@ sudo genmkfile deb-all-dep
       exit 1
    fi
 
-   ## sets: architecture_of_source_package
    ## sets: make_debian_control_file_relative_path
    ## sets: make_debian_control_file_absolute_path
    ## sets: dpkg_print_architecture
@@ -486,15 +670,6 @@ sudo genmkfile deb-all-dep
    [ -n "$host_architecture" ] || host_architecture="$dpkg_print_architecture"
    [ -n "$target_architecture" ] || target_architecture="$dpkg_print_architecture"
 
-   if [ "$binary_package_architecture" = "" ]; then
-      if [ "$architecture_of_source_package" = "all" ]; then
-         ## binary_package_architecture=all
-         binary_package_architecture="$architecture_of_source_package"
-      else
-         binary_package_architecture="$target_architecture"
-      fi
-   fi
-
    local grep_line a package
 
    grep_line="$(grep_no_comments "^Source:" -- "$make_debian_control_file_absolute_path")"
@@ -510,27 +685,37 @@ sudo genmkfile deb-all-dep
    ## Example grep_output:
    ## Package: kicksecure-vm-gui-lxqt
 
-   while read -r -d $'\n' grep_line; do
-      read -r a package _ <<< "$grep_line"
+   local pkg_info_list pkg_info_idx package_name_architecture
+   pkg_info_list=()
+   deb822_extract "$make_debian_control_file_absolute_path" pkg_info_list Package,Architecture 'Package|'
+   for (( pkg_info_idx = 0; pkg_info_idx < ${#pkg_info_list[@]}; \
+      pkg_info_idx += 2 )); do
+      package="${pkg_info_list[pkg_info_idx]}"
+      binary_package_architecture="${pkg_info_list[pkg_info_idx + 1]}"
       true "package: $package"
       true "make_pkg_version: $make_pkg_version"
       true "make_pkg_revision: $make_pkg_revision"
       true "binary_package_architecture: $binary_package_architecture"
+      ## Some packages, like tirdad-dkms, have an architecture of
+      ## 'linux-amd64' or similar, but the resulting deb file name only
+      ## includes 'amd64'.
+      if [[ "${binary_package_architecture}" =~ ^linux-(.*) ]]; then
+        package_name_architecture="${BASH_REMATCH[1]}"
+      else
+        package_name_architecture="${binary_package_architecture}"
+      fi
       ## Example architecture independent "all" package: anon-apt-sources-list_3.4-1_all.deb
-      temp="${package}_${make_pkg_version}${make_pkg_revision}_${binary_package_architecture}.deb"
+      temp="${package}_${make_pkg_version}${make_pkg_revision}_${package_name_architecture}.deb"
       temp="${DISTDIR}/$temp"
       make_package_debs_files_list="$make_package_debs_files_list $temp"
       if [ "$package" = "$make_source_package_name" ]; then
          continue
       fi
       make_package_list="$make_package_list $package"
-   done < <( grep_no_comments "^Package:" -- "$make_debian_control_file_absolute_path" )
+   done
 
    true "make_package_list: $make_package_list"
    true "make_package_debs_files_list: $make_package_debs_files_list"
-
-   make_main_deb_file_name="${package}_${make_pkg_version}${make_pkg_revision}_${binary_package_architecture}.deb"
-   make_main_deb_file="${DISTDIR}/$make_main_deb_file_name"
 
    make_main_dsc_file_name="${make_source_package_name}_${make_pkg_version}${make_pkg_revision}.dsc"
 
