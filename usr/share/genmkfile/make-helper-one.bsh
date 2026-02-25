@@ -704,6 +704,9 @@ sudo genmkfile deb-all-dep
       else
         package_name_architecture="${binary_package_architecture}"
       fi
+      if [ "${package_name_architecture}" = 'any' ]; then
+        package_name_architecture="${target_architecture}"
+      fi
       ## Example architecture independent "all" package: anon-apt-sources-list_3.4-1_all.deb
       temp="${package}_${make_pkg_version}${make_pkg_revision}_${package_name_architecture}.deb"
       temp="${DISTDIR}/$temp"
