@@ -1,3 +1,28 @@
+commit fc3af547e94dcaad529be2e778a14ab7f46f2f68
+Merge: 423d706 753947e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Feb 27 05:12:28 2026 -0500
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 753947e403080a433a744833ff086b20ca9a327b
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Tue Feb 24 21:04:26 2026 -0500
+
+    Fix 'Architecture: any' package builds
+
+commit b9a8bda63719105ffef7638f920ad4b6f2f322ae
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Tue Feb 24 00:29:42 2026 -0500
+
+    Fix mixed-binary-architecture package builds, remove some unused code
+
+commit 423d7060c11452e02acd1a972debd6e47447a390
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Feb 14 12:35:41 2026 +0000
+
+    bumped changelog version
+
 commit fa6395576f2e3ba5e3426624aec3c81426d04997
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Feb 14 05:48:10 2026 -0500
