@@ -251,7 +251,7 @@ make_init() {
 }
 
 make_deinit() {
-   safe-rm -r -f -- "$genmkfile_temp_dir"
+   safe-rm --recursive --force -- "$genmkfile_temp_dir"
 }
 
 make_parse_cmd() {
@@ -977,7 +977,7 @@ make_dist() {
 
    ## Debugging.
    test -w "$(pwd)"
-   touch "$make_upstream_tarball_real_path"
+   touch -- "$make_upstream_tarball_real_path"
    test -w "$make_upstream_tarball_real_path"
    safe-rm -f -- "$make_upstream_tarball_real_path"
 
@@ -1040,7 +1040,7 @@ find \
             -T \
             -
 
-   strip-nondeterminism "$make_upstream_tarball_real_path"
+   strip-nondeterminism -- "$make_upstream_tarball_real_path"
 
    test -f "$make_upstream_tarball_real_path"
 }
@@ -1160,7 +1160,7 @@ make_debinstfile_create() {
             temp_deb_install_file="${genmkfile_temp_dir}/${pkg_name}.install"
 
             if [ -z "${delete_yet[$pkg_name]}" ]; then
-                safe-rm -f -- "$temp_deb_install_file"
+                safe-rm --force -- "$temp_deb_install_file"
                 delete_yet["${pkg_name}"]=true
                 printf "%s\n" "\
 #!/usr/bin/dh-exec
