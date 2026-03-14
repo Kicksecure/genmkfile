@@ -801,101 +801,154 @@ make_help() {
    printf "%s\n" "\
 genmkfile help
    Show this help.
+
 genmkfile dist
    Create package-version.tar.xz from source files in \$DISTDIR (default \"..\").
+
 genmkfile undist
    Delete package-version.tar.xz from source files in \$DISTDIR (default \"..\").
+
 genmkfile debdist
    Create debian.tar.xz from source files in \$DISTDIR (default \"..\").
+
 genmkfile undebdist
    Delete debian.tar.xz from source files in \$DISTDIR (default \"..\").
+
 genmkfile debdsc
-   Create dsc file \$DISTDIR (default \"..\").
+   Create the .dsc file in \$DISTDIR (default \"..\").
+
 genmkfile undebdsc
-   Deletes dsc file \$DISTDIR (default \"..\").
+   Delete the .dsc file in \$DISTDIR (default \"..\").
+
 genmkfile debinstfile
-   Creates files debian/pkg-name.install.
+   Create debian/pkg-name.install files.
+
 genmkfile manpages
-   Create man page from man source folder, which will be stored in auto-generated-man-pages folder.
+   Create man pages from the man source folder. Output is stored in auto-generated-man-pages folder.
+
 genmkfile uch
    Store upstream changelog from git log in changelog.upstream.
+
 genmkfile install
-   Copying the files from the source tree to system-wide directories.
+   Copy files from the source tree to system-wide directories.
+
 genmkfile installsim
-   Simulate copying the files from the source tree to system-wide directories.
+   Simulate copying files from the source tree to system-wide directories.
+
 genmkfile deb-build-dep
    Install build dependencies listed in debian/control under Build-Depends using apt-get.
-   Various environment variables supported.
+   Various environment variables are supported.
+
 genmkfile deb-run-dep
    Install runtime dependencies listed in debian/control under Depends using apt-get.
-   Various environment variables supported.
+   Various environment variables are supported.
+
 genmkfile deb-all-dep
-   Combination of deb-build-dep and deb-build-dep.
+   Combination of deb-build-dep and deb-run-dep.
+
 genmkfile deb-pkg-build
-   Create a deb, which will be stored in parent folder.
+   Create a deb, which will be stored in the parent folder.
+
 genmkfile deb-install
-   Install deb from parent folder.
+   Install deb from the parent folder.
+
 genmkfile deb-icup
-   Combination of genmkfile deb-cleanup, deb-pkg-build, genmkfile deb-pkg-install and genmkfile deb-pkg-cleanup.
+   Combination of genmkfile deb-cleanup, deb-pkg-build, genmkfile deb-install and genmkfile deb-cleanup.
    icup stands for install and cleanup.
+
 genmkfile deb-remove
    apt-get remove make_source_package_name
+
 genmkfile deb-purge
    apt-get purge make_source_package_name
+
 genmkfile deb-clean
    Delete temporary debhelper files.
+
 genmkfile deb-cleanup
-   Same as genmkfile deb-clean and deletes debuild artifacts from parent folder.
+   Same as genmkfile deb-clean, and also deletes debuild artifacts from the parent folder.
+
 genmkfile dput-ubuntu-ppa
-   Upload to Ubuntu ppa. Requires functional .dput.cf.
+   Upload to Ubuntu PPA. Requires a functional .dput.cf.
+
 genmkfile distclean
-   Currently same as genmkfile clean.
+   Currently the same as genmkfile clean.
+
 genmkfile checkout
    Fetch from git.
+
 genmkfile installcheck
    Check if source files match installed files.
+
 genmkfile uninstallcheck
    Check if genmkfile uninstall removed all files.
+
 genmkfile uninstall
    Delete all installed files.
+
 genmkfile uninstallsim
    Simulate what genmkfile uninstall would do.
+
 genmkfile deb-chl-bumpup-manual
-   Manual upstream version number in debian/changelog.
+   Manually bump the upstream version number in debian/changelog.
+
 genmkfile deb-uachl-bumpup-manual
-   Combination of genmkfile uch and genmkfile deb-chl-bumpup.
+   Combination of genmkfile uch and genmkfile deb-chl-bumpup-manual.
+
 genmkfile deb-chl-bumpup-major
-   Major bump upstream version number in debian/changelog.
+   Major bump of the upstream version number in debian/changelog.
+
 genmkfile deb-uachl-bumpup-major
-   Combination of genmkfile uch and genmkfile deb-chl-bumpup.
+   Combination of genmkfile uch and genmkfile deb-chl-bumpup-major.
+
 genmkfile git-tag-show
-   echo the current git tag to stdout.
+   Echo the current git tag to stdout.
+
 genmkfile git-tag-sign
-   git tag (-s) sign latest pkg_version_with_revision from debian/changelog. Only a repository sanity check. Not for security purposes!
+   git tag (-s) sign latest pkg_version_with_revision from debian/changelog.
+   Only a repository sanity check. Not for security purposes!
+
 genmkfile git-tag-verify
-   git tag (-v) verify latest pkg_version_with_revision from debian/changelog. Only a repository sanity check. Not for security purposes!
+   git tag (-v) verify latest pkg_version_with_revision from debian/changelog.
+   Only a repository sanity check. Not for security purposes!
+
 genmkfile git-tag-check
-   Check if current git tag is a signed git tag. Only a repository sanity check. Not for security purposes!
+   Check if the current git tag is a signed git tag.
+   Only a repository sanity check. Not for security purposes!
+
 genmkfile git-commit-verify
-   Check if current git head is a signed git commit. Only a repository sanity check. Not for security purposes!
+   Check if the current git head is a signed git commit.
+   Only a repository sanity check. Not for security purposes!
+
 genmkfile git-verify
-   Combination of tag-check and commit-verify. Only a repository sanity check. Not for security purposes!
+   Combination of tag-check and commit-verify.
+   Only a repository sanity check. Not for security purposes!
+
 genmkfile git-tag-push
-   git push latest pkg_version_with_revision from debian/changelog. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
+   git push latest pkg_version_with_revision from debian/changelog.
+   (Environment variable make_git_tag_push_targets defaults to 'origin'.)
+
 genmkfile git-tag-show-latest
-   echo recent git tag to stdout.
+   Echo the most recent git tag to stdout.
+
 genmkfile git-tag-push-latest
-   git push most recent git tag. (Environment variable make_git_tag_push_targets, that defaults to 'origin'.)
+   git push the most recent git tag.
+   (Environment variable make_git_tag_push_targets defaults to 'origin'.)
+
 genmkfile reprepro-add
-   Add main deb package using reprepro wrapper (Environment variable make_reprepro_wrapper, that default to 'reprepro'.)
-   to repository (Environment variable dist_build_apt_codename, that defaults to 'local'.).
+   Add the main deb package using the reprepro wrapper
+   (Environment variable make_reprepro_wrapper defaults to 'reprepro'.)
+   to the repository (Environment variable dist_build_apt_codename defaults to 'local'.)
+
+   Example oldstable: dist_build_apt_codename=bookworm-developers genmkfile reprepro-add
+   Example stable   : dist_build_apt_codename=trixie-developers genmkfile reprepro-add
+
 genmkfile reprepro-remove
    Delete.
 
 multiple architecture builds examples:
 
 make_use_cowbuilder=true make_cross_build_platform_list='amd64 arm64' genmkfile deb-pkg
-
 make_use_cowbuilder=true make_cross_build_platform_list='amd64' genmkfile deb-pkg"
 }
 
