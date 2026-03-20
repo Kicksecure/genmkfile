@@ -225,6 +225,37 @@ make_log_and_run() {
    "$@"
 }
 
+## CODE DUPLICATION: /usr/libexec/helper-scripts/has.sh
+## This is just a simple wrapper around 'command -v' to avoid
+## spamming '>/dev/null' throughout this function. This also guards
+## against aliases and functions.
+## https://github.com/dylanaraps/pfetch/blob/pfetch#L53
+has(){
+  local _cmd
+  _cmd="$(command -v "${1}")" 2>/dev/null || return 1
+  [ -x "${_cmd}" ] || return 1
+}
+
+deb_variables_check() {
+   has debsign
+   has debchange
+   has sq
+
+   if [ "$DEBEMAIL" = "" ]; then
+      ## Otherwise e-mail address in debian/changelog would default to
+      ## user@host.localdomain and then lintian would complain and exit with
+      ## failure code.
+      printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+      exit 1
+   fi
+   if [ "$DEBFULLNAME" = "" ]; then
+      printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+      exit 1
+   fi
+
+   ## TODO: DEBSIGN_KEYID ?
+}
+
 make_init() {
    ## For manual invocation.
    ## Should be set by makefile already.
@@ -567,7 +598,7 @@ make_get_variables() {
    export XZ_OPT
 
    local temp dpkg_line
-   if ! command -v dpkg-parsechangelog >/dev/null ; then
+   if ! has dpkg-parsechangelog ; then
       true 'dpkg-parsechangelog not found. Do you have the "build-essential" package installed?
 To install all dependencies, try running:
 sudo genmkfile deb-all-dep
@@ -1503,18 +1534,16 @@ sudo genmkfile deb-all-dep
             "$@"
    fi
 
-   printf "%s\n" "$0: INFO: make_use_debsign: $make_use_debsign | whoami: $(whoami)"
+   printf "%s\n" "$0: INFO: make_use_debsign: '$make_use_debsign' | make_debsign_opts: '$make_debsign_opts' whoami: '$(whoami)'"
    if [ "$make_use_debsign" = "true" ]; then
-      ## For manual use for non-maintainer builds use example:
-      #export DEBSIGN_KEYID="FFF25C6BEA585C88D96D9AFC2E39FB8D91FDDF6A"
-      #export make_debsign_opts="-k$DEBSIGN_KEYID"
+      deb_variables_check
 
       ## clearsign's $make_main_changes_file
       make_log_and_run debsign $make_debsign_opts "$make_main_changes_file"
 
       ## sanity test
       #make_log_and_run gpg --verify "$make_main_changes_file"
-      make_log_and_run sq verify --signer "$DEBSIGN_KEYID" --cleartext "$make_main_changes_file"
+      make_log_and_run sq verify --signer-email "$DEBEMAIL" --cleartext "$make_main_changes_file"
 
       #local genmkfile_temp_dir
       #genmkfile_temp_dir="$(mktemp --directory)"
@@ -1551,7 +1580,7 @@ sudo genmkfile deb-all-dep
       make_function_run make_lintian
    else
       printf "%s\n" "$0: ${green}INFO:${reset} make_use_lintian='' - Autodetecting if lintian is installed..."
-      if command -v lintian &>/dev/null ; then
+      if has lintian ; then
          printf "%s\n" "$0: ${green}INFO:${reset} lintian auto detected, using it..."
          make_function_run make_lintian
       else
@@ -1966,19 +1995,7 @@ make_deb-uachl-commit-changelog() {
 }
 
 make_deb-chl-bumpup() {
-   command -v debchange >/dev/null
-
-   if [ "$DEBEMAIL" = "" ]; then
-      ## Otherwise e-mail address in debian/changelog would default to
-      ## user@host.localdomain and then lintian would complain and exit with
-      ## failure code.
-      printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
-      exit 1
-   fi
-   if [ "$DEBFULLNAME" = "" ]; then
-      printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
-      exit 1
-   fi
+   deb_variables_check
 
    local new_upstream_version_without_epoch new_upstream_version new_changelog_version new_revision
 
