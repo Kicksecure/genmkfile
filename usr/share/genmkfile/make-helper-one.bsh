@@ -1534,7 +1534,7 @@ sudo genmkfile deb-all-dep
             "$@"
    fi
 
-   printf "%s\n" "$0: INFO: make_use_debsign: '$make_use_debsign' | make_debsign_opts: '$make_debsign_opts' whoami: '$(whoami)'"
+   printf "%s\n" "$0: INFO: make_use_debsign: '$make_use_debsign' | make_debsign_opts: '$make_debsign_opts' | whoami: '$(whoami)'"
    if [ "$make_use_debsign" = "true" ]; then
       deb_variables_check
 
