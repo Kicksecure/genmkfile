@@ -229,7 +229,7 @@ make_log_and_run() {
 ## This is just a simple wrapper around 'command -v' to avoid
 ## spamming '>/dev/null' throughout this function. This also guards
 ## against aliases and functions.
-## https://github.com/dylanaraps/pfetch/blob/pfetch#L53
+## https://github.com/dylanaraps/pfetch/blob/master/pfetch#L53
 has(){
   local _cmd
   _cmd="$(command -v "${1}")" 2>/dev/null || return 1
