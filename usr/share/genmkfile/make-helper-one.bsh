@@ -237,9 +237,11 @@ has(){
 }
 
 deb_variables_check() {
+   has git
    has debsign
    has debchange
    has sq
+   has sq-git
 
    if [ "$DEBEMAIL" = "" ]; then
       ## Otherwise e-mail address in debian/changelog would default to
@@ -2070,6 +2072,10 @@ make_git_tag_sign() {
 make_git_tag_verify() {
    make_function_run make_git_tag_shared
    #make_log_and_run git verify-tag -- "$make_git_tag_version_number"
+   ## 'sq-git' verifies a '[COMMIT_RANGE]'. Various contributors not listed
+   ## '$sq_git_policy_file' may have committed.
+   ## NOTE: 'git rev-parse' does not support end-of-options ('--').
+   [ -n "$sq_git_trust_root" ] || sq_git_trust_root="$(git rev-parse "${make_git_tag_version_number}^{}")"
    sq_git_run "$make_git_tag_version_number"
 }
 
