@@ -2091,7 +2091,19 @@ make_git_tag_sign() {
 
 make_git_tag_verify() {
    make_function_run make_git_tag_shared
-   make_log_and_run git tag -v -- "$make_git_tag_version_number"
+   #make_log_and_run git verify-tag -- "$make_git_tag_version_number"
+   sq_git_run "$make_git_tag_version_number"
+}
+
+sq_git_run() {
+   local cmd
+   ## XXX: hardcoded
+   [ -n "$sq_git_trust_root" ] || sq_git_trust_root="HEAD"
+   ## XXX: hardcoded
+   [ -n "$sq_git_policy_file" ] || sq_git_policy_file=~/derivative-maker/openpgp-policy.toml
+   cmd=( sq-git log --policy-file "${sq_git_policy_file}" --trust-root "${sq_git_trust_root}" -- "${1}" )
+   printf "%s\n" "$0: ${green}INFO:${reset} ${cmd[*]}"
+   make_function_run "${cmd[@]}"
 }
 
 make_git_tag_check() {
@@ -2114,7 +2126,8 @@ make_git_tag_version_number $make_git_tag_version_number differs from make_git_d
 }
 
 make_git_commit_verify() {
-   make_log_and_run git verify-commit -- "$1"
+   #make_log_and_run git verify-commit -- "$1"
+   sq_git_run "$1"
 }
 
 make_git_commit_verify_current() {
