@@ -1,3 +1,21 @@
+commit 9c6f50bc3b63ad1a276942c4ab5cb507929b3aaa
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 28 06:41:12 2026 -0400
+
+    comment fix (avoid double creation and deletion of genmkfile_temp_dir)
+
+commit a42cad39f29aac2825c75413554403d55b5e2266
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 28 06:40:03 2026 -0400
+
+    port to sequoia-pgp
+
+commit 39330d787f0a06962b7aaaddea7ac5f92adc58ac
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Mar 28 09:02:23 2026 +0000
+
+    bumped changelog version
+
 commit 431cc58e501ce5406f97a5b2dca3f4230cf0615a
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Mar 28 04:43:53 2026 -0400
