@@ -1348,27 +1348,6 @@ make_deb-all-dep() {
    make_function_run make_deb-shared-dep
 }
 
-
-make_dpkg_source_verification_sanity_test_help_message() {
-   ## TODO: Debian forky. Port to sequoia-gpg.
-   printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-source verification failed!
-
-To add you could use for example...
-
-If using OpenPGP (GnuPG / 'gpg'):
-- Does your key exist in file '~/.gnupg/trustedkeys.gpg'?
-- to add, run:
-gpg --no-default-keyring --keyring trustedkeys.gpg --import ~/derivative-maker/packages/kicksecure/repository-dist/usr/share/keyrings/derivative.asc
-
-If using sq (Sequoia-PGP):
-- to add, run:
-1.
-sudo apt install debian-keyring
-2.
-sudo gpg --no-default-keyring --keyring /usr/share/keyrings/debian-maintainers.gpg --import ~/derivative-maker/packages/kicksecure/repository-dist/usr/share/keyrings/derivative.asc
-"
-}
-
 make_deb-pkg-build_shared() {
    if [ "$make_use_cowbuilder" = "true" ]; then
       if ! test -f "$make_upstream_tarball_real_path" ; then
@@ -1545,24 +1524,23 @@ sudo genmkfile deb-all-dep
       #make_log_and_run gpg --verify "$make_main_changes_file"
       make_log_and_run sq verify --signer-email "$DEBEMAIL" --cleartext "$make_main_changes_file"
 
-      #local genmkfile_temp_dir
-      #genmkfile_temp_dir="$(mktemp --directory)"
-      ## Required, otherwise:
-      ## dpkg-source: error: unpack target exists: /tmp/tmp.n1V3KXmMtI
-      #safe-rm --recursive --force -- "$genmkfile_temp_dir"
-      ## Sanity test.
-      ## Broken under Trixie, disabled. See:
-      ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1110172
-      ## TODO: consider re-enabling in Debian forky
-      #make_log_and_run \
-      #   dpkg-source \
-      #      --require-strong-checksums \
-      #      --require-valid-signature \
-      #      -x \
-      #      "$make_main_dsc_file" \
-      #      "$genmkfile_temp_dir/" || \
-      #         { make_dpkg_source_verification_sanity_test_help_message ; return 1; };
-      #safe-rm --recursive --force -- "$genmkfile_temp_dir"
+#       local genmkfile_temp_dir
+#       genmkfile_temp_dir="$(mktemp --directory)"
+#       ## Required, otherwise:
+#       ## dpkg-source: error: unpack target exists: /tmp/tmp.n1V3KXmMtI
+#       genmkfile_dpkg_source_test_extract_temp_dir="${genmkfile_temp_dir}/temp"
+#       ## Sanity test.
+#       ## Broken under Trixie, disabled. See:
+#       ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1110172
+#       ## TODO: consider re-enabling in Debian forky
+#       make_log_and_run \
+#         dpkg-source \
+#            --require-strong-checksums \
+#            --require-valid-signature \
+#            --extract \
+#            "$make_main_dsc_file" \
+#            "${genmkfile_dpkg_source_test_extract_temp_dir}/"
+#       safe-rm --recursive --force -- "$genmkfile_temp_dir"
    fi
 
    for package in $make_package_debs_files_list; do
