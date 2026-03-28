@@ -1526,8 +1526,6 @@ sudo genmkfile deb-all-dep
       #make_log_and_run gpg --verify "$make_main_changes_file"
       make_log_and_run sq verify --signer-email "$DEBEMAIL" --cleartext "$make_main_changes_file"
 
-#       local genmkfile_temp_dir
-#       genmkfile_temp_dir="$(mktemp --directory)"
 #       ## Required, otherwise:
 #       ## dpkg-source: error: unpack target exists: /tmp/tmp.n1V3KXmMtI
 #       genmkfile_dpkg_source_test_extract_temp_dir="${genmkfile_temp_dir}/temp"
@@ -1542,7 +1540,6 @@ sudo genmkfile deb-all-dep
 #            --extract \
 #            "$make_main_dsc_file" \
 #            "${genmkfile_dpkg_source_test_extract_temp_dir}/"
-#       safe-rm --recursive --force -- "$genmkfile_temp_dir"
    fi
 
    for package in $make_package_debs_files_list; do
