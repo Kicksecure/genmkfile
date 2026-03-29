@@ -2072,7 +2072,7 @@ make_git_tag_verify() {
    ## 'sq-git' verifies a '[COMMIT_RANGE]'. Various contributors not listed
    ## '$sq_git_policy_file' may have committed.
    ## NOTE: 'git rev-parse' does not support end-of-options ('--').
-   [ -n "$sq_git_trust_root" ] || sq_git_trust_root="$(git rev-parse "${make_git_tag_version_number}^{}")"
+   [ -n "$sq_git_trust_root" ] || sq_git_trust_root="$(git rev-parse "${make_git_tag_version_number}^commit")"
    sq_git_run "$make_git_tag_version_number"
 }
 
