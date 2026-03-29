@@ -1489,7 +1489,7 @@ beforehand?
                   --buildresult "$DISTDIR"
 
    else
-      if ! command -v debuild >/dev/null ; then
+      if ! has debuild; then
          printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') debuild not found. Do you have the 'devscripts' package installed?
 To install all dependencies, try running:
 sudo genmkfile deb-all-dep
@@ -2051,7 +2051,7 @@ make_git_tag_shared() {
       fi
    fi
    [ -n "$make_git_tag_push_targets" ] || make_git_tag_push_targets="origin"
-   command -v git >/dev/null
+   has git
    make_git_tag_shared_done="true"
 }
 
@@ -2161,7 +2161,7 @@ make_reprepro-shared() {
    ## Can be set by derivative-maker.
 
    [ -n "$make_reprepro_wrapper" ] || make_reprepro_wrapper="dm-reprepro-wrapper"
-   command -v "$make_reprepro_wrapper" 2>/dev/null
+   has "$make_reprepro_wrapper"
 
    if [ "$dist_build_apt_codename" = "local" ]; then
       make_reprepro_codename_list="local"
