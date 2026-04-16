@@ -1,3 +1,22 @@
+commit b778a8cc4bbbd36d32eee680077cba31e95b31b7
+Merge: 8dad130 88829af
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Apr 13 06:50:01 2026 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 88829af37d50799cc2bb1ab6e7f8a79f18b7764c
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Sun Apr 12 13:12:48 2026 -0400
+
+    Strip trailing spaces when generating changelog.upstream
+
+commit 8dad1304b38e630c5bf4b67241474b26b3d9fe9d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Mar 29 08:16:32 2026 +0000
+
+    bumped changelog version
+
 commit 20bc97d4a4f1b32e3243d38cdff0c3fae4199677
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Mar 29 03:12:53 2026 -0400
@@ -636,7 +655,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Apr 16 14:35:26 2025 -0400
 
     fix: `umask 027` compatibility with source folder when using `genmkfile install`
-    
+
     set `chmod 755` on target files if source file is executable
 
 commit 478cee5b104f9048f675275e9a63c26ecca392aa
@@ -842,7 +861,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Sep 10 13:21:01 2024 -0400
 
     Revert "fix, `make_reprepro_codename` is not a local variable"
-    
+
     This reverts commit b651f7fa951f1ef9e4d681098e19aae6d1731ef8.
 
 commit b651f7fa951f1ef9e4d681098e19aae6d1731ef8
@@ -869,7 +888,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Aug 28 06:59:04 2024 -0400
 
     fix
-    
+
     calamares-settings-debian comes with debian/install by upstream default.
     If file debian/calamares-settings-debian.install was created, that would result in debian/install
     being ignored and in an empty package. Therefore, if debian/install already exists, do not
@@ -886,9 +905,9 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Aug 14 05:03:45 2024 -0400
 
     fix: allow "downgrades" by using --allow-downgrades
-    
+
     if installing using genmkfile
-    
+
     this is because if the same version was already installed from the repository,
     APT will consider it a "downgrade" if re-installing locally.
 
@@ -921,7 +940,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Apr 24 18:22:30 2024 -0400
 
     fix parsing in case of commented out debian/control files
-    
+
     and other grep related improvements
 
 commit 452118c9de20967a5ecf8dbbc6ba3ff43f0db499
@@ -989,7 +1008,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Dec 8 02:54:23 2023 -0500
 
     show error message if `genmkfile install` etc. did not actually do anything
-    
+
     because for example it was used in a repository without genmkfile layout
 
 commit 94d9f824d99ab7856dbfc8b47c4caf46006fcd5b
@@ -1027,7 +1046,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Nov 26 23:53:05 2023 -0500
 
     append make_git_tag_sign_appendix if set to make_git_tag_version_number
-    
+
     make_git_tag_sign_appendix gets set by dm-bump-derivative-maker-version
 
 commit dfbb67dd2159f79362fa4b24d4bfbe538d7b8fc9
@@ -1047,7 +1066,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Nov 11 13:41:29 2023 -0500
 
     change license to AGPL-3+
-    
+
     https://forums.whonix.org/t/license-change-to-agplv3/17455
 
 commit 4b527ea7c6b562d6df6db58f53b799eb11ebfcfd
@@ -1061,7 +1080,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Nov 8 17:51:44 2023 -0500
 
     better solution for cowbuilder libpam-tmpdir compatibility found
-    
+
     https://github.com/Kicksecure/security-misc/pull/147
 
 commit f38e319f9a3bbbf225e901a72ac60297057b493c
@@ -1075,7 +1094,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Nov 8 17:29:17 2023 -0500
 
     fix build of hardened-malloc compatibility with cowbuilder and libpam-tmpdir
-    
+
     https://github.com/Kicksecure/security-misc/pull/147
 
 commit ad394f4c3f54e831194354c8bf701b4f6a9e8968
@@ -1173,20 +1192,20 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Nov 3 12:01:52 2023 -0400
 
     add workaround for `libpam-tmpdir` compatibility
-    
+
     `--unset=TMPDIR`
-    
+
     Setting `TMPDIR` breaks `pbuilder` (which gets called by `cowbuilder`).
-    
+
     Installing `libpam-tmpdir` (security-feature) results in these variables being set.
-    
+
     In other words:
     "`sudo apt install libpam-tmpdir` breaks `cowbuilder`"
-    
+
     https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=823651
-    
+
     https://github.com/Kicksecure/security-misc/pull/147
-    
+
     https://forums.whonix.org/t/make-symlink-attacks-and-other-tmp-based-attacks-harder-or-impossible-using-libpam-tmpdir/8488
 
 commit bd0ae4c2f0d3871fd4ce7c6309641daee7aadab6
@@ -1416,9 +1435,9 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Jul 7 15:22:06 2022 -0400
 
     fix `sudo make install`
-    
+
     in case the package contains a `/lib` folder
-    
+
     use `rsync` instead of `cp`
 
 commit 870368aafc895aa36502aab8bef746c09f9c3978
@@ -1570,7 +1589,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Aug 22 06:20:49 2021 -0400
 
     genmkfile deb-install: install using `apt-get install` instead of `dpkg -i`
-    
+
     for dependency resolution (sdwdate vs time-deamon)
 
 commit c2f34ff8b359eb5a8381a0a63b8fcb321f382c5f
@@ -1626,11 +1645,11 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Aug 3 07:00:38 2021 -0400
 
     remove `lintian` `--suppress-tags bad-whatis-entry`
-    
+
     since no longer needed
-    
+
     Was `man` `seccomp` workaround.
-    
+
     https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/135
 
 commit fe5827c2f6fe34e005390124b507f71d38183041
@@ -1656,7 +1675,7 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Tue Aug 3 06:04:43 2021 -0400
 
     exclude `/debian` folder from upstream tarball
-    
+
     to avoid lintian warning `no-debian-changes`
 
 commit 59133ea297149d417694e12d62fa525879b55fac
@@ -1688,9 +1707,9 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Jul 24 18:54:49 2021 -0400
 
     Force the inclusion of the original source
-    
+
     if Debian package revision number is higher than 1.
-    
+
     LKRG package compatibility fix.
 
 commit 480ee2ceaf04e319b816bd340f0017f9a23d8d2e
@@ -1824,7 +1843,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Dec 24 09:19:33 2020 -0500
 
     Revert "genmkfile install: use `cp` with `--archive`"
-    
+
     This reverts commit 3a3fb75c3a32d6c00604fe6fdd91072736bd8ea0.
 
 commit 3a3fb75c3a32d6c00604fe6fdd91072736bd8ea0
@@ -1832,9 +1851,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Dec 24 09:14:14 2020 -0500
 
     genmkfile install: use `cp` with `--archive`
-    
+
     to use same file permissions in installation folder than in source folder
-    
+
     to fix sudo ./usr/bin/genmkfile install
 
 commit cc69916d78632d003eaab4cd1e4e513c0bc0f2ea
@@ -1854,7 +1873,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Dec 20 09:06:00 2020 -0500
 
     hardened-malloc-kicksecure `man` `seccomp` workaround
-    
+
     https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/135
 
 commit 112ac79c2b4f0a7af9ce69e85deb61bd3c387378
@@ -1892,7 +1911,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Oct 26 07:50:35 2020 -0400
 
     Revert "make -> genmkfile"
-    
+
     This reverts commit be4db8ecfcba4362ffe48c058554e6bce401fb50.
 
 commit be4db8ecfcba4362ffe48c058554e6bce401fb50
@@ -2050,7 +2069,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Apr 2 05:22:29 2020 -0400
 
     remove duplicate Makefile
-    
+
     still have usr/share/genmkfile/Makefile
 
 commit 1bdef3d1b19ff35a10eab8347630ce90c4ab00ac
@@ -2112,7 +2131,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 1 12:43:17 2020 -0400
 
     implement "make debinstfile"
-    
+
     Creates files debian/pkg-name.install.
 
 commit 47fb017386f1f2b03615c54377f4ad1b1e35ce7e
@@ -2198,7 +2217,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Sep 20 06:22:43 2019 +0000
 
     pass whonix_build_pbuilder_config_file to cowbuilder als --configfile if set
-    
+
     to fix cross platform builds
 
 commit 422b047d7511c0ee02ce2045a846e93b3fe1c56d
@@ -2380,7 +2399,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Aug 6 14:47:44 2019 +0000
 
     support being used without Makefile
-    
+
     example:
     /usr/share/genmkfile/make-helper.bsh deb-pkg
 
@@ -2527,14 +2546,14 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Jul 23 01:18:13 2019 +0000
 
     lower debugging
-    
+
     support .github folder in source folder
     (previously skipped through too far fetched find ignore
     which lead to source package mismatch)
-    
+
     'make distclean' (called by debhelper) now runs 'make clean',
     if made available by upstream.
-    
+
     output
 
 commit cd3166511aacea1baa3cc15fb5525d0ef14d34c0
@@ -2548,7 +2567,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jul 21 21:09:15 2019 -0400
 
     implement genmkfile-default-target-about
-    
+
     which might run first
 
 commit e0028dd0bb26cafafc5e17c37067f4c458ead330
@@ -2562,12 +2581,12 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jul 21 20:58:49 2019 -0400
 
     move make help target up (becomes default target)
-    
+
     better than running make dist as default target since this could change
     archive sizes which could lead to build failure
-    
+
     add /usr/lib/helper-scripts/pre.bsh skeleton import
-    
+
     lower debugging
 
 commit 7cc0c31b8c69117db379ca5fbb7709cd25da26b1
@@ -2575,13 +2594,13 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jul 21 20:33:34 2019 -0400
 
     remove make targets which are unneeded and conflict with upstream 'Makefile's
-    
+
     - make all
     - make clean
     - wildcard
-    
+
     therefore these can be implemented by upstream
-    
+
     https://github.com/Whonix/genmkfile/pull/1#issuecomment-513578854
 
 commit 570ef16fbc9b64d10b26f310769f4d96a1d8299e
@@ -2639,7 +2658,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jun 21 07:45:03 2019 -0400
 
     Merge pull request #1 from marmarek/packaging
-    
+
     qubes-builder integration
 
 commit 5bc4eed9e4751b1502f4a4370e7c51e818697fa7
@@ -2659,7 +2678,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jun 21 05:12:03 2019 +0000
 
     sanity test: dpkg-source  --require-strong-checksums --require-valid-signature
-    
+
     https://github.com/Whonix/security-misc/pull/8
 
 commit 2761a59b2e17c0ad1007b0736de8ff65743141ca
@@ -2667,7 +2686,7 @@ Author: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
 Date:   Fri Jun 21 04:50:16 2019 +0200
 
     Add rpm packaging
-    
+
     QubesOS/qubes-issues#1885
 
 commit aa8c30b8586c7922c12ab5aee5ef06a4cdf1e4f6
@@ -2675,7 +2694,7 @@ Author: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
 Date:   Fri Jun 21 04:49:34 2019 +0200
 
     Add Makefile.builder for qubes-builder
-    
+
     QubesOS/qubes-issues#1885
 
 commit 04a11c25df6620caebf90083c08a65c9ef6ee8d9
@@ -2881,18 +2900,18 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Mar 1 14:32:38 2019 +0000
 
     add improved legal protections clauses
-    
+
     The license for software created by Whonix is the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version with additional terms applicable per GNU GPL version 3 section 7.
-    
+
     The additional terms are based on the Doom 3 license which is Debian refers to as `GPL-3+-with-id-software-additional-terms`, which is Debian DFSG [1] (The Debian Free Software Guidelines) approved and which is therefore suitable for Debian `main`. Whonix made applied minimal changes to it:
-    
+
     * Rewrite `The Doom 3 BFG Edition GPL Source Code` to the more common `this program` which is used throughout the GPL.
     * Added a "trump clause" [2], in other words, any conflicts or disputes between the additional terms and the GPLv3 shall be resolved in favor of the GPLv3 by adding `Notwithstanding any other provision of this License` (as mentioned in GPL FAQ [3]) at the beginning of the additional terms.
-    
+
     [1] https://www.debian.org/social_contract#guidelines
     [2] https://www.fsf.org/news/canonical-updated-licensing-terms
     [3] https://www.gnu.org/licenses/gpl-faq.html#v3Notwithstanding
-    
+
     For more considerations, see also:
     https://www.whonix.org/wiki/Dev/Licensing
 
@@ -2925,15 +2944,15 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jan 21 04:04:26 2019 -0500
 
     https by default
-    
+
     add support for REPO_PROXY / apt-cacher-ng
-    
+
     make cowbuilder apt --mirror configureable through variable make_cowbuilder_mirror
-    
+
     make cowbuilder --distribution configureable through variable make_cowbuilder_distribution
-    
+
     fallback make_cowbuilder_distribution lsb_release --short --codename
-    
+
     set make_cowbuilder_distribution to $whonix_build_apt_stable_release if set
 
 commit 15ee56c45317eadbbcf25b3a50474304ea29c605
@@ -3079,7 +3098,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Jun 6 15:12:32 2017 +0200
 
     Revert "revert back to simpler Makefile"
-    
+
     This reverts commit 760d6a6b08bdd85d7d41be69c552f28f29214da8.
 
 commit 58bd879db065407073e97e62053bd3d7e7a4ec62
@@ -3099,9 +3118,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Mar 30 13:15:06 2017 +0000
 
     revert back to simpler Makefile
-    
+
     genmkfile - Makefile - version 1.5
-    
+
     The more feature rich version is not needed at the moment and should be refactored.
     (Complexity should be moved to a file in /usr/share/genmkfile so the actual generic
     Makefile to be copied to projects stays simple.)
@@ -3123,9 +3142,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Mar 8 14:26:43 2017 +0000
 
     Fix dependency parsing.
-    
+
     https://phabricator.whonix.org/T643
-    
+
     Thanks to Ole-Morten Ω Duesund (@olemd) for pointing me to a solution!
 
 commit d6deafe9ab85cb046ecd8de00adae509061b0331
@@ -3235,9 +3254,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Feb 13 14:12:05 2017 +0100
 
     fix, depend and build-depend on fakeroot
-    
+
     since required by debuild
-    
+
     debuild --no-lintian -sa -us -uc
     dpkg-buildpackage -rfakeroot -us -uc -sa
     dpkg-buildpackage: error: fakeroot not found, either install the fakeroot
@@ -3311,11 +3330,11 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Feb 10 13:37:52 2017 +0000
 
     add make deb-run-dep and make deb-all-dep
-    
+
     make deb-run-dep
        Install runtime dependencies listed in debian/control under Depends using apt-get.
        Various environment variables supported.
-    
+
     make deb-all-dep
        Combination of deb-build-dep and deb-build-dep.
 
@@ -3330,9 +3349,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jan 29 16:33:51 2017 +0000
 
     use tar --owner=0 --group=0 for deterministic results
-    
+
     Thanks to anonymous1 for the suggestion!
-    
+
     https://forums.whonix.org/t/testing-whonix-installer-for-windows
 
 commit 8d67ec73bc8696c80ecbfb8eb183fd6634d18fcf
@@ -3394,9 +3413,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 20 12:47:48 2017 +0100
 
     reproducibility: use orig.tar.xz rather than orig.tar.gz
-    
+
     so gzip can be avoided which has non-deterministic file ordering
-    
+
     There also removed temporary folder creation workaround.
 
 commit 500122e84986e598ff5533aae55ba9f532adda23
@@ -3411,9 +3430,9 @@ Date:   Fri Jan 20 11:14:02 2017 +0100
 
     use --mtime='2015-10-21 00:00Z'
     as per https://reproducible-builds.org/docs/archives/
-    
+
     no longer use find / touch as no longer needed
-    
+
     use strip-nondeterminism on upstream and debian archive
 
 commit 762fadce053464ba0687ac2ccde4e44807c3253c
@@ -3421,7 +3440,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Jan 20 08:47:08 2017 +0100
 
     use --owner=root --group=root --numeric-owner
-    
+
     as per https://reproducible-builds.org/docs/archives/
 
 commit 3b52c8ed69c1a95d32705bad749e9864d6c25bd6
@@ -3459,7 +3478,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Jan 19 09:40:35 2017 +0000
 
     add --mode=go=rX,u+rw,a-s to tar to avoid non-determinism
-    
+
     as suggested by https://wiki.debian.org/ReproducibleBuilds/VaryingPermissionsInTarballs
 
 commit 2915c81f71ee6d775cd0c7a393b52d2c95f2f378
@@ -3467,7 +3486,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Jan 19 09:34:11 2017 +0000
 
     add LC_ALL=C.UTF-8 to environment to avoid non-determinism
-    
+
     as suggested by https://wiki.debian.org/ReproducibleBuilds/Howto#Files_in_data.tar_vary_with_the_locale
 
 commit 4cf227d8ad6cfbc1e4d9e51784bf7e49ba882eb8
@@ -3482,7 +3501,7 @@ Date:   Thu Jan 19 09:25:56 2017 +0000
 
     move from gz to xz for debian source tarball
     (since this is apparently dpkg-source's standard format in stretch)
-    
+
     make output of 'make debdist' same as output of dpkg-source -b ./ (deterministic)
 
 commit d0fa541d94174abc19da61632ea8bca493d8c1e2
@@ -3526,7 +3545,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jan 16 16:56:55 2017 +0100
 
     add cowbuilder support to make reprepro-add
-    
+
     https://phabricator.whonix.org/T52
 
 commit 0228b6e57c810979a8e616479e84c886a107c60e
@@ -3546,9 +3565,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jan 16 12:45:08 2017 +0000
 
     initial support for using cowbuilder
-    
+
     make_use_cowbuilder=true
-    
+
     https://phabricator.whonix.org/T52
 
 commit d790c0f86b5044df7ef798e661daa11cdb01c7f8
@@ -3568,7 +3587,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jan 15 14:52:36 2017 +0000
 
     run make_deb-cleanup from make_deb-pkg_shared
-    
+
     to prevent stale C build results being used in final package
 
 commit 886f900633ac31025d83f1379807376e2ecc79a2
@@ -3600,9 +3619,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Jan 4 20:09:37 2017 +0000
 
     add support for creating architecture specific packages
-    
+
     required for kloak anti keystorke deanonymization tool
-    
+
     https://phabricator.whonix.org/T583
 
 commit 395875355c5d92b57aae9aee36b1cb7f003d3e7a
@@ -3610,9 +3629,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Jan 4 19:42:56 2017 +0000
 
     add support for source packages that require make / compilation (C, C++, ...)
-    
+
     required for kloak anti keystorke deanonymization tool
-    
+
     https://phabricator.whonix.org/T583
 
 commit 4880a9bb9af104d32a578138421863032b0002d4
@@ -3650,9 +3669,9 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Jul 18 16:18:37 2016 +0000
 
     support symlinks to be able to package corridor
-    
+
     https://github.com/rustybird/corridor/issues/18
-    
+
     https://github.com/rustybird/corridor/issues/10
 
 commit 5ac6bf81625ba0bbb29af85e9f38f59724a1e0a8
@@ -3702,7 +3721,7 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Apr 28 03:56:11 2016 +0000
 
     made deb-install and make reprepro-add also work for multiple created packages
-    
+
     per source package
 
 commit 9d62569cc26987a0321962934edc713a8d0cd0cd
@@ -3716,14 +3735,14 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Fri Apr 8 21:40:00 2016 +0000
 
     split make deb-chl-bumpup and make deb-uchl-bumpup into different commands
-    
+
     for manual (version entering) and major version bumpup
-    
+
     for easier maintenance
-    
+
     make deb-chl-bumpup-manual
     make deb-chl-bumpup-major
-    
+
     make deb-uchl-bumpup-manual
     make deb-uchl-bumpup-major
 
