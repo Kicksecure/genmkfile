@@ -1336,7 +1336,9 @@ make_deb-shared-dep() {
 }
 
 make_deb-build-dep() {
-   make_deb_shared_dependencies="build-essential $make_deb_build_dependencies"
+   ## Adding 'build-essential' here is difficult.
+   ## 'dpkg-parsechangelog' is required very early in 'make_get_variables'.
+   make_deb_shared_dependencies="$make_deb_build_dependencies"
    make_function_run make_deb-shared-dep
 }
 
