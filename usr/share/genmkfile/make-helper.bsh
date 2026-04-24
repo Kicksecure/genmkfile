@@ -6,40 +6,40 @@
 #set -x
 
 if [ "$GENMKFILE_DEBUG" = "1" ]; then
-   set -x
+    set -x
 fi
 
 set -e
 
 if [ -o xtrace ]; then
-   export GENMKFILE_DEBUG=1
+    export GENMKFILE_DEBUG=1
 fi
 
 true "$0: 1: $1"
 true "$0: make_cross_build_platform_list: $make_cross_build_platform_list"
 
 if [ -f /usr/libexec/helper-scripts/pre.bsh ]; then
-   ## 'pre.bsh' would `source` the following folders if they exist:
-   ## /etc/make-helper-one.bsh_pre.d/*.conf
-   ## /usr/local/etc/make-helper-one.bsh_pre.d/*.conf
-   source /usr/libexec/helper-scripts/pre.bsh
-   true
+    ## 'pre.bsh' would `source` the following folders if they exist:
+    ## /etc/make-helper-one.bsh_pre.d/*.conf
+    ## /usr/local/etc/make-helper-one.bsh_pre.d/*.conf
+    source /usr/libexec/helper-scripts/pre.bsh
+    true
 fi
 
 true "$0: GENMKFILE_PATH: $GENMKFILE_PATH"
 
 ## For manual invocation.
 ## Should be set by makefile already.
-if [ "$GENMKFILE_PATH" = "" ] ; then
-   if [ -f "./packages/kicksecure/genmkfile/usr/share/genmkfile/makefile-full" ]; then
-      GENMKFILE_PATH="./packages/kicksecure/genmkfile/usr/share/genmkfile"
-   elif [ -f "./usr/share/genmkfile/makefile-full" ]; then
-      GENMKFILE_PATH="./usr/share/genmkfile"
-   elif [ -f "/usr/share/genmkfile/makefile-full" ]; then
-      GENMKFILE_PATH="/usr/share/genmkfile"
-   else
-      echo "$0: ERROR: Auto detection of GENMKFILE_PATH failed!"
-   fi
+if [ "$GENMKFILE_PATH" = "" ]; then
+    if [ -f "./packages/kicksecure/genmkfile/usr/share/genmkfile/makefile-full" ]; then
+        GENMKFILE_PATH="./packages/kicksecure/genmkfile/usr/share/genmkfile"
+    elif [ -f "./usr/share/genmkfile/makefile-full" ]; then
+        GENMKFILE_PATH="./usr/share/genmkfile"
+    elif [ -f "/usr/share/genmkfile/makefile-full" ]; then
+        GENMKFILE_PATH="/usr/share/genmkfile"
+    else
+        echo "$0: ERROR: Auto detection of GENMKFILE_PATH failed!"
+    fi
 fi
 
 export GENMKFILE_PATH
@@ -53,40 +53,40 @@ make_shared_function
 ## If $make_cross_build_platform_list is unset, just build same platform as
 ## output of 'dpkg --print-architecture'.
 if [ "$make_cross_build_platform_list" = "" ]; then
-   make_cross_build_platform_list="$dpkg_print_architecture"
+    make_cross_build_platform_list="$dpkg_print_architecture"
 fi
 
-for arch in $make_cross_build_platform_list ; do
-   target_architecture="$arch"
-   export target_architecture
+for arch in $make_cross_build_platform_list; do
+    target_architecture="$arch"
+    export target_architecture
 done
 
 if [ "$1" = "deb-pkg" ]; then
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
-   "$GENMKFILE_PATH/make-helper-one.bsh" dist
-   "$GENMKFILE_PATH/make-helper-one.bsh" debdist
-   "$GENMKFILE_PATH/make-helper-one.bsh" debdsc
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-pkg-build
-   exit $?
+    "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
+    "$GENMKFILE_PATH/make-helper-one.bsh" dist
+    "$GENMKFILE_PATH/make-helper-one.bsh" debdist
+    "$GENMKFILE_PATH/make-helper-one.bsh" debdsc
+    "$GENMKFILE_PATH/make-helper-one.bsh" deb-pkg-build
+    exit $?
 fi
 
 if [ "$1" = "deb-icup" ]; then
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
-   "$GENMKFILE_PATH/make-helper-one.bsh" dist
-   "$GENMKFILE_PATH/make-helper-one.bsh" debdist
-   "$GENMKFILE_PATH/make-helper-one.bsh" debdsc
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-pkg-build
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-install
-   "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
-   exit $?
+    "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
+    "$GENMKFILE_PATH/make-helper-one.bsh" dist
+    "$GENMKFILE_PATH/make-helper-one.bsh" debdist
+    "$GENMKFILE_PATH/make-helper-one.bsh" debdsc
+    "$GENMKFILE_PATH/make-helper-one.bsh" deb-pkg-build
+    "$GENMKFILE_PATH/make-helper-one.bsh" deb-install
+    "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
+    exit $?
 fi
 
-for arch in $make_cross_build_platform_list ; do
-   target_architecture="$arch"
-   export target_architecture
-   "$GENMKFILE_PATH/make-helper-one.bsh" "$@"
+for arch in $make_cross_build_platform_list; do
+    target_architecture="$arch"
+    export target_architecture
+    "$GENMKFILE_PATH/make-helper-one.bsh" "$@"
 
-   ## TODO: Implement support for builting source packages containing one or
-   ## more arch-specific binaries for all cross-build architectures.
-   break
+    ## TODO: Implement support for builting source packages containing one or
+    ## more arch-specific binaries for all cross-build architectures.
+    break
 done
