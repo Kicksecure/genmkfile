@@ -27,7 +27,6 @@ if [ -f /usr/libexec/helper-scripts/pre.bsh ]; then
   ## /etc/make-helper-one.bsh_pre.d/*.conf
   ## /usr/local/etc/make-helper-one.bsh_pre.d/*.conf
   source /usr/libexec/helper-scripts/pre.bsh
-  true
 fi
 
 true "$0: GENMKFILE_PATH: ${GENMKFILE_PATH:-}"

@@ -1955,7 +1955,6 @@ if was_executed "${BASH_SOURCE[0]}"; then
     ## /etc/make-helper-one.bsh_pre.d/*.conf
     ## /usr/local/etc/make-helper-one.bsh_pre.d/*.conf
     source /usr/libexec/helper-scripts/pre.bsh
-    true
   fi
 
   ## Color variables are set by pre.bsh if available; default to empty
