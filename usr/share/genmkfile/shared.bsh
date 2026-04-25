@@ -2,8 +2,10 @@
 
 make_shared_function() {
    make_debian_control_file_relative_path="debian/control"
-   make_debian_control_file_absolute_path="$(realpath "$make_debian_control_file_relative_path")"
+   make_debian_control_file_absolute_path="$(realpath -- "$make_debian_control_file_relative_path")"
    test -f "$make_debian_control_file_absolute_path"
 
+   ## Consumed by make-helper-one.bsh (make_get_variables, host/target_architecture defaults, etc.)
+   # shellcheck disable=SC2034
    dpkg_print_architecture="$(dpkg --print-architecture)"
 }

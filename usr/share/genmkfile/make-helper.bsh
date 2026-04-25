@@ -5,18 +5,22 @@
 
 #set -x
 
-if [ "$GENMKFILE_DEBUG" = "1" ]; then
+if [ "${GENMKFILE_DEBUG:-}" = "1" ]; then
     set -x
 fi
 
-set -e
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o errtrace
+shopt -s inherit_errexit
 
 if [ -o xtrace ]; then
     export GENMKFILE_DEBUG=1
 fi
 
-true "$0: 1: $1"
-true "$0: make_cross_build_platform_list: $make_cross_build_platform_list"
+true "$0: 1: ${1:-}"
+true "$0: make_cross_build_platform_list: ${make_cross_build_platform_list:-}"
 
 if [ -f /usr/libexec/helper-scripts/pre.bsh ]; then
     ## 'pre.bsh' would `source` the following folders if they exist:
@@ -26,11 +30,11 @@ if [ -f /usr/libexec/helper-scripts/pre.bsh ]; then
     true
 fi
 
-true "$0: GENMKFILE_PATH: $GENMKFILE_PATH"
+true "$0: GENMKFILE_PATH: ${GENMKFILE_PATH:-}"
 
 ## For manual invocation.
 ## Should be set by makefile already.
-if [ "$GENMKFILE_PATH" = "" ]; then
+if [ -z "${GENMKFILE_PATH:-}" ]; then
     if [ -f "./packages/kicksecure/genmkfile/usr/share/genmkfile/makefile-full" ]; then
         GENMKFILE_PATH="./packages/kicksecure/genmkfile/usr/share/genmkfile"
     elif [ -f "./usr/share/genmkfile/makefile-full" ]; then
@@ -38,7 +42,8 @@ if [ "$GENMKFILE_PATH" = "" ]; then
     elif [ -f "/usr/share/genmkfile/makefile-full" ]; then
         GENMKFILE_PATH="/usr/share/genmkfile"
     else
-        echo "$0: ERROR: Auto detection of GENMKFILE_PATH failed!"
+        printf "%s\n" "$0: ERROR: Auto detection of GENMKFILE_PATH failed!" >&2
+        exit 1
     fi
 fi
 
@@ -47,46 +52,78 @@ export GENMKFILE_PATH
 ## sets: make_debian_control_file_relative_path
 ## sets: make_debian_control_file_absolute_path
 ## sets: dpkg_print_architecture
+# shellcheck source=SCRIPTDIR/shared.bsh
 source "$GENMKFILE_PATH/shared.bsh"
 make_shared_function
 
 ## If $make_cross_build_platform_list is unset, just build same platform as
 ## output of 'dpkg --print-architecture'.
-if [ "$make_cross_build_platform_list" = "" ]; then
+if [ -z "${make_cross_build_platform_list:-}" ]; then
     make_cross_build_platform_list="$dpkg_print_architecture"
 fi
 
-for arch in $make_cross_build_platform_list; do
-    target_architecture="$arch"
-    export target_architecture
-done
+## $make_cross_build_platform_list is a space-separated list of one or
+## more architectures. The first entry is used for architecture-
+## independent operations (source package, cleanup, install). The
+## loops below iterate the full list for architecture-specific binary
+## builds. Cross-architecture binary builds require
+## make_use_cowbuilder=true with appropriately prepared cowbuilder
+## base images for each target architecture; without cowbuilder the
+## per-architecture loop just rebuilds for the host architecture
+## once per entry, which is wasteful but not broken.
+first_arch="${make_cross_build_platform_list%% *}"
 
-if [ "$1" = "deb-pkg" ]; then
+if [ "${1:-}" = "deb-pkg" ]; then
+    target_architecture="$first_arch"
+    export target_architecture
     "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
     "$GENMKFILE_PATH/make-helper-one.bsh" dist
     "$GENMKFILE_PATH/make-helper-one.bsh" debdist
     "$GENMKFILE_PATH/make-helper-one.bsh" debdsc
-    "$GENMKFILE_PATH/make-helper-one.bsh" deb-pkg-build
-    exit $?
+    ## Source artifacts (.dsc, .orig.tar.xz, .debian.tar.xz) were
+    ## built once above and are architecture-independent. Produce one
+    ## set of binary .deb files per requested architecture.
+    # shellcheck disable=SC2086
+    for arch in $make_cross_build_platform_list; do
+        target_architecture="$arch"
+        export target_architecture
+        "$GENMKFILE_PATH/make-helper-one.bsh" deb-pkg-build
+    done
+    exit 0
 fi
 
-if [ "$1" = "deb-icup" ]; then
+if [ "${1:-}" = "deb-icup" ]; then
+    target_architecture="$first_arch"
+    export target_architecture
     "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
     "$GENMKFILE_PATH/make-helper-one.bsh" dist
     "$GENMKFILE_PATH/make-helper-one.bsh" debdist
     "$GENMKFILE_PATH/make-helper-one.bsh" debdsc
-    "$GENMKFILE_PATH/make-helper-one.bsh" deb-pkg-build
+    # shellcheck disable=SC2086
+    for arch in $make_cross_build_platform_list; do
+        target_architecture="$arch"
+        export target_architecture
+        "$GENMKFILE_PATH/make-helper-one.bsh" deb-pkg-build
+    done
+    ## Install only on the host architecture; cross-architecture
+    ## install requires dpkg --add-architecture / multiarch setup
+    ## which is out of scope for this wrapper.
+    target_architecture="$dpkg_print_architecture"
+    export target_architecture
     "$GENMKFILE_PATH/make-helper-one.bsh" deb-install
     "$GENMKFILE_PATH/make-helper-one.bsh" deb-cleanup
-    exit $?
+    exit 0
 fi
 
+## Generic pass-through. Iterate every requested architecture so
+## architecture-specific targets ('genmkfile deb-pkg-build' invoked
+## directly, etc.) build for each one. Architecture-agnostic targets
+## (dist, debdist, install, ...) will run redundantly when multi-arch
+## is requested; callers wanting the source-once / binary-per-arch
+## optimisation should use 'deb-pkg' or 'deb-icup' instead.
+# shellcheck disable=SC2086
 for arch in $make_cross_build_platform_list; do
     target_architecture="$arch"
     export target_architecture
     "$GENMKFILE_PATH/make-helper-one.bsh" "$@"
-
-    ## TODO: Implement support for builting source packages containing one or
-    ## more arch-specific binaries for all cross-build architectures.
-    break
 done
