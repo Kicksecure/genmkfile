@@ -145,8 +145,21 @@ make_parse_cmd() {
         fi
 
         matched="true"
-        make_function_run "$target_fn"
-        shift
+        if [ "$arg" = "all" ]; then
+            ## 'all' uniquely forwards the remaining CLI args to
+            ## make_all, which passes them through to
+            ## 'make -f Makefile_orig all "$@"'. This is what lets
+            ## 'genmkfile all VAR=value' propagate VAR=value to the
+            ## underlying 'make' invocation.
+            shift
+            make_function_run "$target_fn" "$@"
+            ## Args were forwarded; consume the rest so the loop
+            ## terminates.
+            set --
+        else
+            make_function_run "$target_fn"
+            shift
+        fi
     done
 
     ## If there are input files (for example) that follow the options, they
