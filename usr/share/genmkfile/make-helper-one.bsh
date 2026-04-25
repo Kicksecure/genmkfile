@@ -18,200 +18,9 @@ was_executed() {
     fi
     return 1
 }
-
-## Code duplication. Copied from
-## helper-scripts/usr/libexec/helper-scripts/deb822-extract.bsh.
-##
-## Because deb822-extract.bsh cannot be sourced here (the build host may not
-## have helper-scripts installed).
-deb822_extract() {
-    local deb822_extract_input_file deb822_extract_output_var \
-        deb822_extract_desired_field_list deb822_extract_constraint_key_list \
-        deb822_extract_constraint_regex_list deb822_extract_stanza_line \
-        deb822_extract_key_list deb822_extract_key deb822_extract_val \
-        deb822_extract_val_list deb822_extract_last_idx deb822_extract_constraint \
-        deb822_extract_constraint_key deb822_extract_constraint_regex
-
-    ## Process arguments
-    deb822_extract_input_file="${1:-}"
-    deb822_extract_output_var="${2:-}"
-    IFS=',' read -r -a deb822_extract_desired_field_list <<<"${3:-}"
-    shift 3
-    if ! [ -f "${deb822_extract_input_file}" ]; then
-        return 1
-    fi
-    if [ -z "${deb822_extract_output_var}" ]; then
-        return 2
-    fi
-    if [[ "${deb822_extract_output_var}" =~ ^deb822_extract ]]; then
-        return 2
-    fi
-    if ((${#deb822_extract_desired_field_list[@]} == 0)); then
-        return 2
-    fi
-    for deb822_extract_desired_field in \
-        "${deb822_extract_desired_field_list[@]}"; do
-        if [ -z "${deb822_extract_desired_field}" ]; then
-            return 2
-        fi
-    done
-
-    ## From the output of 'help declare':
-    ##
-    ##   -n        make NAME a reference to the variable named by its value
-    ##
-    ## This will therefore make deb822_extract_output_var into an array
-    ## (assuming an array was passed in), and modifications made to it
-    ## will be propagated to the passed-in list.
-    declare -n deb822_extract_output_var
-
-    deb822_extract_constraint_key_list=()
-    deb822_extract_constraint_regex_list=()
-
-    ## Process constraints into key / regex lists
-    for deb822_extract_constraint in "$@"; do
-        if [[ "${deb822_extract_constraint}" != *'|'* ]]; then
-            return 2
-        fi
-        deb822_extract_constraint_key="${deb822_extract_constraint%%|*}"
-        if [ -z "${deb822_extract_constraint_key}" ]; then
-            return 2
-        fi
-        deb822_extract_constraint_regex="${deb822_extract_constraint#*|}"
-
-        deb822_extract_constraint_key_list+=("${deb822_extract_constraint_key}")
-        deb822_extract_constraint_regex_list+=(
-            "${deb822_extract_constraint_regex}"
-        )
-    done
-    if ((${#deb822_extract_constraint_key_list[@]} == 0)); then
-        return 2
-    fi
-
-    ## Break the input file into chunks.
-    deb822_extract_key_list=()
-    deb822_extract_val_list=()
-    while IFS= read -r deb822_extract_stanza_line; do
-        ## Process a loaded stanza once a blank line is hit.
-        if [ -z "${deb822_extract_stanza_line}" ]; then
-            deb822_extract_one
-            deb822_extract_key_list=()
-            deb822_extract_val_list=()
-            continue
-        fi
-        if [ "${deb822_extract_stanza_line:0:1}" = '#' ]; then
-            ## Skip comments
-            continue
-        fi
-        if [ "${deb822_extract_stanza_line:0:1}" = ' ' ]; then
-            ## One-space-indented lines are part of the last recorded value.
-            if ((${#deb822_extract_val_list[@]} == 0)); then
-                return 3
-            fi
-            ## This technically will try to grab one character past the end of
-            ## deb822_extract_val, but in practice Bash simply returns the rest of
-            ## the string.
-            deb822_extract_val="${deb822_extract_stanza_line:1:${#deb822_extract_stanza_line}}"
-            deb822_extract_last_idx=$((${#deb822_extract_val_list[@]} - 1))
-            deb822_extract_val_list[deb822_extract_last_idx]+=$'\n'"${deb822_extract_val}"
-        else
-            ## Lines with no leading spaces are (the start of) key/value pairs.
-            if ! [[ "${deb822_extract_stanza_line}" = *:* ]]; then
-                return 3
-            fi
-            deb822_extract_key="${deb822_extract_stanza_line%%:*}"
-            deb822_extract_val="${deb822_extract_stanza_line#*:}"
-            if [ -z "${deb822_extract_key}" ]; then
-                return 3
-            fi
-            if [ "${deb822_extract_val:0:1}" = ' ' ]; then
-                deb822_extract_val="${deb822_extract_val:1:${#deb822_extract_val}}"
-            fi
-            deb822_extract_key_list+=("${deb822_extract_key}")
-            deb822_extract_val_list+=("${deb822_extract_val}")
-        fi
-    done <"${deb822_extract_input_file}"
-
-    ## Process the last stanza in the file.
-    deb822_extract_one
-}
-deb822_extract_one() {
-    local deb822_extract_constraint_idx deb822_extract_regex_mismatch \
-        deb822_extract_stanza_idx deb822_extract_found_key \
-        deb822_extract_desired_field
-    ## This function also inherits the local variables from deb822_extract.
-
-    ## Ignore empty stanzas, this can happen if there's an extra trailing
-    ## newline in the file or multiple newlines in a row.
-    if ((${#deb822_extract_key_list[@]} == 0)); then
-        return
-    fi
-
-    ## Check each constraint against the current stanza. If a key is missing, or
-    ## the regex in the constraint doesn't match the corresponding value, skip
-    ## the stanza.
-    deb822_extract_regex_mismatch='false'
-    for deb822_extract_constraint_idx in \
-        "${!deb822_extract_constraint_key_list[@]}"; do
-        deb822_extract_constraint_key="${deb822_extract_constraint_key_list[deb822_extract_constraint_idx]}"
-        deb822_extract_found_key='false'
-
-        for deb822_extract_stanza_idx in "${!deb822_extract_key_list[@]}"; do
-            deb822_extract_key="${deb822_extract_key_list[deb822_extract_stanza_idx]}"
-            if [ "${deb822_extract_key}" != "${deb822_extract_constraint_key}" ]; then
-                continue
-            fi
-
-            deb822_extract_found_key='true'
-            ## It would have been more intuitive to load
-            ## deb822_extract_constraint_regex in the outer loop, but it's only ever
-            ## needed here and the loop isn't going to run again at this point, so
-            ## it's more efficient to load it here.
-            deb822_extract_constraint_regex="${deb822_extract_constraint_regex_list[deb822_extract_constraint_idx]}"
-            deb822_extract_val="${deb822_extract_val_list[deb822_extract_stanza_idx]}"
-            if ! [[ "${deb822_extract_val}" =~ ${deb822_extract_constraint_regex} ]]; then
-                deb822_extract_regex_mismatch='true'
-            fi
-            break
-        done
-
-        if [ "${deb822_extract_regex_mismatch}" = 'true' ] ||
-            [ "${deb822_extract_found_key}" = 'false' ]; then
-            return
-        fi
-    done
-
-    ## If we got this far, the stanza matches, and we can load the requested
-    ## fields into the output array.
-    for deb822_extract_desired_field in \
-        "${deb822_extract_desired_field_list[@]}"; do
-        deb822_extract_found_key='false'
-
-        for deb822_extract_stanza_idx in "${!deb822_extract_key_list[@]}"; do
-            deb822_extract_key="${deb822_extract_key_list[deb822_extract_stanza_idx]}"
-            if [ "${deb822_extract_desired_field}" = "${deb822_extract_key}" ]; then
-                deb822_extract_val="${deb822_extract_val_list[deb822_extract_stanza_idx]}"
-                deb822_extract_found_key='true'
-                deb822_extract_output_var+=("${deb822_extract_val}")
-                break
-            fi
-        done
-
-        if [ "${deb822_extract_found_key}" = 'false' ]; then
-            deb822_extract_output_var+=('')
-        fi
-    done
-}
-
-if [ "$GENMKFILE_DEBUG" = "1" ]; then
+if [ "${GENMKFILE_DEBUG:-}" = "1" ]; then
     set -x
 fi
-
-grep_no_comments() {
-    ## Not using end-of-options ("--") for the first invocation of 'grep',
-    ## because it is up to the caller of this function to use it or not.
-    grep "$@" | grep --invert-match -- "^#"
-}
 
 make_log_and_run() {
     printf "%s\n" "${green}$0: running:${reset} $*"
@@ -226,38 +35,63 @@ make_log_and_run() {
 has() {
     local _cmd
     _cmd="$(command -v "${1}")" 2>/dev/null || return 1
-    [ -x "${_cmd}" ] || return 1
+    test -x "${_cmd}" || return 1
 }
 
-deb_variables_check() {
-    has git
-    has debsign
-    has debchange
-    has sq
-    has sq-git
+## Print a red ERROR: line to stderr, tagged with the calling
+## function, then exit 1. The '${FUNCNAME[1]:-main}' expansion shows
+## the caller of die(), not die() itself.
+die() {
+    printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '${FUNCNAME[1]:-main}') $*" >&2
+    exit 1
+}
 
-    if [ "$DEBEMAIL" = "" ]; then
+## Abort with a clear error if any of the given commands is missing.
+## Points the user at 'genmkfile deb-build-dep' so they can install the
+## project's declared dependencies (plus build-essential) in one go.
+make_require() {
+    local cmd
+    for cmd in "$@"; do
+        if ! has "$cmd"; then
+            ## Use printf directly rather than die() because we want
+            ## the caller of make_require (not make_require itself or
+            ## die itself) in the FUNCNAME tag, and the message is
+            ## multi-line with a help pointer.
+            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '${FUNCNAME[1]:-main}') required command '$cmd' not found in PATH.
+If '$cmd' is listed in debian/control, try:
+  sudo genmkfile deb-build-dep" >&2
+            exit 1
+        fi
+    done
+}
+
+## Validate DEBEMAIL / DEBFULLNAME. The matching tools (debsign,
+## debchange, sq, sq-git, git, bc, ...) are 'make_require'd at each
+## individual call site rather than lumped together here, so failing a
+## target only blocks on the tools that target actually needs.
+deb_variables_check() {
+    if [ -z "${DEBEMAIL:-}" ]; then
         ## Otherwise e-mail address in debian/changelog would default to
         ## user@host.localdomain and then lintian would complain and exit with
         ## failure code.
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
-        exit 1
+        die "environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
     fi
-    if [ "$DEBFULLNAME" = "" ]; then
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
-        exit 1
+    if [ -z "${DEBFULLNAME:-}" ]; then
+        die "environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
     fi
 
     ## TODO: DEBSIGN_KEYID ?
 }
 
 make_init() {
+    local pwd dirname_pwd parent_folder
+
     ## For manual invocation.
     ## Should be set by makefile already.
-    [ -n "$GENMKFILE_PATH" ] || GENMKFILE_PATH="/usr/share/genmkfile"
+    [ -n "${GENMKFILE_PATH:-}" ] || GENMKFILE_PATH="/usr/share/genmkfile"
     export GENMKFILE_PATH
 
-    pwd="$(pwd)"
+    pwd="$PWD"
     ## Example pwd:
     ## ~/derivative-maker/packages/kicksecure/genmkfile
     dirname_pwd="$(dirname -- "$pwd")"
@@ -277,6 +111,7 @@ make_init() {
 }
 
 make_deinit() {
+    make_require safe-rm
     safe-rm --recursive --force -- "$genmkfile_temp_dir"
 }
 
@@ -284,297 +119,98 @@ make_parse_cmd() {
     ## Thanks to:
     ## http://mywiki.wooledge.org/BashFAQ/035
 
-    local matched="false"
-    local deb
+    local matched="false" arg target_fn
 
-    while :; do
-        case $1 in
-        help)
-            matched="true"
-            make_function_run make_help
-            shift
-            ;;
-        all)
-            matched="true"
-            make_function_run make_all "$@"
-            shift
-            ;;
-        dist)
-            matched="true"
-            make_function_run make_dist
-            shift
-            ;;
-        test)
-            matched="true"
-            make_function_run make_test
-            shift
-            ;;
-        undist)
-            matched="true"
-            make_function_run make_undist
-            shift
-            ;;
-        debdist)
-            matched="true"
-            make_function_run make_debdist
-            shift
-            ;;
-        undebdist)
-            matched="true"
-            make_function_run make_undebdist
-            shift
-            ;;
-        debdsc)
-            matched="true"
-            make_function_run make_debdsc
-            shift
-            ;;
-        undebdsc)
-            matched="true"
-            make_function_run make_undebdsc
-            shift
-            ;;
-        debinstfile)
-            matched="true"
-            make_function_run make_debinstfile
-            shift
-            ;;
-        manpages)
-            matched="true"
-            make_function_run make_manpages
-            shift
-            ;;
-        uch)
-            matched="true"
-            make_function_run make_uch
-            shift
-            ;;
-        install)
-            matched="true"
-            make_function_run make_install
-            shift
-            ;;
-        deb-build-dep)
-            matched="true"
-            make_function_run make_deb-build-dep
-            shift
-            ;;
-        deb-run-dep)
-            matched="true"
-            make_function_run make_deb-run-dep
-            shift
-            ;;
-        deb-all-dep)
-            matched="true"
-            make_function_run make_deb-all-dep
-            shift
-            ;;
-        deb-pkg-build)
-            matched="true"
-            make_function_run make_deb-pkg-build
-            shift
-            ;;
-        deb-install)
-            matched="true"
-            make_function_run make_deb-install
-            shift
-            ;;
-        deb-remove)
-            matched="true"
-            make_function_run make_deb-remove
-            shift
-            ;;
-        deb-purge)
-            matched="true"
-            make_function_run make_deb-purge
-            shift
-            ;;
-        deb-clean)
-            matched="true"
-            make_function_run make_deb-clean
-            shift
-            ;;
-        deb-cleanup)
-            matched="true"
-            make_function_run make_deb-cleanup
-            shift
-            ;;
-        lintian)
-            matched="true"
-            make_function_run make_lintian
-            shift
-            ;;
-        dput-ubuntu-ppa)
-            matched="true"
-            make_function_run make_dput-ubuntu-ppa
-            shift
-            ;;
-        clean)
-            matched="true"
-            make_function_run make_clean
-            shift
-            ;;
-        distclean)
-            matched="true"
-            make_function_run make_distclean
-            shift
-            ;;
-        checkout)
-            matched="true"
-            make_function_run make_checkout
-            shift
-            ;;
-        installcheck)
-            matched="true"
-            make_function_run make_installcheck
-            shift
-            ;;
-        installsim)
-            matched="true"
-            make_function_run make_installsim
-            shift
-            ;;
-        uninstallcheck)
-            matched="true"
-            make_function_run make_uninstallcheck
-            shift
-            ;;
-        uninstall)
-            matched="true"
-            make_function_run make_uninstall
-            shift
-            ;;
-        uninstallsim)
-            matched="true"
-            make_function_run make_uninstallsim
-            shift
-            ;;
-        deb-chl-bumpup-major)
-            matched="true"
-            make_function_run make_deb-chl-bumpup-major
-            shift
-            ;;
-        deb-chl-bumpup-manual)
-            matched="true"
-            make_function_run make_deb-chl-bumpup-manual
-            shift
-            ;;
-        deb-uachl-bumpup-major)
-            matched="true"
-            make_function_run make_deb-uachl-bumpup-major
-            shift
-            ;;
-        deb-uachl-bumpup-manual)
-            matched="true"
-            make_function_run make_deb-uachl-bumpup-manual
-            shift
-            ;;
-        deb-uachl-commit-changelog)
-            matched="true"
-            make_function_run make_deb-uachl-commit-changelog
-            shift
-            ;;
-        git-tag-show)
-            matched="true"
-            make_function_run make_git_tag_show
-            shift
-            ;;
-        git-tag-sign)
-            matched="true"
-            make_function_run make_git_tag_sign
-            shift
-            ;;
-        git-tag-verify)
-            matched="true"
-            make_function_run make_git_tag_verify
-            shift
-            ;;
-        git-tag-check)
-            matched="true"
-            make_function_run make_git_tag_check
-            shift
-            ;;
-        git-commit-verify)
-            matched="true"
-            make_function_run make_git_commit_verify_current
-            shift
-            ;;
-        git-verify)
-            matched="true"
-            make_function_run make_git_verify
-            shift
-            ;;
-        git-tag-push)
-            matched="true"
-            make_function_run make_git_tag_push
-            shift
-            ;;
-        git-tag-show-latest)
-            matched="true"
-            make_function_run make_git_tag_show_latest
-            shift
-            ;;
-        git-tag-push-latest)
-            matched="true"
-            make_function_run make_git_tag_push_latest
-            shift
-            ;;
-        reprepro-add)
-            matched="true"
-            make_function_run make_reprepro-add
-            shift
-            ;;
-        reprepro-remove)
-            matched="true"
-            make_function_run make_reprepro-remove
-            shift
-            ;;
+    while [ $# -gt 0 ]; do
+        arg="$1"
+        case "$arg" in
         --)
             true "$0: end-of-options"
             shift
             break
             ;;
         -*)
-            printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') unknown option: $1" >&2
-            exit 1
-            ;;
-        *)
-            true "$0: positional parameter: $@"
-            break
+            die "unknown option: $arg"
             ;;
         esac
+
+        ## Targets map to 'make_<target with dashes -> underscores>'.
+        ## If no such function exists, fall through to the trailing
+        ## block which either defaults to make_all or tries to call
+        ## the argument as a function name directly.
+        target_fn="make_${arg//-/_}"
+        if ! declare -F "$target_fn" >/dev/null 2>&1; then
+            true "$0: positional parameter: $*"
+            break
+        fi
+
+        matched="true"
+        make_function_run "$target_fn"
+        shift
     done
 
     ## If there are input files (for example) that follow the options, they
     ## will remain in the "$@" positional parameters.
 
-    local args
-    args="$@"
-
-    if [ "$args" = "" ]; then
+    if [ $# -eq 0 ] && [ "$matched" != "true" ]; then
         make_function_run make_all
         return 0
     fi
 
-    if [ ! "$matched" = "true" ]; then
+    if [ "$matched" != "true" ]; then
         make_function_run "$@"
     fi
 }
 
 make_dependencies_filter_helper() {
     local temp to_remove
-    temp="$@"
+    ## Read a Debian dependency expression on stdin, write a clean
+    ## space-separated package name list to stdout. Strips:
+    ##   - commas (separator)
+    ##   - version constraints like '(>= 1.0)'
+    ##   - architecture qualifiers like '[linux-any]' / '[!linux-any]'
+    ##   - debhelper substitution markers (${shlibs:Depends} etc.)
+    ##   - '|' alternative-dep markers
+    temp="$(sed -e 's/,/ /g' -e 's/([^)]*)//g' -e 's/\[[^]]*\]//g')"
+    ## These are debhelper substitution markers, literal in debian/control.
+    # shellcheck disable=SC2016
     for to_remove in '${shlibs:Depends}' '${misc:Depends}' '${python:Depends}' '${python3:Depends}' '|'; do
         temp="${temp//"$to_remove"/""}"
     done
     printf "%s\n" "$temp"
 }
 
+## Parse Build-Depends and Depends from debian/control. Split out from
+## make_get_variables so 'genmkfile deb-build-dep' (and friends) can run on a
+## fresh system without build-essential, then install it from
+## debian/control. dpkg-parsechangelog (which pulls in build-essential) is
+## therefore only required for other targets.
+make_get_dependencies() {
+    ## sets: make_debian_control_file_relative_path
+    ## sets: make_debian_control_file_absolute_path
+    ## sets: dpkg_print_architecture
+    # shellcheck source=SCRIPTDIR/shared.bsh
+    source "$GENMKFILE_PATH/shared.bsh"
+    make_shared_function
+
+    make_require grep-dctrl
+
+    local raw_build_depends raw_runtime_depends
+    raw_build_depends="$(grep-dctrl --show-field=Build-Depends --no-field-names '' "$make_debian_control_file_absolute_path")"
+    make_deb_build_dependencies="$(make_dependencies_filter_helper <<<"$raw_build_depends")"
+
+    raw_runtime_depends="$(grep-dctrl --show-field=Depends --no-field-names '' "$make_debian_control_file_absolute_path")"
+    make_deb_runtime_dependencies="$(make_dependencies_filter_helper <<<"$raw_runtime_depends")"
+}
+
 make_get_variables() {
+    ## Initialize the array if the caller did not set it (nounset-safe).
+    [ -n "${make_folder_list_for_un_and_install+x}" ] || make_folder_list_for_un_and_install=()
     if [ "${#make_folder_list_for_un_and_install[@]}" -eq 0 ]; then
         make_folder_list_for_un_and_install=(bin boot dev etc home lib opt sbin srv sys usr var)
     fi
 
+    local my_user_id
     my_user_id="$(id -u)"
     if [ "$my_user_id" = "0" ]; then
         running_as_root_maybe="Running as ${under}root${eunder}. ($my_user_id)"
@@ -588,101 +224,56 @@ make_get_variables() {
     export LC_ALL TZ
 
     ## XXX: maybe better set dynamically but would that be deterministic?
-    [ -n "$XZ_OPT" ] || XZ_OPT="--threads=8"
+    [ -n "${XZ_OPT:-}" ] || XZ_OPT="--threads=8"
     export XZ_OPT
 
-    local temp dpkg_line
+    local temp
     if ! has dpkg-parsechangelog; then
-        true 'dpkg-parsechangelog not found. Do you have the "build-essential" package installed?
-To install all dependencies, try running:
-sudo genmkfile deb-all-dep
-'
-        exit 1
+        die "dpkg-parsechangelog not found (provided by 'dpkg-dev'). Run: sudo genmkfile deb-build-dep"
     fi
 
-    ## sets: make_debian_control_file_relative_path
-    ## sets: make_debian_control_file_absolute_path
-    ## sets: dpkg_print_architecture
-    source "$GENMKFILE_PATH/shared.bsh"
-    make_shared_function
+    make_function_run make_get_dependencies
 
     make_debian_changelog_file_relative_path="debian/changelog"
-    make_debian_changelog_file_absolute_path="$(realpath "$make_debian_changelog_file_relative_path")"
+    make_debian_changelog_file_absolute_path="$(realpath -- "$make_debian_changelog_file_relative_path")"
     test -f "$make_debian_changelog_file_absolute_path"
 
-    ## Thanks to jakob for the perl lines.
-    ## http://unix.stackexchange.com/users/20977/jakob
-    ## http://unix.stackexchange.com/a/215919/49297
+    ## Example make_changelog_version values:
+    ##   3:0.1-1
+    ##   0.1-1
+    ##   1:20240810
+    make_changelog_version="$(dpkg-parsechangelog --show-field Version)"
 
-    make_deb_build_dependencies="$(perl -ne 'next if /^#/; $p=(s/^Build-Depends:\s*/ / or (/^ / and $p)); s/,|\n|\([^)]+\)//mg; print if $p' <"$make_debian_control_file_absolute_path")"
-    make_deb_build_dependencies="$(make_dependencies_filter_helper "$make_deb_build_dependencies")"
+    if [[ "$make_changelog_version" == *-* ]]; then
+        make_pkg_revision="-${make_changelog_version#*-}"
+        temp="${make_changelog_version%-*}"
+    else
+        make_pkg_revision=""
+        temp="$make_changelog_version"
+    fi
 
-    make_deb_build_dependencies=${make_deb_build_dependencies//"[linux-any]"/}
-    make_deb_build_dependencies=${make_deb_build_dependencies//"[all]"/}
+    ## Parse version (strip epoch if present).
+    make_pkg_version="${temp#*:}"
 
-    make_deb_runtime_dependencies="$(perl -ne 'next if /^#/; $p=(s/^Depends:\s*/ / or (/^ / and $p)); s/,|\n|\([^)]+\)//mg; print if $p' <"$make_debian_control_file_absolute_path")"
-    make_deb_runtime_dependencies="$(make_dependencies_filter_helper "$make_deb_runtime_dependencies")"
+    ## Parse epoch (if present).
+    if [[ "$make_changelog_version" == *:* ]]; then
+        make_epoch="${temp%:*}"
+    else
+        make_epoch=""
+    fi
 
-    while read -r -d $'\n' dpkg_line; do
-        true "dpkg_line: $dpkg_line"
-        ## Example dpkg_line:
-        ## Version: 0.1-1
-        ## Version: 1:20240810
-        read -r first second _ <<<"$dpkg_line"
-        ## Example first:
-        ## Version:
-        ## Example second:
-        ## 3:0.1-1
-        ## Example second:
-        ## 1:20240810
-        first="${first,,}"
-        true "first: $first"
-        true "second: $second"
+    true "make_changelog_version: $make_changelog_version"
+    true "make_pkg_revision: $make_pkg_revision"
+    true "make_pkg_version: $make_pkg_version"
+    true "make_epoch: $make_epoch"
 
-        if [ "$first" = "version:" ]; then
-            make_changelog_version="$second"
-            ## Example make_changelog_version:
-            ## 3:0.1-1
-            ## 0.1-1
-            ## 1:20240810
-
-            if [[ "$make_changelog_version" == *-* ]]; then
-                make_pkg_revision="${make_changelog_version#*-}"
-                ## prepend '-'
-                make_pkg_revision="-${make_pkg_revision}"
-                temp="${make_changelog_version%-*}"
-            else
-                make_pkg_revision=""
-                temp="$make_changelog_version"
-            fi
-
-            ## Parse version (strip epoch if present)
-            make_pkg_version="${temp#*:}"
-
-            ## Parse epoch (if present)
-            if [[ "$make_changelog_version" == *:* ]]; then
-                make_epoch="${temp%:*}"
-            else
-                make_epoch=""
-            fi
-
-            ## Debugging outputs
-            true "make_changelog_version: $make_changelog_version"
-            true "make_pkg_revision: $make_pkg_revision"
-            true "make_pkg_version: $make_pkg_version"
-            true "make_epoch: $make_epoch"
-            break
-        fi
-    done < <(dpkg-parsechangelog)
-
-    if [ "$make_pkg_version" = "" ]; then
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') variable make_pkg_version is empty."
-        exit 1
+    if [ -z "$make_pkg_version" ]; then
+        die "variable make_pkg_version is empty."
     fi
 
     make_pkg_version_with_revision="${make_pkg_version}${make_pkg_revision}"
 
-    if [ "$make_pkg_use_pkg_version_without_revision_for_git_version" = "true" ]; then
+    if [ "${make_pkg_use_pkg_version_without_revision_for_git_version:-}" = "true" ]; then
         ## used for derivative-maker
         make_git_tag_version_number="$make_pkg_version"
     else
@@ -690,99 +281,95 @@ sudo genmkfile deb-all-dep
         make_git_tag_version_number="$make_pkg_version_with_revision"
     fi
     ## make_git_tag_sign_appendix gets set by dm-bump-derivative-maker-version
-    make_git_tag_version_number="${make_git_tag_version_number}${make_git_tag_sign_appendix}"
+    make_git_tag_version_number="${make_git_tag_version_number}${make_git_tag_sign_appendix:-}"
 
-    [ -n "$host_architecture" ] || host_architecture="$dpkg_print_architecture"
-    [ -n "$target_architecture" ] || target_architecture="$dpkg_print_architecture"
+    [ -n "${host_architecture:-}" ] || host_architecture="$dpkg_print_architecture"
+    [ -n "${target_architecture:-}" ] || target_architecture="$dpkg_print_architecture"
 
-    local grep_line a package
-
-    grep_line="$(grep_no_comments "^Source:" -- "$make_debian_control_file_absolute_path")"
-    read -r a package _ <<<"$grep_line"
-    make_source_package_name="$package"
+    local package
+    make_source_package_name="$(dpkg-parsechangelog --show-field Source)"
     ## Source package name may or may not match binary package name.
-    make_package_list="$make_source_package_name"
-    make_package_debs_files_list=""
+    make_package_list=("$make_source_package_name")
+    make_package_debs_files_list=()
 
     make_debian_non_package_specific_install_file_relative_path="debian/install"
     make_debian_install_file_relative_path="debian/${make_source_package_name}.install"
 
-    ## Example grep_output:
-    ## Package: kicksecure-vm-gui-lxqt
+    ## Walk every binary-package stanza in debian/control via grep-dctrl
+    ## and build:
+    ##   make_package_list           - source name + every binary package name
+    ##   make_package_debs_files_list - the .deb path each binary will produce
+    local package_name_architecture binary_package_architecture line
+    package=""
+    binary_package_architecture=""
+    while IFS= read -r line; do
+        case "$line" in
+        "Package: "*) package="${line#Package: }" ;;
+        "Architecture: "*) binary_package_architecture="${line#Architecture: }" ;;
+        "")
+            [ -n "$package" ] || continue
+            true "package: $package"
+            true "make_pkg_version: $make_pkg_version"
+            true "make_pkg_revision: $make_pkg_revision"
+            true "binary_package_architecture: $binary_package_architecture"
+            ## Some packages, like tirdad-dkms, have an architecture of
+            ## 'linux-amd64' or similar, but the resulting deb file name
+            ## only includes 'amd64'.
+            if [[ "$binary_package_architecture" =~ ^linux-(.*) ]]; then
+                package_name_architecture="${BASH_REMATCH[1]}"
+            else
+                package_name_architecture="$binary_package_architecture"
+            fi
+            if [ "$package_name_architecture" = "any" ]; then
+                package_name_architecture="$target_architecture"
+            fi
+            ## Example architecture independent "all" package:
+            ## anon-apt-sources-list_3.4-1_all.deb
+            temp="${DISTDIR}/${package}_${make_pkg_version}${make_pkg_revision}_${package_name_architecture}.deb"
+            make_package_debs_files_list+=("$temp")
+            if [ "$package" != "$make_source_package_name" ]; then
+                make_package_list+=("$package")
+            fi
+            package=""
+            binary_package_architecture=""
+            ;;
+        esac
+    done < <(grep-dctrl --show-field=Package,Architecture '' "$make_debian_control_file_absolute_path")
 
-    local pkg_info_list pkg_info_idx package_name_architecture
-    pkg_info_list=()
-    deb822_extract "$make_debian_control_file_absolute_path" pkg_info_list Package,Architecture 'Package|'
-    for ((pkg_info_idx = 0; pkg_info_idx < ${#pkg_info_list[@]};  \
-    pkg_info_idx += 2)); do
-        package="${pkg_info_list[pkg_info_idx]}"
-        binary_package_architecture="${pkg_info_list[pkg_info_idx + 1]}"
-        true "package: $package"
-        true "make_pkg_version: $make_pkg_version"
-        true "make_pkg_revision: $make_pkg_revision"
-        true "binary_package_architecture: $binary_package_architecture"
-        ## Some packages, like tirdad-dkms, have an architecture of
-        ## 'linux-amd64' or similar, but the resulting deb file name only
-        ## includes 'amd64'.
-        if [[ "${binary_package_architecture}" =~ ^linux-(.*) ]]; then
-            package_name_architecture="${BASH_REMATCH[1]}"
-        else
-            package_name_architecture="${binary_package_architecture}"
-        fi
-        if [ "${package_name_architecture}" = 'any' ]; then
-            package_name_architecture="${target_architecture}"
-        fi
-        ## Example architecture independent "all" package: anon-apt-sources-list_3.4-1_all.deb
-        temp="${package}_${make_pkg_version}${make_pkg_revision}_${package_name_architecture}.deb"
-        temp="${DISTDIR}/$temp"
-        make_package_debs_files_list="$make_package_debs_files_list $temp"
-        if [ "$package" = "$make_source_package_name" ]; then
-            continue
-        fi
-        make_package_list="$make_package_list $package"
-    done
-
-    true "make_package_list: $make_package_list"
-    true "make_package_debs_files_list: $make_package_debs_files_list"
+    true "make_package_list: ${make_package_list[*]}"
+    true "make_package_debs_files_list: ${make_package_debs_files_list[*]}"
 
     make_main_dsc_file_name="${make_source_package_name}_${make_pkg_version}${make_pkg_revision}.dsc"
 
     ## Changes file contains target_architecture such as 'amd64', not 'all'.
     ## Example changes file for architecture independent package:
     ## anon-apt-sources-list_3.4-1_amd64.changes
-    if [ "$make_use_cowbuilder" = "true" ]; then
-        make_main_dsc_file="$DISTDIR/$make_main_dsc_file_name"
-        make_main_changes_file="$DISTDIR/${make_source_package_name}_${make_pkg_version}${make_pkg_revision}_${target_architecture}.changes"
-    else
-        make_main_dsc_file="${DISTDIR}/$make_main_dsc_file_name"
-        make_main_changes_file="${DISTDIR}/${make_source_package_name}_${make_pkg_version}${make_pkg_revision}_${target_architecture}.changes"
-    fi
+    make_main_dsc_file="${DISTDIR}/$make_main_dsc_file_name"
+    make_main_changes_file="${DISTDIR}/${make_source_package_name}_${make_pkg_version}${make_pkg_revision}_${target_architecture}.changes"
 
     make_debian_tarball_file_name="${make_source_package_name}_${make_pkg_version}${make_pkg_revision}.debian.tar.xz"
     make_debian_tarball="${DISTDIR}/$make_debian_tarball_file_name"
-    if [ "$make_debdist_tolower" = "false" ]; then
-        true
-    else
+    if [ "${make_debdist_tolower:-}" != "false" ]; then
         make_debian_tarball_file_name="${make_debian_tarball_file_name,,}"
         make_debian_tarball="${make_debian_tarball,,}"
     fi
-    make_debian_tarball_absolute_path="$(realpath "$make_debian_tarball")"
+    make_debian_tarball_absolute_path="$(realpath -- "$make_debian_tarball")"
 
     make_upstream_tarball_relative_path_file_name="${make_source_package_name}_${make_pkg_version}.orig.tar.xz"
     make_upstream_tarball_relative_path="${DISTDIR}/$make_upstream_tarball_relative_path_file_name"
-    if [ "$make_upstream_tarball_relative_path_tolower" = "false" ]; then
-        true
-    else
+    if [ "${make_upstream_tarball_relative_path_tolower:-}" != "false" ]; then
         make_upstream_tarball_relative_path_file_name="${make_upstream_tarball_relative_path_file_name,,}"
         make_upstream_tarball_relative_path="${make_upstream_tarball_relative_path,,}"
     fi
-    make_upstream_tarball_real_path="$(realpath "$make_upstream_tarball_relative_path")"
+    make_upstream_tarball_real_path="$(realpath -- "$make_upstream_tarball_relative_path")"
 
+    ## Exposed for consumption by override hook files.
+    # shellcheck disable=SC2034
     make_upstream_tarball_source_folder_name="${make_source_package_name}-${make_pkg_version}"
 }
 
 make_get_destdir() {
-    if [ "$DESTDIR" = "" ]; then
+    if [ -z "${DESTDIR:-}" ]; then
         DESTDIR="/"
     fi
     if type -t make_hook_at_the_end_of_get_destdir; then
@@ -791,33 +378,28 @@ make_get_destdir() {
 }
 
 make_get_distdir() {
-    if [ "$DISTDIR" = "" ]; then
+    if [ -z "${DISTDIR:-}" ]; then
         DISTDIR=".."
     fi
 
-    if [ "$make_use_cowbuilder" = "true" ]; then
-        if [ "$make_cowbuilder_dist_folder" = "" ]; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_use_cowbuilder=$make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set! For example:"
-            printf "%s\n" "make_use_cowbuilder=$make_use_cowbuilder make_cowbuilder_dist_folder=~/genmkfile-packages-result"
-            exit 1
-        else
-            DISTDIR="$make_cowbuilder_dist_folder"
+    if [ "${make_use_cowbuilder:-}" = "true" ]; then
+        if [ -z "${make_cowbuilder_dist_folder:-}" ]; then
+            die "make_use_cowbuilder=$make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set! For example:
+make_use_cowbuilder=$make_use_cowbuilder make_cowbuilder_dist_folder=~/genmkfile-packages-result"
         fi
+        DISTDIR="$make_cowbuilder_dist_folder"
 
         if ! test -d "$make_cowbuilder_dist_folder"; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
+            die "make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
 mkdir -p -- $make_cowbuilder_dist_folder"
-            exit 1
         fi
     fi
 
     if ! test -d "$DISTDIR"; then
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
-        exit 1
+        die "DISTDIR '$DISTDIR' does not exist!"
     fi
     if ! test -w "$DISTDIR"; then
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
-        exit 1
+        die "DISTDIR '$DISTDIR' is not writeable!"
     fi
 }
 
@@ -826,6 +408,14 @@ make_help() {
     printf "%s\n" "\
 genmkfile help
    Show this help.
+
+genmkfile all
+   Forwarded to 'make -f Makefile_orig all' when a Makefile_orig exists
+   in the current directory, otherwise a no-op.
+
+genmkfile test
+   Dummy target. Exists only so debhelper can invoke it without
+   failing; genmkfile does not run any tests itself.
 
 genmkfile dist
    Create package-version.tar.xz from source files in \$DISTDIR (default \"..\").
@@ -877,6 +467,10 @@ genmkfile deb-pkg-build
 genmkfile deb-install
    Install deb from the parent folder.
 
+genmkfile deb-pkg
+   Combination of genmkfile deb-cleanup, dist, debdist, debdsc and deb-pkg-build.
+   Builds a .deb (or source package) from scratch.
+
 genmkfile deb-icup
    Combination of genmkfile deb-cleanup, deb-pkg-build, genmkfile deb-install and genmkfile deb-cleanup.
    icup stands for install and cleanup.
@@ -892,6 +486,16 @@ genmkfile deb-clean
 
 genmkfile deb-cleanup
    Same as genmkfile deb-clean, and also deletes debuild artifacts from the parent folder.
+
+genmkfile lintian
+   Run lintian on the latest .changes file. Normally invoked
+   automatically at the end of 'genmkfile deb-pkg-build'; exposed here
+   for manual re-runs. Honours \$DEBUILD_LINTIAN_OPTS and
+   \$make_lintian_fail_open_versus_closed.
+
+genmkfile clean
+   If a Makefile_orig exists, forward to 'make -f Makefile_orig clean',
+   otherwise run 'make clean' if that target is defined.
 
 genmkfile dput-ubuntu-ppa
    Upload to Ubuntu PPA. Requires a functional .dput.cf.
@@ -925,6 +529,10 @@ genmkfile deb-chl-bumpup-major
 
 genmkfile deb-uachl-bumpup-major
    Combination of genmkfile uch and genmkfile deb-chl-bumpup-major.
+
+genmkfile deb-uachl-commit-changelog
+   git add debian/changelog (and changelog.upstream if present) and
+   commit with a standard message.
 
 genmkfile git-tag-show
    Echo the current git tag to stdout.
@@ -978,13 +586,15 @@ make_use_cowbuilder=true make_cross_build_platform_list='amd64' genmkfile deb-pk
 }
 
 make_all() {
-    if [ -f "$PWD/Makefile_orig" ]; then
+    if test -f "$PWD/Makefile_orig"; then
         make -f "$PWD/Makefile_orig" all "$@"
     fi
 }
 
 make_dist() {
-    local empty_directories
+    local empty_directories msg
+
+    make_require safe-rm strip-nondeterminism
 
     #find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
@@ -992,30 +602,27 @@ make_dist() {
     ## (Important for 'corridor' package.)
 
     if ! test -d "$DISTDIR"; then
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
-        exit 1
+        die "DISTDIR '$DISTDIR' does not exist!"
     fi
     if ! test -w "$DISTDIR"; then
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
-        exit 1
+        die "DISTDIR '$DISTDIR' is not writeable!"
     fi
 
     ## Debugging.
-    test -w "$(pwd)"
+    test -w "$PWD"
     touch -- "$make_upstream_tarball_real_path"
     test -w "$make_upstream_tarball_real_path"
     safe-rm -f -- "$make_upstream_tarball_real_path"
 
     empty_directories="$(find "." -not -ipath '*.git*' -type d -empty)"
 
-    if ! [ "${empty_directories}" = "" ]; then
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} Empty directory found! empty_directories:
+    if [ -n "${empty_directories}" ]; then
+        die "Empty directory found! empty_directories:
 '${empty_directories}'"
-        exit 1
     fi
 
     printf "%s\n" "$0: DEBUG manual reproduction:
-cd $(pwd)"
+cd $PWD"
 
     ## Excluding '/debian' folder from upstream tarball to avoid lintian warning
     ## 'no-debian-changes'.
@@ -1071,6 +678,8 @@ find \
 }
 
 make_debdist() {
+    make_require strip-nondeterminism
+
     #find "." -not -iwholename '*.git*' -exec touch --no-dereference --date="Wed Sep 30 16:30:05 UTC 2015" {} +
 
     ## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=657401
@@ -1092,23 +701,23 @@ make_debdist() {
             -T \
             -
 
-    strip-nondeterminism "$make_debian_tarball_absolute_path"
+    strip-nondeterminism -- "$make_debian_tarball_absolute_path"
 
     test -f "$make_debian_tarball_absolute_path"
 }
 
 make_undist() {
+    make_require safe-rm
     safe-rm --force -- "$make_upstream_tarball_relative_path"
 }
 
 make_debdsc() {
+    make_require dpkg-source
     if ! test -d "$DISTDIR"; then
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' does not exist!"
-        exit 1
+        die "DISTDIR '$DISTDIR' does not exist!"
     fi
     if ! test -w "$DISTDIR"; then
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DISTDIR '$DISTDIR' is not writeable!"
-        exit 1
+        die "DISTDIR '$DISTDIR' is not writeable!"
     fi
 
     pushd "$DISTDIR" >/dev/null
@@ -1130,16 +739,16 @@ make_debdsc() {
 }
 
 make_undebdsc() {
+    make_require safe-rm
     safe-rm --force -- "$make_main_dsc_file"
 }
 
 make_undebdist() {
+    make_require safe-rm
     safe-rm --force -- "$make_debian_tarball_absolute_path"
 }
 
 make_debinstfile() {
-    local line d missing
-
     ## calamares-settings-debian comes with debian/install by upstream default.
     ## If file debian/calamares-settings-debian.install was created, that would result in debian/install
     ## being ignored and in an empty package. Therefore, if debian/install already exists, do not
@@ -1159,9 +768,11 @@ make_debinstfile() {
 
 make_debinstfile_create() {
     local new_file filename_without_hash cleaned_filename_without_hash pkg_name \
-        temp_deb_install_file real_deb_instal_file destination_directory
+        temp_deb_install_file real_deb_install_file
     local -a find_cmd
     local -A delete_yet
+
+    make_require safe-rm sponge
 
     find_cmd+=(find)
     find_cmd+=(.)
@@ -1180,7 +791,6 @@ make_debinstfile_create() {
                 filename_without_dot="${file_name#./}"
                 filename_without_hash="${file_name%%#*}"
                 cleaned_filename_without_hash="${filename_without_hash/#.\//\/}"
-                destination_directory="${cleaned_filename_without_hash%/*}"
                 pkg_name="${file_name#*#}"
                 temp_deb_install_file="${genmkfile_temp_dir}/${pkg_name}.install"
 
@@ -1202,19 +812,19 @@ make_debinstfile_create() {
             done
 
         for new_file in "$genmkfile_temp_dir"/*.install; do
-            real_deb_instal_file="debian/$(basename "$new_file")"
-            if [ -f "$real_deb_instal_file" ]; then
-                if cmp -s "$new_file" "$real_deb_instal_file"; then
+            real_deb_install_file="debian/${new_file##*/}"
+            if test -f "$real_deb_install_file"; then
+                if cmp -s -- "$new_file" "$real_deb_install_file"; then
                     continue
                 fi
             fi
-            cp -- "$new_file" "$real_deb_instal_file"
+            cp -- "$new_file" "$real_deb_install_file"
         done
 
     else
         true "multi-package hash filename found: no"
         temp_deb_install_file="${genmkfile_temp_dir}/pkg.install"
-        real_deb_instal_file="$make_debian_install_file_relative_path"
+        real_deb_install_file="$make_debian_install_file_relative_path"
         printf "%s\n" "\
 ## Copyright (C) 2020 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
@@ -1223,35 +833,36 @@ make_debinstfile_create() {
 " | sponge -a -- "$temp_deb_install_file"
         local d
         for d in "${make_folder_list_for_un_and_install[@]}"; do
-            if [ -d "$d" ]; then
+            if test -d "$d"; then
                 printf "%s\n" "${d}/*" | sponge -a -- "$temp_deb_install_file"
             fi
         done
-        if cmp -s "$temp_deb_install_file" "$real_deb_instal_file"; then
+        if cmp -s -- "$temp_deb_install_file" "$real_deb_install_file"; then
             return 0
         fi
-        cp -- "$temp_deb_install_file" "$real_deb_instal_file"
+        cp -- "$temp_deb_install_file" "$real_deb_install_file"
     fi
 }
 
 make_test() {
     ## Automatically run by debhelper. To prevent debhelper from failing,
     ## implemented a dummy function here.
-    printf "%s\n" "${green}$0: INFO:${reset} $FUNCNAME not implemented"
+    printf "%s\n" "${green}$0: INFO:${reset} ${FUNCNAME[0]} not implemented"
 }
 
 make_manpages() {
     shopt -s globstar dotglob nullglob
-    local i source_folder filename_without_ronn_file_extension base_name
+    local i filename_without_ronn_file_extension base_name
+    make_require ronn
     for i in "$PWD/man/"*".ronn"; do
-        if [ -d "$i" ]; then
+        if test -d "$i"; then
             continue
         fi
 
         base_name="${i##*/}"
         filename_without_ronn_file_extension="${base_name%.*}"
 
-        mkdir --parents -- "$PWD/auto-generated-man-pages/$source_folder"
+        mkdir --parents -- "$PWD/auto-generated-man-pages"
 
         true "${bold}${cyan}${green}INFO:${reset} Creating man page $PWD/auto-generated-man-pages/$filename_without_ronn_file_extension ${reset}"
 
@@ -1272,17 +883,18 @@ make_uch() {
     if test -f "$PWD/CHANGES"; then
         return 0
     fi
+    make_require git sponge
     git log | sed 's/[[:space:]]\+$//' | sponge -- "$PWD/changelog.upstream"
     test -f "$PWD/changelog.upstream"
 }
 
 make_distclean() {
     printf "%s\n" "$0: ${green}INFO:${reset} (internal) genmkfile distclean"
-    make_clean
+    make_function_run make_clean
 }
 
 make_clean() {
-    if [ -f "$PWD/Makefile_orig" ]; then
+    if test -f "$PWD/Makefile_orig"; then
         make -f "$PWD/Makefile_orig" clean
     else
         if make --dry-run clean &>/dev/null; then
@@ -1294,25 +906,19 @@ make_clean() {
     fi
 }
 
-make_deb-shared-dep() {
+make_deb_shared_dep() {
     local msg apt_get_exit_code
 
-    ## TODO: check if sudo is available.
+    make_require sudo apt-get
 
-    msg="sudo \
-      apt-get \
-         "${APTGETOPT[@]}" \
-         --yes \
-         --no-install-recommends \
-         --allow-downgrades \
-         install \
-         -- \
-         $make_deb_shared_dependencies"
-
-    msg="$(printf "%s\n" "$msg" | sed 's/  */ /g')"
+    msg="sudo apt-get ${APTGETOPT[*]} --yes --no-install-recommends --allow-downgrades install -- $make_deb_shared_dependencies"
     printf "%s\n" "$msg"
 
     apt_get_exit_code="0"
+    ## $make_deb_shared_dependencies is intentionally unquoted: the
+    ## perl extractor produces a space-separated package list and
+    ## apt-get expects one argument per package.
+    # shellcheck disable=SC2086
     sudo \
         apt-get \
         "${APTGETOPT[@]}" \
@@ -1321,89 +927,93 @@ make_deb-shared-dep() {
         --allow-downgrades \
         install \
         -- \
-        $make_deb_shared_dependencies ||
-        {
-            apt_get_exit_code="$?"
-            true
-        }
+        $make_deb_shared_dependencies || apt_get_exit_code="$?"
 
-    exit "$apt_get_exit_code"
+    ## 'return', not 'exit' -- exiting the shell here used to abort
+    ## chained targets (e.g. 'genmkfile deb-build-dep debinstfile'
+    ## would stop after deb-build-dep even on success) and also skip
+    ## make_deinit.
+    return "$apt_get_exit_code"
 }
 
-make_deb-build-dep() {
-    ## Adding 'build-essential' here is difficult.
-    ## 'dpkg-parsechangelog' is required very early in 'make_get_variables'.
-    make_deb_shared_dependencies="$make_deb_build_dependencies"
-    make_function_run make_deb-shared-dep
+make_deb_build_dep() {
+    ## 'build-essential' is implicitly assumed by every Debian source
+    ## package; lintian emits 'build-depends-on-build-essential' if it
+    ## is listed in debian/control Build-Depends. So we cannot put it
+    ## there. To save users from having to install it by hand before
+    ## running 'genmkfile deb-build-dep' for the first time, inject it
+    ## here on top of whatever Build-Depends the perl extractor pulled
+    ## from debian/control.
+    local make_deb_shared_dependencies="build-essential $make_deb_build_dependencies"
+    make_function_run make_deb_shared_dep
 }
 
-make_deb-run-dep() {
-    make_deb_shared_dependencies="$make_deb_runtime_dependencies"
-    make_function_run make_deb-shared-dep
+make_deb_run_dep() {
+    local make_deb_shared_dependencies="$make_deb_runtime_dependencies"
+    make_function_run make_deb_shared_dep
 }
 
-make_deb-all-dep() {
-    make_deb_shared_dependencies="$make_deb_build_dependencies $make_deb_runtime_dependencies"
-    make_function_run make_deb-shared-dep
+make_deb_all_dep() {
+    ## See make_deb_build_dep for why build-essential is added here.
+    local make_deb_shared_dependencies="build-essential $make_deb_build_dependencies $make_deb_runtime_dependencies"
+    make_function_run make_deb_shared_dep
 }
 
-make_deb-pkg-build_shared() {
-    if [ "$make_use_cowbuilder" = "true" ]; then
+make_deb_pkg_build_shared() {
+    local cow_folder base_folder package
+    local -a make_cowbuilder_config_file_arg=()
+    if [ "${make_use_cowbuilder:-}" = "true" ]; then
+        make_require sudo cowbuilder
         if ! test -f "$make_upstream_tarball_real_path"; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') upstream tarball $make_upstream_tarball_real_path does not exist.
+            die "upstream tarball $make_upstream_tarball_real_path does not exist.
 Did you run
 genmkfile dist && genmkfile debdist && genmkfile debdsc
-beforehand?
-"
-            exit 1
+beforehand?"
         fi
 
         if ! test -f "$make_debian_tarball_absolute_path"; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') debian tarball $make_debian_tarball_absolute_path does not exist.
+            die "debian tarball $make_debian_tarball_absolute_path does not exist.
 Did you run
 genmkfile dist && genmkfile debdist && genmkfile debdsc
-beforehand?
-"
-            exit 1
+beforehand?"
         fi
 
         if ! test -f "$make_main_dsc_file"; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') dsc file $make_main_dsc_file does not exist.
+            die "dsc file $make_main_dsc_file does not exist.
 Did you run
 genmkfile dist && genmkfile debdist && genmkfile debdsc
-beforehand?
-"
-            exit 1
+beforehand?"
         fi
 
-        true "COWBUILDER_PREFIX: $COWBUILDER_PREFIX"
+        true "COWBUILDER_PREFIX: ${COWBUILDER_PREFIX:-}"
 
-        if [ ! "$dist_build_apt_stable_release" = "" ]; then
-            [ -n "$make_cowbuilder_distribution" ] || make_cowbuilder_distribution="$dist_build_apt_stable_release"
-        else
-            [ -n "$make_cowbuilder_distribution" ] || make_cowbuilder_distribution="$(lsb_release --short --codename)"
+        if [ -n "${dist_build_apt_stable_release:-}" ]; then
+            [ -n "${make_cowbuilder_distribution:-}" ] || make_cowbuilder_distribution="$dist_build_apt_stable_release"
+        elif [ -z "${make_cowbuilder_distribution:-}" ]; then
+            make_require lsb_release
+            make_cowbuilder_distribution="$(lsb_release --short --codename)"
         fi
 
-        ## Whonix build script sets variable `make_cowbuilder_mirror`.
+        ## derivative-maker sets variable `make_cowbuilder_mirror`.
 
-        if [ ! "$dist_build_apt_sources_mirror" = "" ]; then
-            [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="$dist_build_apt_sources_mirror"
+        if [ -n "${dist_build_apt_sources_mirror:-}" ]; then
+            [ -n "${make_cowbuilder_mirror:-}" ] || make_cowbuilder_mirror="$dist_build_apt_sources_mirror"
         else
             ## approx caching proxy support
-            if [ "$APPROX_PROXY_ENABLE" = "yes" ]; then
+            if [ "${APPROX_PROXY_ENABLE:-}" = "yes" ]; then
                 ## TODO: Use the derivative-maker specific proxy at port 9977, or
                 ## the system-wide proxy at port 9999?
-                [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="http://127.0.0.1:9977/debian"
+                [ -n "${make_cowbuilder_mirror:-}" ] || make_cowbuilder_mirror="http://127.0.0.1:9977/debian"
             fi
-            [ -n "$make_cowbuilder_mirror" ] || make_cowbuilder_mirror="https://deb.debian.org/debian"
+            [ -n "${make_cowbuilder_mirror:-}" ] || make_cowbuilder_mirror="https://deb.debian.org/debian"
         fi
 
         ## TODO: change that folder
         cow_folder="/var/cache/pbuilder/cow.cow_${target_architecture}"
         base_folder="/var/cache/pbuilder/base.cow_${target_architecture}"
 
-        if [ ! "$dist_build_pbuilder_config_file" = "" ]; then
-            make_cowbuilder_config_file_arg="--configfile $dist_build_pbuilder_config_file"
+        if [ -n "${dist_build_pbuilder_config_file:-}" ]; then
+            make_cowbuilder_config_file_arg=(--configfile "$dist_build_pbuilder_config_file")
         fi
 
         ## Using cowbuilder with
@@ -1426,7 +1036,7 @@ beforehand?
 
         ## TODO: REPO_PROXY is no longer used, update this comment.
         ## COWBUILDER_PREFIX could set variables such as http_proxy.
-        ## Whonix build script sets:
+        ## derivative-maker sets:
         ## COWBUILDER_PREFIX+=" env http_proxy=${REPO_PROXY}"
         ## which results in:
         ## sudo env http_proxy=http://127.0.0.1:9977 cowbuilder [...]
@@ -1470,13 +1080,17 @@ beforehand?
         ## Installing libpam-tmpdir inside the grml-debootstrap chroot did fix a similar issue for grml-debootstrap / grub.
         ## https://github.com/grml/grml-debootstrap/issues/232
         ## Installing libpam-tmpdir inside the cowbuilder chroot did however not fix this issue.
+        ## $COWBUILDER_PREFIX is intentionally unquoted: callers set it
+        ## to something like 'env http_proxy=... env foo=bar' that needs
+        ## to split into multiple argv slots.
+        # shellcheck disable=SC2086
         make_log_and_run \
             sudo \
-            $COWBUILDER_PREFIX \
+            ${COWBUILDER_PREFIX:-} \
             cowbuilder \
             --debbuildopts="-sa" \
             --architecture "$target_architecture" \
-            $make_cowbuilder_config_file_arg \
+            "${make_cowbuilder_config_file_arg[@]}" \
             --build "$make_main_dsc_file" \
             --basepath "$base_folder" \
             --buildplace "$cow_folder" \
@@ -1486,38 +1100,37 @@ beforehand?
             --buildresult "$DISTDIR"
 
     else
-        if ! has debuild; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') debuild not found. Do you have the 'devscripts' package installed?
-To install all dependencies, try running:
-sudo genmkfile deb-all-dep
-"
-            exit 1
-        fi
+        make_require debuild dpkg-checkbuilddeps
 
         if ! dpkg-checkbuilddeps; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') dpkg-checkbuilddeps reported missing build dependencies.
+            die "dpkg-checkbuilddeps reported missing build dependencies.
 To install all dependencies, try running:
-sudo genmkfile deb-all-dep
-"
-            exit 1
+sudo genmkfile deb-all-dep"
         fi
 
         ## Using --no-lintian, because debuild does not exist with a non-zero exit
         ## code, should lintian find an error. Therefore running lintian afterwards.
+        ## $make_debuild_maybe_unsigned_opts is a space-separated
+        ## string like '-us -uc' that needs to word-split.
+        # shellcheck disable=SC2086
         make_log_and_run \
             debuild \
             --no-lintian \
             -sa \
-            $make_debuild_maybe_unsigned_opts \
+            ${make_debuild_maybe_unsigned_opts:-} \
             "$@"
     fi
 
-    printf "%s\n" "$0: INFO: make_use_debsign: '$make_use_debsign' | make_debsign_opts: '$make_debsign_opts' | whoami: '$(whoami)' | DEBEMAIL: '${DEBEMAIL}'"
-    if [ "$make_use_debsign" = "true" ]; then
+    printf "%s\n" "$0: INFO: make_use_debsign: '${make_use_debsign:-}' | make_debsign_opts: '${make_debsign_opts:-}' | whoami: '$(whoami)' | DEBEMAIL: '${DEBEMAIL:-}'"
+    if [ "${make_use_debsign:-}" = "true" ]; then
+        make_require debsign sq
         deb_variables_check
 
         ## clearsign's $make_main_changes_file
-        make_log_and_run debsign $make_debsign_opts "$make_main_changes_file"
+        ## $make_debsign_opts is intentionally unquoted: user-supplied
+        ## flags like '-k<keyid> --re-sign' must split into argv slots.
+        # shellcheck disable=SC2086
+        make_log_and_run debsign ${make_debsign_opts:-} "$make_main_changes_file"
 
         ## sanity test
         #make_log_and_run gpg --verify "$make_main_changes_file"
@@ -1539,17 +1152,16 @@ sudo genmkfile deb-all-dep
         #            "${genmkfile_dpkg_source_test_extract_temp_dir}/"
     fi
 
-    for package in $make_package_debs_files_list; do
+    for package in "${make_package_debs_files_list[@]}"; do
         if ! test -f "$package"; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') File '$package' does not exist."
-            exit 1
+            die "File '$package' does not exist."
         fi
         printf "%s\n" "$0: ${green}INFO:${reset} You can find your deb file here: ${bold}$package${reset}"
     done
 
-    if [ "$make_use_lintian" = "false" ]; then
+    if [ "${make_use_lintian:-}" = "false" ]; then
         printf "%s\n" "$0: ${green}INFO:${reset} make_use_lintian=false - skipping lintian."
-    elif [ "$make_use_lintian" = "true" ]; then
+    elif [ "${make_use_lintian:-}" = "true" ]; then
         printf "%s\n" "$0: ${green}INFO:${reset} make_use_lintian=true - running lintian..."
         make_function_run make_lintian
     else
@@ -1564,24 +1176,23 @@ sudo genmkfile deb-all-dep
 }
 
 make_lintian_on_warning() {
-    if [ "$make_lintian_fail_open_versus_closed" = "open" ]; then
-        printf "%s\n" "$0: ${red}WARNING:${reset} lintian warning. make_lintian_fail_open_versus_closed=open - Therefore, failing open."
-    else
-        printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') lintian warning. make_lintian_fail_open_versus_closed is not set to 'open' - Therefore, failing closed."
-        if [ "$make_lintian_exit_code" = "0" ]; then
-            exit 1
-        else
-            exit "$make_lintian_exit_code"
-        fi
+    local lintian_exit_code="${1:-0}"
+    if [ "${make_lintian_fail_open_versus_closed:-}" = "open" ]; then
+        printf "%s\n" "$0: ${red}WARNING:${reset} lintian warning. make_lintian_fail_open_versus_closed=open - Therefore, failing open." >&2
+        return 0
     fi
+    printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '${FUNCNAME[0]}') lintian warning. make_lintian_fail_open_versus_closed is not set to 'open' - Therefore, failing closed." >&2
+    ## If lintian itself exited 0 but we got here because of warning
+    ## output, still exit 1 to signal the failure.
+    [ "$lintian_exit_code" = "0" ] && lintian_exit_code=1
+    exit "$lintian_exit_code"
 }
 
 make_lintian() {
     if ! test -f "$make_main_changes_file"; then
-        printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') make_main_changes_file '$make_main_changes_file' does not exist."
-        exit 1
+        die "make_main_changes_file '$make_main_changes_file' does not exist."
     fi
-    if [ "$DEBUILD_LINTIAN_OPTS" = "" ]; then
+    if [ -z "${DEBUILD_LINTIAN_OPTS:-}" ]; then
         ## https://github.com/openwall/lkrg/pull/105
         ## --suppress-tags systemd-service-file-missing-documentation-key
         ##
@@ -1602,12 +1213,16 @@ make_lintian() {
          "
     fi
     local make_lintian_exit_code="0"
-    printf "%s\n" "lintian $genmkfile_lintian_pre_opts $DEBUILD_LINTIAN_OPTS $genmkfile_lintian_post_opts \"$make_main_changes_file\""
-    lintian_output="$(lintian $genmkfile_lintian_pre_opts $DEBUILD_LINTIAN_OPTS $genmkfile_lintian_post_opts "$make_main_changes_file" 2>&1 || {
-        make_lintian_exit_code="$?"
-        true
-    })"
-    if [ ! "" = "$lintian_output" ]; then
+    local lintian_output
+    printf "%s\n" "lintian ${genmkfile_lintian_pre_opts:-} $DEBUILD_LINTIAN_OPTS ${genmkfile_lintian_post_opts:-} \"$make_main_changes_file\""
+    ## Capture the exit code in the parent shell. A previous idiom
+    ## assigned it inside the $(...) subshell, where the assignment was
+    ## thrown away when the subshell exited and the code was never seen.
+    ## Lintian option vars are user-supplied multi-flag strings; leave
+    ## them unquoted so they word-split into argv.
+    # shellcheck disable=SC2086
+    lintian_output="$(lintian ${genmkfile_lintian_pre_opts:-} $DEBUILD_LINTIAN_OPTS ${genmkfile_lintian_post_opts:-} "$make_main_changes_file" 2>&1)" || make_lintian_exit_code="$?"
+    if [ -n "$lintian_output" ]; then
         if ! test -o xtrace; then
             printf "%s\n" "$0: ${green}INFO:${reset} lintian exit code: $make_lintian_exit_code"
             printf "%s\n" "$0: ${green}INFO:${reset} lintian output:"
@@ -1615,26 +1230,28 @@ make_lintian() {
             printf "%s\n" "$lintian_output"
             printf "%s\n" "################################################################################"
         fi
-        make_lintian_on_warning
+        make_lintian_on_warning "$make_lintian_exit_code"
     fi
-    if [ ! "$make_lintian_exit_code" = "0" ]; then
-        make_lintian_on_warning
+    if [ "$make_lintian_exit_code" != "0" ]; then
+        make_lintian_on_warning "$make_lintian_exit_code"
     else
         printf "%s\n" "$0: ${green}INFO:${reset} lintian ok."
     fi
 }
 
-make_deb-pkg-build() {
-    make_debuild_maybe_unsigned_opts="-us -uc"
-    make_function_run make_deb-pkg-build_shared "$@"
+make_deb_pkg_build() {
+    ## Local so make_deb_pkg_build_shared sees it via dynamic scoping
+    ## without polluting the global namespace.
+    local make_debuild_maybe_unsigned_opts="-us -uc"
+    make_function_run make_deb_pkg_build_shared "$@"
 }
 
-make_deb-install() {
+make_deb_install() {
     local package
-    for package in $make_package_debs_files_list; do
-        if [ ! -f "$package" ]; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') File $package does not exist. Have you run \"genmkfile deb-pkg-build\" already?"
-            exit 1
+    make_require sudo apt-get
+    for package in "${make_package_debs_files_list[@]}"; do
+        if ! test -f "$package"; then
+            die "File $package does not exist. Have you run 'genmkfile deb-pkg-build' already?"
         fi
         ## --reinstall is required otherwise apt-get would refuse to install the package with the following error message:
         ## Note, selecting 'systemcheck' instead of '/home/user/derivative-binary/genmkfile-packages-result/systemcheck_25.1-1_all.deb'
@@ -1652,40 +1269,43 @@ make_deb-install() {
     done
 }
 
-make_deb-remove() {
+make_deb_remove() {
+    make_require sudo apt-get
     sudo apt-get --yes remove -- "$make_source_package_name"
 }
 
-make_deb-purge() {
+make_deb_purge() {
+    make_require sudo apt-get
     sudo apt-get --yes purge -- "$make_source_package_name"
 }
 
 make_dh_clean() {
     ## TODO: Executes arbitrary code from the working directory, is this safe?
-    if [ -x debian/rules ]; then
+    if test -x debian/rules; then
         debian/rules clean
     fi
 }
 
-make_deb-clean() {
-    if [ -d "debian/tmp" ]; then
+make_deb_clean() {
+    make_require safe-rm
+    if test -d "debian/tmp"; then
         safe-rm --recursive -- "debian/tmp"
     fi
-    if [ -d "deb_dist" ]; then
+    if test -d "deb_dist"; then
         safe-rm --recursive -- "deb_dist"
     fi
-    if [ -d "debian/.debhelper" ]; then
+    if test -d "debian/.debhelper"; then
         safe-rm --recursive -- "debian/.debhelper"
     fi
-    if [ -f "debian/autoreconf.after" ]; then
+    if test -f "debian/autoreconf.after"; then
         safe-rm -- "debian/autoreconf.after"
     fi
-    if [ -f "debian/autoreconf.before" ]; then
+    if test -f "debian/autoreconf.before"; then
         safe-rm -- "debian/autoreconf.before"
     fi
     local to_delete package
-    for package in $make_package_list; do
-        if [ -d "debian/$package" ]; then
+    for package in "${make_package_list[@]}"; do
+        if test -d "debian/$package"; then
             safe-rm --recursive -- "debian/$package"
         fi
         for to_delete in \
@@ -1698,22 +1318,23 @@ make_deb-clean() {
             "debian/$package.postrm.debhelper" \
             "debian/$package.dkms.debhelper" \
             "debian/debhelper-build-stamp"; do
-            if [ -e "$to_delete" ]; then
+            if test -e "$to_delete"; then
                 safe-rm -- "$to_delete"
             fi
         done
     done
 }
 
-make_deb-cleanup() {
+make_deb_cleanup() {
     local to_delete package
+    make_require safe-rm
     make_function_run make_undist
     make_function_run make_undebdist
     make_function_run make_undebdsc
     make_function_run make_clean
     make_function_run make_dh_clean
-    make_function_run make_deb-clean
-    for package in $make_package_list; do
+    make_function_run make_deb_clean
+    for package in "${make_package_list[@]}"; do
         for to_delete in \
             "${DISTDIR}/${package}_"*-*_*".deb" \
             "${DISTDIR}/${package}-dbgsym_"*-*_*".deb" \
@@ -1726,21 +1347,23 @@ make_deb-cleanup() {
             "${DISTDIR}/${package}_"*-*"_source.build" \
             "${DISTDIR}/${package}_"*-*"_source.changes" \
             "${DISTDIR}/${package}_"*-*"_source.${package}.upload"; do
-            if [ -e "$to_delete" ]; then
+            if test -e "$to_delete"; then
                 safe-rm -- "$to_delete"
             fi
         done
     done
-    if [ -f "$make_upstream_tarball_relative_path" ]; then
+    if test -f "$make_upstream_tarball_relative_path"; then
         safe-rm -- "$make_upstream_tarball_relative_path"
     fi
 }
 
-make_dput-ubuntu-ppa() {
+make_dput_ubuntu_ppa() {
+    make_require dput
     dput "$make_source_package_name" "${DISTDIR}/${make_source_package_name}_${make_pkg_version}${make_pkg_revision}_source.changes"
 }
 
 make_checkout() {
+    make_require git
     git fetch
 }
 
@@ -1748,7 +1371,7 @@ in_array() {
     local needle item
     needle="$1"
     shift
-    true "INFO: in_array: @: |$@|"
+    true "INFO: in_array: @: |$*|"
     for item in "$@"; do
         true "INFO: in_array: item: $item"
         if [ "$item" = "$needle" ]; then
@@ -1764,10 +1387,10 @@ array_match() {
     local needle item
     needle="$1"
     shift
-    true "INFO: array_match: @: |$@|"
+    true "INFO: array_match: @: |$*|"
     for item in "$@"; do
         true "item: $item"
-        if printf "%s\n" "$needle" | grep --quiet --fixed-strings -- "$item"; then
+        if [[ "$needle" == *"$item"* ]]; then
             true "INFO: array_match: found"
             return 0
         fi
@@ -1779,16 +1402,33 @@ array_match() {
 make_helper() {
     shopt -s globstar dotglob nullglob
     local source_directory source_fso file_without_pwd file_with_destdir
+    local still_installed="false"
+    local fso_with_destdir_stat
+    local genmkfile_rsync_opts folder_permission_skip_list
+
+    make_require safe-rm rsync
+
+    ## Mode flags are set by the wrappers (make_install, make_uninstall,
+    ## ...) as bash locals, and dynamic scoping makes them visible here.
+    ## Snapshot them into our own locals and default any unset flag to
+    ## "false" so nounset keeps catching real logic errors. Using
+    ## 'local' here (rather than bare assignment) means make_helper
+    ## does not leak globals that could make a subsequent wrapper
+    ## invocation see stale state.
+    local make_install_="${make_install_:-false}"
+    local make_installcheck_="${make_installcheck_:-false}"
+    local make_installsim_="${make_installsim_:-false}"
+    local make_uninstall_="${make_uninstall_:-false}"
+    local make_uninstallcheck_="${make_uninstallcheck_:-false}"
+    local make_uninstallsim_="${make_uninstallsim_:-false}"
 
     if ! test -d "$DESTDIR"; then
-        printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' does not exist!"
-        exit 1
+        die "DESTDIR '$DESTDIR' does not exist!"
     fi
 
-    if [ ! "$make_installcheck_" = "true" ]; then
+    if [ "$make_installcheck_" != "true" ]; then
         if ! test -w "$DESTDIR"; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') DESTDIR '$DESTDIR' is not writeable!"
-            exit 1
+            die "DESTDIR '$DESTDIR' is not writeable!"
         fi
     fi
 
@@ -1808,14 +1448,14 @@ make_helper() {
 
     ## Cannot be `local` so hooks can increase it.
     #local genmkfile_file_has_been_copied
-    [ -n "$genmkfile_file_has_been_copied" ] || genmkfile_file_has_been_copied=false
+    [ -n "${genmkfile_file_has_been_copied:-}" ] || genmkfile_file_has_been_copied=false
 
     folder_permission_skip_list=()
     folder_permission_skip_list+=("/etc/sudoers.d")
     folder_permission_skip_list+=("/usr/src")
 
     if [ "$make_installsim_" = "true" ]; then
-        if [ ! -d "$DESTDIR" ]; then
+        if ! test -d "$DESTDIR"; then
             printf "%s\n" "${green}$0: INFO:${reset} would create DESTDIR '$DESTDIR': mkdir --parents -- '$DESTDIR'"
         else
             printf "%s\n" "${green}$0: INFO:${reset} No need to run, because folder DESTDIR '$DESTDIR' already exists: mkdir --parents -- '$DESTDIR'"
@@ -1823,23 +1463,23 @@ make_helper() {
     fi
 
     for source_directory in "${make_folder_list_for_un_and_install[@]}"; do
-        if [ ! -d "$source_directory" ]; then
+        if ! test -d "$source_directory"; then
             continue
         fi
         local rsync_done
         rsync_done=""
         for source_fso in "$PWD/$source_directory"/**; do
             genmkfile_file_has_been_copied=true
-            file_without_pwd="${source_fso#$PWD}"
+            file_without_pwd="${source_fso#"$PWD"}"
             ## Issue: starts with double '//'
             #file_with_destdir="${DESTDIR}${file_without_pwd}"
             ## New: single '/'
             file_with_destdir="${DESTDIR%/}/${file_without_pwd#/}"
             if [ "$make_install_" = "true" ]; then
-                if [ ! -d "$DESTDIR" ]; then
+                if ! test -d "$DESTDIR"; then
                     mkdir --parents -- "$DESTDIR"
                 fi
-                if [ ! "$rsync_done" = "true" ]; then
+                if [ "$rsync_done" != "true" ]; then
                     ## Not using 'cp' because:
                     #cp --recursive lib /
                     # > cp: cannot overwrite non-directory '/lib' with directory 'lib'
@@ -1849,12 +1489,12 @@ make_helper() {
                 ## Need to check first if it is a file...
                 ## ...before checking if it is an executable.
                 ## Because folders can also have executable bit.
-                fso_with_destdir_stat="$(stat -c "%a" "$file_with_destdir")"
+                fso_with_destdir_stat="$(stat -c "%a" -- "$file_with_destdir")"
                 #echo "source_fso: $source_fso"
                 if test -d "$source_fso"; then
-                    if ! [ "$fso_with_destdir_stat" = "755" ]; then
+                    if [ "$fso_with_destdir_stat" != "755" ]; then
                         if [ "$DESTDIR" = "/" ]; then
-                            true "calling...: in_array |$file_without_pwd| |${folder_permission_skip_list[@]}|"
+                            true "calling...: in_array |$file_without_pwd| |${folder_permission_skip_list[*]}|"
                             if ! in_array "$file_without_pwd" "${folder_permission_skip_list[@]}"; then
                                 true "in_array did not match, therefore continuing..."
                                 printf "%s\n" "$0: INFO: chmod change on folder might(!) be required, consider running the following command: chmod -- 755 '$file_with_destdir'"
@@ -1864,16 +1504,16 @@ make_helper() {
                         fi
                     fi
                 elif test -f "$source_fso"; then
-                    true "calling...: array_match |$file_without_pwd| |${folder_permission_skip_list[@]}|"
+                    true "calling...: array_match |$file_without_pwd| |${folder_permission_skip_list[*]}|"
                     if ! array_match "$file_without_pwd" "${folder_permission_skip_list[@]}"; then
                         true "array_match did not match, therefore continuing..."
                         if test -x "$source_fso"; then
-                            if ! [ "$fso_with_destdir_stat" = "755" ]; then
+                            if [ "$fso_with_destdir_stat" != "755" ]; then
                                 printf "%s\n" "$0: INFO: executable file found, running command...: chmod -- 755 '$file_with_destdir'"
                                 chmod -- 755 "$file_with_destdir"
                             fi
                         else
-                            if ! [ "$fso_with_destdir_stat" = "644" ]; then
+                            if [ "$fso_with_destdir_stat" != "644" ]; then
                                 printf "%s\n" "$0: INFO: non-executable file found, running command...: chmod -- 644 '$file_with_destdir'"
                                 chmod -- 644 "$file_with_destdir"
                             fi
@@ -1881,7 +1521,7 @@ make_helper() {
                     fi
                 fi
             elif [ "$make_installsim_" = "true" ]; then
-                if [ ! "$rsync_done" = "true" ]; then
+                if [ "$rsync_done" != "true" ]; then
                     ## use '[*]' to trat as single line and avoid newlines in output
                     printf "%s\n" "${green}$0: INFO:${reset} would do: rsync --dry-run ${genmkfile_rsync_opts[*]} -- \"$source_directory\" \"$DESTDIR\""
                     rsync --dry-run "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
@@ -1889,25 +1529,24 @@ make_helper() {
                 fi
                 ## chmod cannot be simulated because actually no file gets copied.
             elif [ "$make_uninstallcheck_" = "true" ]; then
-                if [ -f "$file_with_destdir" ]; then
-                    printf "%s\n" "$0: ${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') file $file_with_destdir still installed."
-                    local still_installed="true"
+                if test -f "$file_with_destdir"; then
+                    printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '${FUNCNAME[0]}') file $file_with_destdir still installed." >&2
+                    still_installed="true"
                 fi
             elif [ "$make_installcheck_" = "true" ]; then
                 if test -f "$source_fso"; then
                     diff -- "$source_fso" "$file_with_destdir"
                 fi
             elif [ "$make_uninstallsim_" = "true" ]; then
-                if [ -f "$file_with_destdir" ]; then
+                if test -f "$file_with_destdir"; then
                     printf "%s\n" "${green}$0: INFO:${reset} would do: safe-rm --verbose -- \"$file_with_destdir\""
                 fi
             elif [ "$make_uninstall_" = "true" ]; then
-                if [ -f "$file_with_destdir" ]; then
+                if test -f "$file_with_destdir"; then
                     safe-rm --verbose -- "$file_with_destdir"
                 fi
             else
-                printf "%s\n" "$0: ${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') error 2 in $FUNCNAME!"
-                exit 1
+                die "error 2 in ${FUNCNAME[0]}!"
             fi
         done
     done
@@ -1916,52 +1555,59 @@ make_helper() {
         exit 1
     fi
     if [ "$genmkfile_file_has_been_copied" = "false" ]; then
-        printf "%s\n" "$0: ${red}${bold}$0: ERROR:${reset} Nothing has been copied."
-        exit 1
+        die "Nothing has been copied."
     fi
 }
 
+## Each of the six wrappers below sets its flag as a bash 'local' so it
+## is visible to make_helper via dynamic scoping but does not leak to
+## the global scope. Previously these were global assignments, which
+## caused stale state: 'genmkfile install uninstall' left make_install_
+## set to 'true' after the first call, so the second call saw *both*
+## flags true, hit the earlier branch in make_helper's elif chain, and
+## silently re-ran install instead of uninstalling.
 make_install() {
-    make_install_="true"
+    local make_install_="true"
     make_function_run make_helper
 }
 
 make_installcheck() {
-    make_installcheck_="true"
+    local make_installcheck_="true"
     make_function_run make_helper
 }
 
 make_installsim() {
-    make_installsim_="true"
+    local make_installsim_="true"
     make_function_run make_helper
 }
 
 make_uninstallcheck() {
-    make_uninstallcheck_="true"
+    local make_uninstallcheck_="true"
     make_function_run make_helper
 }
 
 make_uninstall() {
-    make_uninstall_="true"
+    local make_uninstall_="true"
     make_function_run make_helper
 }
 
 make_uninstallsim() {
-    make_uninstallsim_="true"
+    local make_uninstallsim_="true"
     make_function_run make_helper
 }
 
-make_deb-chl-bumpup-major() {
-    make_bump_type="major"
-    make_function_run make_deb-chl-bumpup
+make_deb_chl_bumpup_major() {
+    local make_bump_type="major"
+    make_function_run make_deb_chl_bumpup
 }
 
-make_deb-chl-bumpup-manual() {
-    make_bump_type="manual"
-    make_function_run make_deb-chl-bumpup
+make_deb_chl_bumpup_manual() {
+    local make_bump_type="manual"
+    make_function_run make_deb_chl_bumpup
 }
 
-make_deb-uachl-commit-changelog() {
+make_deb_uachl_commit_changelog() {
+    make_require git
     if test -f changelog.upstream; then
         git add -- changelog.upstream
     fi
@@ -1969,15 +1615,16 @@ make_deb-uachl-commit-changelog() {
     git commit -m "bumped changelog version"
 }
 
-make_deb-chl-bumpup() {
+make_deb_chl_bumpup() {
+    make_require debchange bc
     deb_variables_check
 
-    local new_upstream_version_without_epoch new_upstream_version new_changelog_version new_revision
+    local new_upstream_version new_changelog_version new_revision
 
-    if [ "$make_bump_type" = "major" ]; then
+    if [ "${make_bump_type:-}" = "major" ]; then
         true "make_pkg_version: $make_pkg_version"
 
-        if [ "$version_numbers_by_upstream" = "true" ]; then
+        if [ "${version_numbers_by_upstream:-}" = "true" ]; then
             ## Thanks to:
             ## https://stackoverflow.com/a/4485581
             #new_upstream_version="$(printf "%s\n" "$make_pkg_version" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')"
@@ -1986,22 +1633,23 @@ make_deb-chl-bumpup() {
         else
             #new_upstream_version_without_epoch="$(bc -l <<< "scale=9 ; $make_pkg_version + 0.1" 2>&1)"
             #new_upstream_version="$(printf '%3.1f\n' "$new_upstream_version_without_epoch")"
-            new_upstream_version="$(/usr/share/genmkfile/version-bump-calculate "$make_pkg_version")"
+            make_require "$GENMKFILE_PATH/version-bump-calculate"
+            new_upstream_version="$("$GENMKFILE_PATH/version-bump-calculate" "$make_pkg_version")"
             ## Packages by Kicksecure / Whonix always bump package version. Not Debian package revision.
             new_revision="1"
         fi
 
-        if [ "$make_epoch" = "" ]; then
+        if [ -z "$make_epoch" ]; then
             new_changelog_version="$new_upstream_version-$new_revision"
         else
             new_changelog_version="$make_epoch:$new_upstream_version-$new_revision"
         fi
-    elif [ "$make_bump_type" = "manual" ]; then
+    elif [ "${make_bump_type:-}" = "manual" ]; then
         printf "%s\n" "$0: INFO: Current version number: $make_changelog_version"
         printf "%s\n" "Please enter new version number!"
-        read new_changelog_version
+        read -r new_changelog_version
     else
-        true "make_bump_type $make_bump_type is neither major nor manual!"
+        die "make_bump_type '${make_bump_type:-}' is neither 'major' nor 'manual'."
     fi
 
     true "\
@@ -2009,12 +1657,11 @@ Bumping version from / to...
 $make_changelog_version
 $new_changelog_version"
 
-    if printf "%s\n" "$new_changelog_version" | grep_no_comments --quiet -- "error"; then
-        printf "%s\n" "$0: ${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed!" >&2
-        exit 1
+    if [[ "$new_changelog_version" == *error* ]]; then
+        die "Failed!"
     fi
 
-    [ -n "$DEBCHANGE_MSG" ] || DEBCHANGE_MSG="New upstream version (local package)."
+    [ -n "${DEBCHANGE_MSG:-}" ] || DEBCHANGE_MSG="New upstream version (local package)."
 
     make_log_and_run \
         debchange \
@@ -2027,29 +1674,28 @@ $new_changelog_version"
         ""
 }
 
-make_deb-uachl-bumpup-manual() {
+make_deb_uachl_bumpup_manual() {
     make_function_run make_uch
-    make_function_run make_deb-chl-bumpup-manual
+    make_function_run make_deb_chl_bumpup_manual
 }
 
-make_deb-uachl-bumpup-major() {
+make_deb_uachl_bumpup_major() {
     make_function_run make_uch
-    make_function_run make_deb-chl-bumpup-major
+    make_function_run make_deb_chl_bumpup_major
 }
 
 make_git_tag_shared() {
-    if [ "$make_git_tag_shared_done" = "true" ]; then
+    if [ "${make_git_tag_shared_done:-}" = "true" ]; then
         return 0
     fi
-    if [ "$package" = "derivative-maker" ]; then
+    if [ "$make_source_package_name" = "derivative-maker" ]; then
         ## make_git_tag_sign_appendix gets set by dm-bump-derivative-maker-version
-        if [ "$make_git_tag_sign_appendix" = "" ]; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') package is '$package' but variable make_git_tag_sign_appendix is empty."
-            exit 1
+        if [ -z "${make_git_tag_sign_appendix:-}" ]; then
+            die "package is '$make_source_package_name' but variable make_git_tag_sign_appendix is empty."
         fi
     fi
-    [ -n "$make_git_tag_push_targets" ] || make_git_tag_push_targets="origin"
-    has git
+    [ -n "${make_git_tag_push_targets:-}" ] || make_git_tag_push_targets="origin"
+    make_require git
     make_git_tag_shared_done="true"
 }
 
@@ -2060,7 +1706,15 @@ make_git_tag_show() {
 
 make_git_tag_sign() {
     make_function_run make_git_tag_shared
-    make_log_and_run git tag -s "$make_git_tag_version_number" -m "."
+    ## Refuse to create a tag that collides with an existing branch
+    ## name. Tags and branches live in separate namespaces so git
+    ## will happily create both, but afterwards every subsequent
+    ## operation that takes a bare ref name ('git push origin X',
+    ## 'git rev-parse X', ...) becomes ambiguous.
+    if git show-ref --verify --quiet -- "refs/heads/$make_git_tag_version_number"; then
+        die "A branch named '$make_git_tag_version_number' already exists. Refusing to create a tag with the same name; rename the branch or delete it first."
+    fi
+    make_log_and_run git tag -s -m "." -- "$make_git_tag_version_number"
     make_function_run make_git_tag_verify
 }
 
@@ -2070,16 +1724,20 @@ make_git_tag_verify() {
     ## 'sq-git' verifies a '[COMMIT_RANGE]'. Various contributors not listed
     ## '$sq_git_policy_file' may have committed.
     ## NOTE: 'git rev-parse' does not support end-of-options ('--').
-    [ -n "$sq_git_trust_root" ] || sq_git_trust_root="$(git rev-parse "${make_git_tag_version_number}^{commit}")"
-    sq_git_run "$make_git_tag_version_number"
+    ## Use 'refs/tags/...^{commit}' rather than a bare name so a
+    ## same-named branch does not silently win the lookup. Pass the
+    ## full tag ref to sq_git_run for the same reason.
+    [ -n "${sq_git_trust_root:-}" ] || sq_git_trust_root="$(git rev-parse --verify "refs/tags/${make_git_tag_version_number}^{commit}")"
+    sq_git_run "refs/tags/$make_git_tag_version_number"
 }
 
 sq_git_run() {
     local cmd
+    make_require sq-git
     ## XXX: hardcoded
-    [ -n "$sq_git_trust_root" ] || sq_git_trust_root="HEAD"
+    [ -n "${sq_git_trust_root:-}" ] || sq_git_trust_root="HEAD"
     ## XXX: hardcoded
-    [ -n "$sq_git_policy_file" ] || sq_git_policy_file=~/derivative-maker/openpgp-policy.toml
+    [ -n "${sq_git_policy_file:-}" ] || sq_git_policy_file=~/derivative-maker/openpgp-policy.toml
     cmd=(sq-git log --policy-file "${sq_git_policy_file}" --trust-root "${sq_git_trust_root}" -- "${1}")
     printf "%s\n" "$0: ${green}INFO:${reset} ${cmd[*]}"
     make_function_run "${cmd[@]}"
@@ -2091,12 +1749,10 @@ make_git_tag_check() {
     ## Sanity test.
     #local make_git_describe_output
     ## dm-bump-derivative-maker-version script overrules this to disable this check.
-    [ -n "$make_git_describe_output" ] || make_git_describe_output="$(git describe --always --abbrev=1000000000)"
-    if [ ! "$make_git_tag_version_number" = "$make_git_describe_output" ]; then
-        if [ ! "$make_skip_git_describe_output_check" = "true" ]; then
-            printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed! Current git head is a untagged git tag! $running_as_root_maybe \
-make_git_tag_version_number $make_git_tag_version_number differs from make_git_describe_output $make_git_describe_output" >&2
-            exit 1
+    [ -n "${make_git_describe_output:-}" ] || make_git_describe_output="$(git describe --always --abbrev=1000000000)"
+    if [ "$make_git_tag_version_number" != "$make_git_describe_output" ]; then
+        if [ "${make_skip_git_describe_output_check:-}" != "true" ]; then
+            die "Failed! Current git head is a untagged git tag! $running_as_root_maybe make_git_tag_version_number $make_git_tag_version_number differs from make_git_describe_output $make_git_describe_output"
         fi
     fi
 
@@ -2105,26 +1761,18 @@ make_git_tag_version_number $make_git_tag_version_number differs from make_git_d
 }
 
 make_git_commit_verify() {
-    #make_log_and_run git verify-commit -- "$1"
-    sq_git_run "$1"
-}
-
-make_git_commit_verify_current() {
     make_function_run make_git_tag_shared
-    local make_git_commit_verify_return_code="0"
-    make_function_run make_git_commit_verify "HEAD" || {
-        make_git_commit_verify_return_code="$?"
-        true
-    }
-    if [ ! "$make_git_commit_verify_return_code" = "0" ]; then
-        printf "%s\n" "$0: ${red}${bold}ERROR:${reset} (FUNCNAME: '$FUNCNAME') Failed! Current git head commit is unsigned! $running_as_root_maybe" >&2
-        exit 1
+    ## Inline: verify HEAD via sq_git_run. The old internal helper
+    ## 'make_git_commit_verify(ref)' only existed to translate the
+    ## target name into a sq_git_run call.
+    if ! make_function_run sq_git_run "HEAD"; then
+        die "Failed! Current git head commit is unsigned! $running_as_root_maybe"
     fi
     printf "%s\n" "$0: ${green}INFO:${reset} Ok, current git head commit is signed."
 }
 
 make_git_verify() {
-    make_function_run make_git_commit_verify_current
+    make_function_run make_git_commit_verify
     make_function_run make_git_tag_check
     printf "%s\n" "$0: ${green}INFO:${reset} Ok, current git head is a signed git commit and a signed git tag."
 }
@@ -2133,38 +1781,51 @@ make_git_tag_push() {
     make_function_run make_git_tag_shared
     local repository
     for repository in $make_git_tag_push_targets; do
-        printf "%s\n" "git push -- $repository $make_git_tag_version_number"
-        git push "$repository" -- "$make_git_tag_version_number"
+        ## Explicit refs/tags/ so 'git push' cannot be confused by a
+        ## branch sharing the tag's name.
+        printf "%s\n" "git push -- $repository refs/tags/$make_git_tag_version_number"
+        git push "$repository" -- "refs/tags/$make_git_tag_version_number"
     done
 }
 
 make_git_tag_show_latest() {
     make_function_run make_git_tag_shared
     ## Thanks to kilianc - http://stackoverflow.com/a/7979255/2605155
-    make_git_tag_latest="$(git describe --tags $(git rev-list --tags --max-count=1))"
+    local latest_tagged_commit make_git_tag_latest
+    latest_tagged_commit="$(git rev-list --tags --max-count=1)"
+    if [ -z "$latest_tagged_commit" ]; then
+        die "no tags exist in this repository."
+    fi
+    make_git_tag_latest="$(git describe --tags -- "$latest_tagged_commit")"
     printf "%s\n" "$make_git_tag_latest"
 }
 
 make_git_tag_push_latest() {
     make_function_run make_git_tag_shared
     ## Thanks to kilianc - http://stackoverflow.com/a/7979255/2605155
-    make_git_tag_latest="$(git describe --tags -- "$(git rev-list --tags --max-count=1)")"
-    local repository
+    local latest_tagged_commit make_git_tag_latest repository
+    latest_tagged_commit="$(git rev-list --tags --max-count=1)"
+    if [ -z "$latest_tagged_commit" ]; then
+        die "no tags exist in this repository."
+    fi
+    make_git_tag_latest="$(git describe --tags -- "$latest_tagged_commit")"
     for repository in $make_git_tag_push_targets; do
-        make_log_and_run git push -- "$repository" "$make_git_tag_latest"
+        ## Explicit refs/tags/ so 'git push' cannot be confused by a
+        ## branch sharing the tag's name.
+        make_log_and_run git push -- "$repository" "refs/tags/$make_git_tag_latest"
     done
 }
 
-make_reprepro-shared() {
-    local package package_absolute_path make_reprepro_codename_list make_reprepro_codename_item
+make_reprepro_shared() {
+    local package make_reprepro_codename_list make_reprepro_codename_item changes_file_absolute_path
 
     ## global dist_build_apt_codename
     ## Can be set by derivative-maker.
 
-    [ -n "$make_reprepro_wrapper" ] || make_reprepro_wrapper="dm-reprepro-wrapper"
-    has "$make_reprepro_wrapper"
+    [ -n "${make_reprepro_wrapper:-}" ] || make_reprepro_wrapper="dm-reprepro-wrapper"
+    make_require "$make_reprepro_wrapper"
 
-    if [ "$dist_build_apt_codename" = "local" ]; then
+    if [ "${dist_build_apt_codename:-local}" = "local" ]; then
         make_reprepro_codename_list="local"
     else
         make_reprepro_codename_list="local $dist_build_apt_codename"
@@ -2174,13 +1835,19 @@ make_reprepro-shared() {
         ## read by help-steps/variables
         export make_reprepro_codename_item
 
+        ## $make_reprepro_wrapper is intentionally unquoted so that a
+        ## wrapper set to e.g. 'dm-reprepro-wrapper --some-flag' splits
+        ## correctly across the next four call sites.
         if [ "$make_reprepro_cmd" = "add" ]; then
-            changes_file_absolute_path="$(readlink -f "$make_main_changes_file")"
+            changes_file_absolute_path="$(readlink -f -- "$make_main_changes_file")"
             test -f "$changes_file_absolute_path"
+            # shellcheck disable=SC2086
             make_log_and_run $make_reprepro_wrapper --ignore=wrongdistribution include "$make_reprepro_codename_item" "$changes_file_absolute_path"
         else
-            for package in $make_package_list; do
+            for package in "${make_package_list[@]}"; do
+                # shellcheck disable=SC2086
                 make_log_and_run $make_reprepro_wrapper remove "$make_reprepro_codename_item" "$package"
+                # shellcheck disable=SC2086
                 make_log_and_run $make_reprepro_wrapper removesrc "$make_reprepro_codename_item" "$package"
                 ## Avoid the following issue during the next package "include".
                 # File "pool/main/a/anon-apt-sources-list/anon-apt-sources-list_6.5-1.dsc" is already registered with different checksums!
@@ -2188,6 +1855,7 @@ make_reprepro-shared() {
                 # sha1 expected: 154a00a18c2d60d4d10148abab5ce809e85cbe86, got: b6da54d5d481180adf5298cd031e7381bf7253ba
                 # sha256 expected: c5312451a92bda546a4d8e4331f835fecf1dbc07ebf99f21d67eab9e5082967d, got: 6a2f2d3aaba452659385a7727c246e45dfbb76af40a98278912a3a1d3c8563c8
                 # There have been errors!'
+                # shellcheck disable=SC2086
                 make_log_and_run $make_reprepro_wrapper deleteunreferenced
                 ## Results in:
                 # deleting and forgetting pool/main/a/anon-apt-sources-list/anon-apt-sources-list_6.5-1.debian.tar.xz
@@ -2199,46 +1867,46 @@ make_reprepro-shared() {
     done
 }
 
-make_reprepro-add() {
-    make_reprepro_cmd=add
-    make_reprepro-shared
+make_reprepro_add() {
+    local make_reprepro_cmd=add
+    make_function_run make_reprepro_shared
 }
 
-make_reprepro-remove() {
-    make_reprepro_cmd=remove
-    make_reprepro-shared
+make_reprepro_remove() {
+    local make_reprepro_cmd=remove
+    make_function_run make_reprepro_shared
 }
 
 make_source_overrides_file() {
-    if [ -x "./make-helper-overrides.bsh" ]; then
+    if test -x "./make-helper-overrides.bsh"; then
         bash -n "./make-helper-overrides.bsh"
         source "./make-helper-overrides.bsh"
     fi
-    if [ -x "./debian/make-helper-overrides.bsh" ]; then
+    if test -x "./debian/make-helper-overrides.bsh"; then
         bash -n "./debian/make-helper-overrides.bsh"
         source "./debian/make-helper-overrides.bsh"
     fi
 }
 
 make_source_overrides_folder() {
-    local folder_name
+    local folder_name i
     for folder_name in ./make-helper-overrides.d ./debian/make-helper-overrides.d; do
-        if [ -d "$folder_name" ]; then
-            local i
-            for i in "$folder_name"*; do
-                if [ -x "$i" ]; then
+        if test -d "$folder_name"; then
+            for i in "$folder_name"/*; do
+                if test -x "$i"; then
                     ## If the last character is a ~, ignore that file,
                     ## because it was created by some editor,
                     ## which creates backup files.
-                    if [ "${i: -1}" = "~" ]; then
+                    if [[ "$i" == *'~' ]]; then
                         continue
                     fi
                     ## Skipping files such as .dpkg-old and .dpkg-dist.
-                    if printf "%s\n" "$i" | grep --quiet -- ".dpkg-"; then
+                    if [[ "$i" == *'.dpkg-'* ]]; then
                         true "skip: $i"
                         continue
                     fi
                     bash -n "$i"
+                    # shellcheck disable=SC1090
                     source "$i"
                 fi
             done
@@ -2253,13 +1921,15 @@ make_function_run() {
     if type -t "${function_name}_hook_pre" >/dev/null; then
         "${function_name}_hook_pre" "$@"
     fi
-    if true; then
-        "$function_name" "$@"
-        function_name_return_code="$?"
-        if [ ! "$function_name_return_code" = "0" ]; then
-            true "${green}INFO:${reset} function_name_return_code: $function_name_return_code"
-            return "$function_name_return_code"
-        fi
+    ## Capture the exit code without tripping errexit. 'cmd; rc=$?'
+    ## would never reach the assignment when cmd failed, because
+    ## errexit would have killed the shell first. 'cmd || rc=$?'
+    ## disables errexit for cmd and the RHS sees cmd's exit status.
+    function_name_return_code=0
+    "$function_name" "$@" || function_name_return_code="$?"
+    if [ "$function_name_return_code" != "0" ]; then
+        true "${green}INFO:${reset} function_name_return_code: $function_name_return_code"
+        return "$function_name_return_code"
     fi
     if type -t "${function_name}_hook_post" >/dev/null; then
         "${function_name}_hook_post" "$@"
@@ -2267,7 +1937,7 @@ make_function_run() {
 }
 
 if was_executed "${BASH_SOURCE[0]}"; then
-    if [ -f /usr/libexec/helper-scripts/pre.bsh ]; then
+    if test -f /usr/libexec/helper-scripts/pre.bsh; then
         ## pre.bsh would `source` the following folders:
         ## /etc/make-helper-one.bsh_pre.d/*.conf
         ## /usr/local/etc/make-helper-one.bsh_pre.d/*.conf
@@ -2275,18 +1945,28 @@ if was_executed "${BASH_SOURCE[0]}"; then
         true
     fi
 
-    temp="$@"
-    if [ "$temp" = "" ]; then
+    ## Color variables are set by pre.bsh if available; default to empty
+    ## strings so printf calls do not fail under nounset.
+    : "${red:=}" "${green:=}" "${bold:=}" "${reset:=}" \
+      "${cyan:=}" "${under:=}" "${eunder:=}"
+
+    temp="$*"
+    if [ -z "$temp" ]; then
         printf "%s\n" "$0: ${green}INFO:${reset} called without parameters."
     else
         printf "%s\n" "$0: ${green}INFO:${reset} $*"
     fi
 
-    set -e
+    set -o errexit
+    set -o nounset
     set -o pipefail
+    set -o errtrace
+    shopt -s inherit_errexit
 
     if [ -n "${APTGETOPT_SERIALIZED:-}" ]; then
         mapfile -t APTGETOPT <<<"$APTGETOPT_SERIALIZED"
+    else
+        APTGETOPT=()
     fi
 
     make_function_run make_init
@@ -2296,7 +1976,36 @@ if was_executed "${BASH_SOURCE[0]}"; then
 
     make_function_run make_get_distdir
     make_function_run make_get_destdir
-    make_function_run make_get_variables
+
+    ## deb-{build,run,all}-dep only need Build-Depends / Depends parsed
+    ## from debian/control. Every other target additionally needs
+    ## dpkg-parsechangelog (from dpkg-dev, pulled in by build-essential)
+    ## which may be absent on a fresh system -- the user would run
+    ## 'genmkfile deb-build-dep' to install it. So call the full setup
+    ## only when a target actually needs it.
+    __needs_version_info=false
+    __needs_dependencies=false
+    for __arg in "$@"; do
+        case "$__arg" in
+        "" | help | --) ;;
+        deb-build-dep | deb-run-dep | deb-all-dep)
+            __needs_dependencies=true
+            ;;
+        *)
+            __needs_version_info=true
+            ;;
+        esac
+    done
+    ## No arguments falls through to make_all in make_parse_cmd; treat it
+    ## like any other build target.
+    [ $# -eq 0 ] && __needs_version_info=true
+
+    if [ "$__needs_version_info" = "true" ]; then
+        make_function_run make_get_variables
+    elif [ "$__needs_dependencies" = "true" ]; then
+        make_function_run make_get_dependencies
+    fi
+    unset __arg __needs_version_info __needs_dependencies
 
     make_function_run make_parse_cmd "$@"
     make_function_run make_deinit
