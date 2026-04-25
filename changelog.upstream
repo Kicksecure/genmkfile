@@ -1,3 +1,294 @@
+commit d5a413fbf2b62134f29cfd579b6007372fce1915
+Merge: e006a00 2cc0075
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Apr 25 06:24:05 2026 -0400
+
+    Merge remote-tracking branch 'assisted-by-ai/claude/forward-cli-args-to-make-all'
+
+commit 2cc0075881ab1a6fd06b05e2186b47704cbd8238
+Author: Claude <noreply@anthropic.com>
+Date:   Sat Apr 25 10:21:32 2026 +0000
+
+    make_parse_cmd: forward CLI args to dispatched 'all' target
+
+    Restore the per-arm '"$@"' forwarding that the squashed dispatch-
+    table refactor unintentionally dropped.
+
+    The original make_parse_cmd's 'all)' case arm was the only one to
+    pass remaining CLI args through to the target function:
+
+        all)
+            matched="true"
+            make_function_run make_all "$@"
+            shift
+            ;;
+
+    so 'genmkfile all VAR=value' reached make_all, which forwards "$@"
+    to 'make -f Makefile_orig all "$@"' and ultimately to make as a
+    variable assignment. Other arms intentionally did not forward, and
+    their target functions ignore positional parameters.
+
+    The unified-dispatch refactor collapsed every arm to
+    'make_function_run "$target_fn"' (no args), regressing the 'all'
+    behaviour: 'genmkfile all VAR=value' silently dropped VAR=value
+    before it reached make.
+
+    Special-case 'all' inside the loop:
+
+        if [ "$arg" = "all" ]; then
+            shift
+            make_function_run "$target_fn" "$@"
+            set --
+        else
+            make_function_run "$target_fn"
+            shift
+        fi
+
+    Shifting before the dispatch means make_all does not receive its
+    own target name as $1 (the old behaviour passed 'all' twice; the
+    new form is cleaner and equivalent for 'make -f Makefile_orig all
+    "$@"'). 'set --' consumes the rest because they were already
+    forwarded; the trailing matched-true guard then prevents the
+    empty-args fallback from firing.
+
+    Verified with a Makefile_orig that prints variables 'make' was
+    called with:
+
+      genmkfile all              -> VAR=         (empty, baseline)
+      genmkfile all VAR=hello    -> VAR=hello    (regression fixed)
+      genmkfile all V=1 X=2      -> V=1 X=2      (multiple)
+      genmkfile dist VAR=foo     -> VAR=foo dropped (matches old behaviour)
+      genmkfile deb-pkg-build X  -> X dropped     (matches old behaviour)
+
+    shellcheck -x -S warning still clean across the three bash files.
+
+    Reported-by: chatgpt-codex-connector
+
+commit e006a00f4fd260b20ba0f9dbedc26d344ef70dd0
+Merge: 4a58e97 c703a1d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Apr 25 06:05:55 2026 -0400
+
+    Merge remote-tracking branch 'assisted-by-ai/claude/bash-strict-error-handling-42pkA'
+
+commit c703a1db79dbd3474939b188bb63132244c42010
+Author: Claude <noreply@anthropic.com>
+Date:   Sat Apr 25 09:30:54 2026 +0000
+
+    genmkfile: bash strict mode, hardening, and tooling cleanup
+
+    Strict error handling
+    ---------------------
+    * set -o errexit, nounset, pipefail, errtrace; shopt -s inherit_errexit
+    * All references made nounset-safe (user/env vars guarded with
+      ${var:-}, internal flags initialised at point of use, color vars
+      defaulted to empty strings if pre.bsh is absent).
+    * Capture exit codes via 'cmd || rc=\$?' (the only form that works
+      under errexit; 'if ! cmd; then rc=\$?' returns 0).
+    * make_function_run: errexit-safe exit-code capture so its return
+      branch is actually reachable.
+
+    Dispatch, naming, hooks
+    -----------------------
+    * make_parse_cmd: 47-arm 'while :; case' rewritten as a five-line
+      computed lookup, 'target_fn=make_\${arg//-/_}; declare -F ...'.
+    * All function names unified to underscores; the 'git-commit-verify
+      -> make_git_commit_verify_current' alias inlined and the helper
+      collapsed.
+    * make_distclean and make_reprepro-{add,remove} no longer call
+      make_clean / make_reprepro-shared directly; they go through
+      make_function_run so override hooks fire uniformly.
+
+    External-tool dependency checks
+    -------------------------------
+    * make_require helper that wraps 'has' with a clear error and a hint
+      to run 'sudo genmkfile deb-build-dep'. Added at every external-tool
+      call site (sudo, apt-get, debuild, dpkg-checkbuilddeps, dpkg-source,
+      cowbuilder, lsb_release, debsign, sq, sq-git, debchange, bc,
+      rsync, safe-rm, sponge, strip-nondeterminism, ronn, dput, git,
+      grep-dctrl).
+    * deb_variables_check trimmed to just DEBEMAIL/DEBFULLNAME; tool
+      checks now live at the call site that actually uses each tool.
+
+    deb-build-dep / deb-all-dep
+    ---------------------------
+    * Inject 'build-essential' into the apt-get list. lintian forbids
+      listing it in debian/control Build-Depends so packages cannot
+      declare it themselves; injecting here lets a fresh system
+      bootstrap with one command.
+    * Split make_get_variables: dpkg-parsechangelog (and the rest of the
+      full variable setup) is now skipped for deb-{build,run,all}-dep,
+      so those targets work on a system that does not have build-essential
+      yet.
+    * The standalone make_deb-bootstrap function is gone; the split
+      obsoletes it.
+
+    Multi-architecture support in make-helper.bsh
+    ---------------------------------------------
+    * deb-pkg: build the source package once (arch-independent dist /
+      debdist / debdsc) then loop binary builds, one per architecture
+      in \$make_cross_build_platform_list.
+    * deb-icup: same source-once / binary-per-arch pattern, then install
+      on the host architecture only (cross-architecture install requires
+      multiarch setup which is out of scope).
+    * Generic pass-through: iterate every requested architecture so
+      arch-specific targets ('genmkfile deb-pkg-build' invoked directly)
+      build for each one. Arch-agnostic targets run redundantly under
+      multi-arch; callers wanting source-once / binary-per-arch should
+      use deb-pkg / deb-icup which handle that explicitly.
+    * Cross-architecture binary builds require make_use_cowbuilder=true
+      with cowbuilder base images prepared for each target architecture.
+
+    Branch/tag collision safety
+    ---------------------------
+    * make_git_tag_sign refuses to create a tag whose name matches an
+      existing branch ('git show-ref --verify --quiet refs/heads/...').
+    * All git commands that take a ref name use refs/tags/... explicitly:
+      'git rev-parse --verify refs/tags/X^{commit}',
+      'git push REMOTE -- refs/tags/X', 'sq_git_run refs/tags/X'. No
+      bare names left to DWIM into a same-named branch.
+    * git rev-parse uses --verify so an unresolvable ref fails fast
+      instead of returning empty.
+
+    Use Debian tools instead of custom parsers
+    ------------------------------------------
+    * Replace the 185-line deb822_extract / deb822_extract_one helper
+      with a small while-read loop over
+      'grep-dctrl --show-field=Package,Architecture'.
+    * Replace two perl one-liners (Build-Depends, Depends) with
+      'grep-dctrl --show-field=X --no-field-names | filter helper'.
+    * Replace the dpkg-parsechangelog while-loop / read parser with
+      'dpkg-parsechangelog --show-field Version' and
+      '--show-field Source'.
+    * make_dependencies_filter_helper centralises the sed pipeline (commas,
+      version constraints, '[arch]' qualifiers, debhelper substitution
+      markers, '|') and reads stdin for clean xtrace.
+    * Add 'dctrl-tools' to debian/control Build-Depends and Depends.
+    * New parser is strictly more correct than the old one for negative
+      arch qualifiers like '[!linux-any]', which the old parser left in.
+
+    State leaks fixed
+    -----------------
+    * Wrapper-set globals (make_install_, make_installcheck_, ...,
+      make_bump_type, make_reprepro_cmd, make_debuild_maybe_unsigned_opts,
+      make_deb_shared_dependencies) are now 'local' so dynamic scoping
+      exposes them to the called function but they are cleaned up on
+      return. Previously 'genmkfile install uninstall' silently re-ran
+      install because make_install_=true survived globally into the
+      second make_helper invocation.
+    * make_helper snapshots the six mode flags into its own locals.
+    * 'still_installed' declared at function scope, not inside the
+      branch that sets it.
+    * Many other functions get explicit 'local' for variables that
+      previously leaked: pwd/dirname_pwd/parent_folder (make_init);
+      cow_folder/base_folder/make_cowbuilder_config_file_arg/package
+      (make_deb_pkg_build_shared); my_user_id, first, second,
+      binary_package_architecture (make_get_variables); msg (make_dist);
+      make_git_tag_latest (make_git_tag_*_latest);
+      changes_file_absolute_path, fso_with_destdir_stat,
+      genmkfile_rsync_opts, folder_permission_skip_list (make_helper).
+
+    Other functional fixes
+    ----------------------
+    * make-helper.bsh: exit 1 on GENMKFILE_PATH auto-detection failure
+      (previously printed an error and continued).
+    * make_source_overrides_folder: glob fixed (was '\$folder_name*'
+      -- missing slash, never iterated the folder's contents).
+    * Override-folder skip check uses --fixed-strings and bash pattern
+      match instead of regex.
+    * make_parse_cmd: 'all' argument no longer triggers a double
+      make_all invocation.
+    * make_deb_shared_dep: 'return', not 'exit' -- chained targets
+      ('genmkfile deb-build-dep debinstfile') now run all of them and
+      make_deinit gets to clean up.
+    * make_lintian: capture lintian's exit code in the parent shell
+      ('|| make_lintian_exit_code=\$?') -- the previous 'rc=\$? inside
+      \$()' lost the value to the subshell.
+    * make_lintian_on_warning takes the exit code as \$1 instead of
+      reading the caller's local via dynamic scoping; if/elif flattened.
+    * make_get_variables / make_get_destdir / make_get_distdir error
+      paths now go to stderr via die() rather than stdout printf.
+    * make_uch and make_deb_uachl_commit_changelog 'make_require git'.
+    * make_deb_install / make_deb_remove / make_deb_purge
+      'make_require sudo apt-get'.
+    * version-bump-calculate path: \"\$GENMKFILE_PATH/version-bump-calculate\"
+      instead of hard-coded /usr/share/genmkfile/version-bump-calculate
+      so dev trees with a different GENMKFILE_PATH work.
+    * No-tags-in-repo guard in make_git_tag_show_latest /
+      make_git_tag_push_latest.
+    * Empty Build-Depends, no-Build-Depends-field, multi-line
+      continuation, and comment-laden control files all parse correctly.
+
+    Help output and error messages
+    ------------------------------
+    * Every target make_parse_cmd accepts now has a help stanza
+      (added: all, test, lintian, clean, deb-uachl-commit-changelog,
+      deb-pkg). Drop excessive 'build-essential' mentions from user-
+      visible output.
+    * Centralised die() helper. ~30 verbose 'printf ERROR + exit 1'
+      blocks collapsed; 27 of 30 ERROR prints had been going to stdout
+      -- all now go to stderr.
+    * Four duplicated '\$0:' typos in error messages fixed.
+
+    Idiomatic bash
+    --------------
+    * '[ ! X = Y ]' -> '[ X != Y ]'; '[ X = \"\" ]' -> '[ -z X ]'.
+    * '\$(pwd)' -> '\$PWD' (bash builtin, no subshell).
+    * 'basename -- \"\$x\"' -> '\${x##*/}' where the '/' edge case
+      cannot apply.
+    * 'printf | grep --fixed-strings' substring tests -> bash
+      '[[ \"\$x\" == *\"\$y\"* ]]'.
+    * 'if X = false; then true; else apply; fi' -> 'if X != false;
+      then apply; fi'.
+    * Drop the redundant trailing 'true' in '|| { rc=\$?; true; }'.
+    * Quote 'case \"\$arg\" in' (idiomatic and shellcheck-preferred).
+    * Use 'test -X' consistently for file-existence tests.
+    * 'cmp -s', 'realpath', 'basename', 'strip-nondeterminism', 'stat',
+      'readlink' all use end-of-options '--'.
+    * 'git tag -s -m \".\" -- \"\$name\"' so a tag name beginning with
+      '-' cannot be mistaken for an option.
+    * '\$FUNCNAME' -> '\${FUNCNAME[0]}' (33 sites; \$FUNCNAME is
+      technically an array).
+
+    Cleanup
+    -------
+    * Drop dead 'local deb', 'local line d missing', 'local
+      package_absolute_path', 'a' (in 'read -r a package _'),
+      'destination_directory', 'new_upstream_version_without_epoch',
+      source_folder (make_manpages -- declared but never assigned and
+      used in 'mkdir --parents -- ...auto-generated-man-pages/\$source_folder';
+      silently OK because it expanded to empty).
+    * Drop the four-armed 'if cowbuilder = true; then X else Y; fi'
+      in make_get_variables where both branches assigned identical values.
+    * Drop grep_no_comments helper (now unused after Source-name
+      extraction switched to dpkg-parsechangelog).
+    * Drop make_deb-bootstrap (subsumed by the make_get_variables
+      split).
+    * make_package_list and make_package_debs_files_list switched from
+      space-joined strings to bash arrays.
+    * APTGETOPT initialised to '()' when APTGETOPT_SERIALIZED is unset
+      so '\${APTGETOPT[@]}' does not trip nounset.
+    * make_folder_list_for_un_and_install initialised to '()' if not
+      already set (nounset-safe array-length check).
+    * shared.bsh: 'realpath --' end-of-options; SC2034 directive for
+      the cross-file dpkg_print_architecture variable.
+
+    shellcheck
+    ----------
+    * 'shellcheck -x -S warning' clean across all three files
+      (make-helper.bsh, make-helper-one.bsh, shared.bsh).
+    * 'shellcheck source=SCRIPTDIR/shared.bsh' directives so '-x' can
+      follow the cross-file source.
+    * Targeted disable comments where word-splitting is intentional
+      (\$COWBUILDER_PREFIX, \$make_debsign_opts, lintian opt vars,
+      \$make_reprepro_wrapper, \$make_deb_shared_dependencies).
+
+commit 4a58e974913791bd0e3c5d11bb6455dafda084c8
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Apr 24 12:41:25 2026 +0000
+
+    bumped changelog version
+
 commit 7e991c4b676dd1b2927f6dd3e67b73f797576565
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Apr 24 08:12:08 2026 -0400
