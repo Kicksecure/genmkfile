@@ -733,7 +733,7 @@ make_debdsc() {
     die "DISTDIR '$DISTDIR' is not writeable!"
   fi
 
-  pushd "$DISTDIR" >/dev/null
+  pushd -- "$DISTDIR" >/dev/null
 
   ## Creates make_main_dsc_file.
   make_log_and_run \
