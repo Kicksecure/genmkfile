@@ -1,3 +1,26 @@
+commit 6f9b860a7d914d9c5fb24f7ed7afb98ec7ef3c61
+Merge: 214e61d 0f4595f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Apr 26 11:57:43 2026 -0400
+
+    Merge remote-tracking branch 'assisted-by-ai/claude/add-end-of-options-support-uB6We'
+
+commit 0f4595fe188e8a139e579e34632a68ae6cf355e0
+Author: Claude <noreply@anthropic.com>
+Date:   Sun Apr 26 11:30:36 2026 +0000
+
+    make-helper-one.bsh: pass -- to pushd before variable path
+
+    Guard against $DISTDIR values starting with '-' being interpreted as
+    options.
+    https://claude.ai/code/session_01BAQS9pE9zQYieV6Uys9Reo
+
+commit 214e61d615b8e3b56605762575f11b53d0faa9f6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Apr 26 09:52:57 2026 +0000
+
+    bumped changelog version
+
 commit ce9f81d740266f33c949fe8da8b33aaec038139e
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Apr 25 07:38:11 2026 -0400
