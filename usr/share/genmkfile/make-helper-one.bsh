@@ -170,7 +170,7 @@ make_parse_cmd() {
     return 0
   fi
 
-  if [ "$matched" != "true" ]; then
+  if ! [ "$matched" = "true" ]; then
     make_function_run "$@"
   fi
 }
@@ -929,8 +929,8 @@ make_deb_shared_dep() {
 
   apt_get_exit_code="0"
   ## $make_deb_shared_dependencies is intentionally unquoted: the
-  ## perl extractor produces a space-separated package list and
-  ## apt-get expects one argument per package.
+  ## extractor produces a space-separated package list and apt-get
+  ## expects one argument per package.
   # shellcheck disable=SC2086
   sudo \
     apt-get \
@@ -955,8 +955,8 @@ make_deb_build_dep() {
   ## is listed in debian/control Build-Depends. So we cannot put it
   ## there. To save users from having to install it by hand before
   ## running 'genmkfile deb-build-dep' for the first time, inject it
-  ## here on top of whatever Build-Depends the perl extractor pulled
-  ## from debian/control.
+  ## here on top of whatever Build-Depends the extractor pulled from
+  ## debian/control.
   local make_deb_shared_dependencies="build-essential $make_deb_build_dependencies"
   make_function_run make_deb_shared_dep
 }
@@ -1735,7 +1735,7 @@ make_git_tag_verify() {
   make_function_run make_git_tag_shared
   #make_log_and_run git verify-tag -- "$make_git_tag_version_number"
   ## 'sq-git' verifies a '[COMMIT_RANGE]'. Various contributors not listed
-  ## '$sq_git_policy_file' may have committed.
+  ## in '$sq_git_policy_file' may have committed.
   ## NOTE: 'git rev-parse' does not support end-of-options ('--').
   ## Use 'refs/tags/...^{commit}' rather than a bare name so a
   ## same-named branch does not silently win the lookup. Pass the
