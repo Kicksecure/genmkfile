@@ -1,3 +1,15 @@
+commit 8ec228d555c14378a8a6420811b3a18779382157
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon May 4 12:30:04 2026 -0400
+
+    use "${HELPER_SCRIPTS_PATH:-}"
+
+commit cafc12d241b558eba7f24c078a77f1cd7b5d7928
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Apr 29 09:01:34 2026 +0000
+
+    bumped changelog version
+
 commit 0419bae3767409510d95268dff0970aa8c5c47da
 Merge: 38a8d44 308ae3a
 Author: Patrick Schleizer <adrelanos@whonix.org>
