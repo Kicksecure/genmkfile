@@ -957,7 +957,13 @@ make_deb_build_dep() {
   ## running 'genmkfile deb-build-dep' for the first time, inject it
   ## here on top of whatever Build-Depends the extractor pulled from
   ## debian/control.
-  local make_deb_shared_dependencies="build-essential $make_deb_build_dependencies"
+  ##
+  ## dctrl-tools (provides grep-dctrl) is added for the same reason:
+  ## make_get_dependencies needs grep-dctrl to parse debian/control,
+  ## so any environment that ran us this far must keep it. Hardcoding
+  ## here keeps the apt-install path explicit even if a future
+  ## debian/control accidentally drops dctrl-tools from Build-Depends.
+  local make_deb_shared_dependencies="build-essential dctrl-tools $make_deb_build_dependencies"
   make_function_run make_deb_shared_dep
 }
 
@@ -967,8 +973,9 @@ make_deb_run_dep() {
 }
 
 make_deb_all_dep() {
-  ## See make_deb_build_dep for why build-essential is added here.
-  local make_deb_shared_dependencies="build-essential $make_deb_build_dependencies $make_deb_runtime_dependencies"
+  ## See make_deb_build_dep for why build-essential and dctrl-tools
+  ## are added here.
+  local make_deb_shared_dependencies="build-essential dctrl-tools $make_deb_build_dependencies $make_deb_runtime_dependencies"
   make_function_run make_deb_shared_dep
 }
 
@@ -1520,7 +1527,33 @@ make_helper() {
           true "calling...: array_match |$file_without_pwd| |${folder_permission_skip_list[*]}|"
           if ! array_match "$file_without_pwd" "${folder_permission_skip_list[@]}"; then
             true "array_match did not match, therefore continuing..."
-            if test -x "$source_fso"; then
+            ## CI workaround for tree-mode regressions. Some upstream
+            ## push paths (notably the GitHub Contents API used by
+            ## github-mcp-server's push_files / create_or_update_file)
+            ## set every new tree entry to mode 100644 with no way to
+            ## opt out, so an executable script can land in the git
+            ## tree at 100644. `test -x "$source_fso"` then returns
+            ## false here and the file installs as 0644, breaking any
+            ## CI step that invokes it from PATH (rc=126, EACCES).
+            ##
+            ## Under CI=true (set by GitHub Actions), force +x for
+            ## files installed under one of the conventional
+            ## executable locations: /usr/bin, /usr/sbin, and the
+            ## per-package /usr/libexec/<source-pkg-name>/. False
+            ## positives (a sourced lib file gaining an exec bit it
+            ## does not need) are functionally harmless: bash
+            ## `source` does not consult the bit. Disable with
+            ## GENMKFILE_CI_FORCE_EXEC=0.
+            genmkfile_force_exec=false
+            if [ "${CI:-}" = "true" ] \
+              && [ "${GENMKFILE_CI_FORCE_EXEC:-1}" = "1" ]; then
+              case "$file_without_pwd" in
+                /usr/bin/*|/usr/sbin/*|/usr/libexec/"${make_source_package_name:-__none__}"/*)
+                  genmkfile_force_exec=true
+                  ;;
+              esac
+            fi
+            if test -x "$source_fso" || [ "$genmkfile_force_exec" = "true" ]; then
               if [ "$fso_with_destdir_stat" != "755" ]; then
                 printf "%s\n" "$0: INFO: executable file found, running command...: chmod -- 755 '$file_with_destdir'"
                 chmod -- 755 "$file_with_destdir"
