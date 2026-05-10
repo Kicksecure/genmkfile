@@ -206,6 +206,19 @@ make_get_dependencies() {
   source "$GENMKFILE_PATH/shared.bsh"
   make_shared_function
 
+  ## Bootstrap dctrl-tools when missing. grep-dctrl (from dctrl-tools)
+  ## is required to PARSE debian/control, so it cannot itself be
+  ## listed in Build-Depends and self-bootstrapped through the
+  ## normal deb-build-dep flow. On fresh CI images this leaves a
+  ## chicken-and-egg: 'genmkfile deb-build-dep' fails immediately
+  ## with "grep-dctrl not found". When running as root with apt-get
+  ## available, install it transparently. Non-root invocations fall
+  ## through to make_require below for the existing error path.
+  if ! has grep-dctrl && [ "${EUID:-$(id -u)}" -eq 0 ] && has apt-get; then
+    apt-get update --error-on=any
+    apt-get install --yes --no-install-recommends dctrl-tools
+  fi
+
   make_require grep-dctrl
 
   local raw_build_depends raw_runtime_depends
