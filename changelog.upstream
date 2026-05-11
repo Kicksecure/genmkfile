@@ -1,3 +1,211 @@
+commit 05aeae7ad619148853a995b720605f71edf9ea59
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon May 11 16:21:16 2026 -0400
+
+    .
+
+commit 09ce8b47e1f1498332d9c85ffc4fb11c03727705
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon May 11 16:15:34 2026 -0400
+
+    fix
+
+commit 12490f94063f0f99ec07a807ef3ecec2eb87c3f2
+Merge: ce0df2f 88b0dcb
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon May 11 15:00:19 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 88b0dcbdf02b078b5b9170a5ce70c06fdf4328d9
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 20:18:55 2026 -0400
+
+    workflows: add concurrency blocks (#9)
+
+    3 cancellable.
+
+commit f74365ec2b30def995ea70fabd2e0582cbe9130d
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 17:59:25 2026 -0400
+
+    codex-review: forward only OPENAI_API_KEY explicitly (#8)
+
+    Replace secrets: inherit with explicit single-secret map.
+
+commit eaed042805d7afd9dabeb9df4f8ba746fb894562
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 17:59:23 2026 -0400
+
+    make_get_dependencies: bootstrap dctrl-tools when missing (#7)
+
+    Auto-install dctrl-tools when running as root with apt-get available. Unblocks whonix-firewall dry-run.
+
+commit ce0df2f188dfc181181ac472f320e62d92806c44
+Merge: 1af6bf2 0450747
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 10 14:34:46 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 0450747de1f8473ff9545dcc4205fc1cb4b9334d
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 10 14:11:46 2026 -0400
+
+    restore: re-apply session work (rebased away) (#6)
+
+    Re-applies session work lost during rebase: explicit ANTHROPIC_API_KEY
+    secret in .github/workflows/claude-code.yml (replacing secrets:
+    inherit).
+
+    Co-authored-by: claude-code <claude-code@anthropic.com>
+
+commit 1af6bf2f36575ef6420f1fd64648a00296ce49e8
+Merge: d7a0b98 b90f2ed
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat May 9 16:33:39 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/master'
+
+commit b90f2edc005d46891c0df30cc03d2034d0331ce7
+Author: Claude <noreply@anthropic.com>
+Date:   Fri May 8 15:49:14 2026 +0000
+
+    claude-code: restore id-token: write
+
+    Reverts the earlier 'drop id-token' commit. Verified against a live
+    workflow log that the action DOES use OIDC federation:
+
+      Requesting OIDC token...
+      OIDC token successfully obtained
+      Exchanging OIDC token for app token...
+      Using GITHUB_TOKEN from OIDC
+
+    The action federates the runner's id-token to an Anthropic-controlled
+    GitHub App which mints a higher-privilege GITHUB_TOKEN used to post
+    review comments. Without id-token: write the next run would have
+    failed with 'Could not fetch an OIDC token'.
+
+commit 057cf86487fd3f88c2fd8ad24fc5ff56633399d2
+Author: Claude <noreply@anthropic.com>
+Date:   Fri May 8 15:24:15 2026 +0000
+
+    scorecard: drop inline cron allocation table
+
+    The org-wide allocation table is single-source-of-truth in
+    developer-meta-files/.github/workflows/reusable-scorecard.yml. Each
+    consumer should carry only its own cron line with no commentary.
+
+commit 2681970fd82f811c2ffd6b1be929bad63f24497b
+Author: Claude <noreply@anthropic.com>
+Date:   Fri May 8 15:21:18 2026 +0000
+
+    claude-code: drop id-token: write
+
+    The reusable workflow no longer needs id-token: write (the action
+    authenticates to api.anthropic.com via a static ANTHROPIC_API_KEY;
+    OIDC federation is unused). Drop the permission to honor
+    least-privilege - an OIDC token, if forged or leaked, can
+    authenticate to cloud-provider integrations.
+
+commit 608d67b3c8a51654fcfe96e95199d1ff46c96bef
+Author: Claude <noreply@anthropic.com>
+Date:   Fri May 8 14:50:34 2026 +0000
+
+    ci: add scorecard, Claude Code Review, OpenAI Codex Review
+
+    Thin consumer wrappers around the reusables in
+    org-ai-assisted/developer-meta-files. Brings genmkfile
+    in line with the helper-scripts / kloak / security-misc baseline.
+
+commit d7a0b985ec5fc126c8f1003b283f87e8238992ea
+Merge: f65597b 5190d0d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu May 7 17:32:12 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/master'
+
+commit 5190d0d256d16ddfa3d3ef87c5e240a3364ac8d8
+Merge: caacabc d6eb1e4
+Author: assisted-by-ai (Bot Account) <server@kicksecure.com>
+Date:   Wed May 6 18:23:51 2026 -0400
+
+    Merge pull request #3 from org-ai-assisted/claude/restore-log-max-len-f04n4
+
+    make-helper-one.bsh: CI=true workaround for tree-mode-stripped exec bits
+
+commit d6eb1e47f970efcb4cb8fcc7a456c175f23a5f2b
+Author: claude-code <claude-code@assisted-by-ai>
+Date:   Wed May 6 22:20:36 2026 +0000
+
+    make-helper-one.bsh: CI=true workaround for tree-mode-stripped exec bits
+
+    Some upstream push paths set every new git tree entry to mode 100644
+    with no way to opt out -- notably the GitHub Contents API used by
+    github-mcp-server's push_files and create_or_update_file. When that
+    hits an executable script in usr/bin/, the file lands in the tree at
+    100644, 'test -x' returns false in make_helper, and rsync + the
+    existing chmod-by-source-mode logic installs it as 0644. Any CI step
+    that invokes the binary from PATH then fails with rc=126 (EACCES).
+
+    Same bug fixed before in upstream consumers via per-repo
+    'git update-index --chmod=+x' + push (e.g. developer-meta-files
+    commit 63d8941). That fix-up only works from a developer's local
+    checkout, so PRs pushed entirely through the MCP cannot recover.
+
+    Add a CI-only safety net here: under CI=true (set by GitHub Actions
+    and equivalent), force chmod 755 for any file installed under one of
+    the conventional executable locations regardless of source-tree mode:
+
+      /usr/bin/*
+      /usr/sbin/*
+      /usr/libexec/<source-pkg-name>/*
+
+    False positives (a sourced lib gaining an exec bit it does not need)
+    are functionally harmless: bash 'source' does not consult the bit.
+    The behavior is gated on CI=true so production installs continue to
+    mirror source mode exactly. Hard opt-out: GENMKFILE_CI_FORCE_EXEC=0.
+
+commit caacabcd4da8b223ae2a4881415626fcf7f8b2dc
+Merge: f65597b 152849b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 6 09:42:23 2026 -0400
+
+    Merge pull request #2 from org-ai-assisted/claude/read-agents-meta-file-uKeT9
+
+    fix(deb-{build,all}-dep): hardcode dctrl-tools alongside build-essential
+
+commit 152849b2bfc41308dcc8ded2b808c9120fab962b
+Author: claude-code <claude-code@assisted-by-ai>
+Date:   Wed May 6 13:26:30 2026 +0000
+
+    fix(deb-{build,all}-dep): hardcode dctrl-tools alongside build-essential
+
+    dctrl-tools (provides grep-dctrl) is added to the install lists of
+    make_deb_build_dep and make_deb_all_dep alongside the existing
+    build-essential. genmkfile cannot truly self-bootstrap dctrl-tools
+    because make_get_dependencies needs grep-dctrl to parse
+    debian/control in the first place - so the first ever run on a
+    clean image without dctrl-tools still has to be primed manually
+    (apt install dctrl-tools, or apt-get build-dep .).
+
+    Once primed, this hardcoded include keeps it explicit:
+    - on a re-run, dctrl-tools stays installed.
+    - on a fresh checkout where build-essential is being installed
+      anyway by these targets, dctrl-tools rides along in the same
+      apt-get call rather than being a hidden runtime requirement.
+
+    Note: debian/control already declares dctrl-tools in Build-Depends;
+    this hardcoding is genmkfile's own apt-install path saying 'I need
+    this tool myself' rather than relying on the package-build machinery
+    to read debian/control.
+
+commit f65597b79f2800188ff0105aff48675627677caf
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon May 4 19:51:24 2026 +0000
+
+    bumped changelog version
+
 commit 8ec228d555c14378a8a6420811b3a18779382157
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Mon May 4 12:30:04 2026 -0400
