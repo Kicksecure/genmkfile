@@ -1,9 +1,20 @@
 #!/bin/bash
 
 make_shared_function() {
-   make_debian_control_file_relative_path="debian/control"
-   make_debian_control_file_absolute_path="$(realpath -- "$make_debian_control_file_relative_path")"
-   test -f "$make_debian_control_file_absolute_path"
+   ## Repos without debian/control (qubes-template-{kicksecure,whonix},
+   ## Whonix-Installer, Whonix-Starter) opt in via
+   ## ./make-helper-overrides.bsh by setting
+   ## make_use_git_describe_for_version=true. The version is then
+   ## derived from `git describe --abbrev=0` in make_get_variables
+   ## rather than from dpkg-parsechangelog.
+   if [ "${make_use_git_describe_for_version:-}" = "true" ]; then
+      make_debian_control_file_relative_path=""
+      make_debian_control_file_absolute_path=""
+   else
+      make_debian_control_file_relative_path="debian/control"
+      make_debian_control_file_absolute_path="$(realpath -- "$make_debian_control_file_relative_path")"
+      test -f "$make_debian_control_file_absolute_path"
+   fi
 
    ## Consumed by make-helper-one.bsh (make_get_variables, host/target_architecture defaults, etc.)
    # shellcheck disable=SC2034

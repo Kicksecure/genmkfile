@@ -206,6 +206,14 @@ make_get_dependencies() {
   source "$GENMKFILE_PATH/shared.bsh"
   make_shared_function
 
+  ## Special repos opted in via make_use_git_describe_for_version
+  ## have no debian/control; nothing to parse.
+  if [ -z "${make_debian_control_file_absolute_path:-}" ]; then
+    make_deb_build_dependencies=""
+    make_deb_runtime_dependencies=""
+    return 0
+  fi
+
   ## Bootstrap dctrl-tools when missing. grep-dctrl (from dctrl-tools)
   ## is required to PARSE debian/control, so it cannot itself be
   ## listed in Build-Depends and self-bootstrapped through the
@@ -252,6 +260,32 @@ make_get_variables() {
   ## XXX: maybe better set dynamically but would that be deterministic?
   [ -n "${XZ_OPT:-}" ] || XZ_OPT="--threads=8"
   export XZ_OPT
+
+  ## Special repos opt in to deriving the version from the nearest
+  ## git tag instead of debian/changelog. Skip dpkg-parsechangelog;
+  ## make_get_dependencies short-circuits on empty
+  ## make_debian_control_file_absolute_path. The downstream
+  ## make_git_tag_check still asserts HEAD is AT the tag (its
+  ## `git describe --abbrev=1000000000` comparison fires if HEAD
+  ## has moved past the tag).
+  if [ "${make_use_git_describe_for_version:-}" = "true" ]; then
+    make_function_run make_get_dependencies
+
+    make_changelog_version=""
+    make_pkg_revision=""
+    make_pkg_version=""
+    make_epoch=""
+    make_pkg_version_with_revision=""
+
+    if ! make_git_tag_version_number="$(git describe --abbrev=0 2>/dev/null)"; then
+      die "make_use_git_describe_for_version=true but no git tag reachable from HEAD; sign one with dm-quickgittagsign first."
+    fi
+    [ -n "${make_git_tag_version_number}" ] \
+      || die "make_use_git_describe_for_version=true but 'git describe --abbrev=0' returned empty."
+    make_git_tag_version_number="${make_git_tag_version_number}${make_git_tag_sign_appendix:-}"
+    true "make_git_tag_version_number (from git describe): $make_git_tag_version_number"
+    return 0
+  fi
 
   local temp
   if ! has dpkg-parsechangelog; then
