@@ -1799,6 +1799,24 @@ make_git_tag_show() {
 
 make_git_tag_sign() {
   make_function_run make_git_tag_shared
+
+  ## Special repos opted in via make_use_git_describe_for_version
+  ## have no debian/changelog version; make_get_variables set
+  ## make_git_tag_version_number to the EXISTING nearest tag name
+  ## (`git describe --abbrev=0`). Reusing that name to create a new
+  ## tag would collide. Override with a HEAD-SHA-encoded name so the
+  ## tag is unique per commit. Idempotent: if the SHA-named tag
+  ## already exists at HEAD, no-op.
+  if [ "${make_use_git_describe_for_version:-}" = "true" ]; then
+    local head_sha
+    head_sha="$(git rev-parse --verify HEAD)"
+    make_git_tag_version_number="commit_${head_sha}"
+    if git rev-parse --verify --quiet -- "refs/tags/${make_git_tag_version_number}" >/dev/null; then
+      printf "%s\n" "$0: ${green}INFO:${reset} tag '${make_git_tag_version_number}' already exists at HEAD - no-op."
+      return 0
+    fi
+  fi
+
   ## Refuse to create a tag that collides with an existing branch
   ## name. Tags and branches live in separate namespaces so git
   ## will happily create both, but afterwards every subsequent
