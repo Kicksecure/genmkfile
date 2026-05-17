@@ -277,6 +277,15 @@ make_get_variables() {
     make_epoch=""
     make_pkg_version_with_revision=""
 
+    ## Downstream make_git_tag_shared reads make_source_package_name
+    ## under `set -o nounset` (just to check whether it equals
+    ## "derivative-maker"). The regular branch sets it from
+    ## `dpkg-parsechangelog --show-field Source`; for special repos
+    ## there's no changelog, so use the repo's directory basename
+    ## ("qubes-template-kicksecure", "Whonix-Installer", ...).
+    make_source_package_name="$(basename -- "$PWD")"
+    make_package_list=("$make_source_package_name")
+
     if ! make_git_tag_version_number="$(git describe --abbrev=0 2>/dev/null)"; then
       die "make_use_git_describe_for_version=true but no git tag reachable from HEAD; sign one with dm-quickgittagsign first."
     fi
@@ -1799,6 +1808,24 @@ make_git_tag_show() {
 
 make_git_tag_sign() {
   make_function_run make_git_tag_shared
+
+  ## Special repos opted in via make_use_git_describe_for_version
+  ## have no debian/changelog version; make_get_variables set
+  ## make_git_tag_version_number to the EXISTING nearest tag name
+  ## (`git describe --abbrev=0`). Reusing that name to create a new
+  ## tag would collide. Override with a HEAD-SHA-encoded name so the
+  ## tag is unique per commit. Idempotent: if the SHA-named tag
+  ## already exists at HEAD, no-op.
+  if [ "${make_use_git_describe_for_version:-}" = "true" ]; then
+    local head_sha
+    head_sha="$(git rev-parse --verify HEAD)"
+    make_git_tag_version_number="commit_${head_sha}"
+    if git rev-parse --verify --quiet -- "refs/tags/${make_git_tag_version_number}" >/dev/null; then
+      printf "%s\n" "$0: ${green}INFO:${reset} tag '${make_git_tag_version_number}' already exists at HEAD - no-op."
+      return 0
+    fi
+  fi
+
   ## Refuse to create a tag that collides with an existing branch
   ## name. Tags and branches live in separate namespaces so git
   ## will happily create both, but afterwards every subsequent
