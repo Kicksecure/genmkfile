@@ -277,6 +277,15 @@ make_get_variables() {
     make_epoch=""
     make_pkg_version_with_revision=""
 
+    ## Downstream make_git_tag_shared reads make_source_package_name
+    ## under `set -o nounset` (just to check whether it equals
+    ## "derivative-maker"). The regular branch sets it from
+    ## `dpkg-parsechangelog --show-field Source`; for special repos
+    ## there's no changelog, so use the repo's directory basename
+    ## ("qubes-template-kicksecure", "Whonix-Installer", ...).
+    make_source_package_name="$(basename -- "$PWD")"
+    make_package_list=("$make_source_package_name")
+
     if ! make_git_tag_version_number="$(git describe --abbrev=0 2>/dev/null)"; then
       die "make_use_git_describe_for_version=true but no git tag reachable from HEAD; sign one with dm-quickgittagsign first."
     fi

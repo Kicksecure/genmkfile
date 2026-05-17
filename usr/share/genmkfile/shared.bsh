@@ -1,19 +1,26 @@
 #!/bin/bash
 
 make_shared_function() {
-   ## Repos without debian/control (qubes-template-{kicksecure,whonix},
-   ## Whonix-Installer, Whonix-Starter) opt in via
-   ## ./make-helper-overrides.bsh by setting
-   ## make_use_git_describe_for_version=true. The version is then
-   ## derived from `git describe --abbrev=0` in make_get_variables
-   ## rather than from dpkg-parsechangelog.
-   if [ "${make_use_git_describe_for_version:-}" = "true" ]; then
+   ## Detect debian/control. Set path variables to empty when the
+   ## file is absent so callers that need it can fail with a
+   ## specific message at the point of use (make_get_variables,
+   ## make_get_dependencies).
+   ##
+   ## make_shared_function is called by make-helper.bsh BEFORE the
+   ## override files are sourced (it needs dpkg_print_architecture
+   ## to default make_cross_build_platform_list), so the
+   ## make_use_git_describe_for_version flag is not yet in scope
+   ## here. Probing for the file directly - and not dying on absence
+   ## - lets the special repos (qubes-template-{kicksecure,whonix},
+   ## Whonix-Installer, Whonix-Starter) opted into
+   ## make_use_git_describe_for_version flow through this preamble
+   ## unaffected.
+   make_debian_control_file_relative_path="debian/control"
+   if [ -f "$make_debian_control_file_relative_path" ]; then
+      make_debian_control_file_absolute_path="$(realpath -- "$make_debian_control_file_relative_path")"
+   else
       make_debian_control_file_relative_path=""
       make_debian_control_file_absolute_path=""
-   else
-      make_debian_control_file_relative_path="debian/control"
-      make_debian_control_file_absolute_path="$(realpath -- "$make_debian_control_file_relative_path")"
-      test -f "$make_debian_control_file_absolute_path"
    fi
 
    ## Consumed by make-helper-one.bsh (make_get_variables, host/target_architecture defaults, etc.)
