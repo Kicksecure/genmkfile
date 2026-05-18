@@ -264,10 +264,11 @@ make_get_variables() {
   ## Special repos opt in to deriving the version from the nearest
   ## git tag instead of debian/changelog. Skip dpkg-parsechangelog;
   ## make_get_dependencies short-circuits on empty
-  ## make_debian_control_file_absolute_path. The downstream
-  ## make_git_tag_check still asserts HEAD is AT the tag (its
-  ## `git describe --abbrev=1000000000` comparison fires if HEAD
-  ## has moved past the tag).
+  ## make_debian_control_file_absolute_path. Downstream
+  ## make_git_tag_verify / make_git_tag_check both assert HEAD is AT
+  ## the tag (their `git describe --abbrev=1000000000` comparison
+  ## fires if HEAD has moved past the tag) so this "nearest tag"
+  ## fallback only feeds non-verify targets (dist, build, ...).
   if [ "${make_use_git_describe_for_version:-}" = "true" ]; then
     make_function_run make_get_dependencies
 
@@ -1852,6 +1853,26 @@ make_git_tag_verify() {
   ## Use 'refs/tags/...^{commit}' rather than a bare name so a
   ## same-named branch does not silently win the lookup. Pass the
   ## full tag ref to sq_git_run for the same reason.
+  ##
+  ## Assert HEAD is AT the tag whose signature we're about to verify.
+  ## Without this, special repos (make_use_git_describe_for_version)
+  ## set make_git_tag_version_number to the NEAREST PRIOR tag via
+  ## 'git describe --abbrev=0', and we'd happily verify that prior
+  ## tag's signature while HEAD is in fact untagged. Regular repos
+  ## have the same shape (make_git_tag_version_number comes from
+  ## debian/changelog) and benefit from the same check.
+  ## dm-packaging-helper-script's
+  ##   if ! genmkfile git-tag-verify; then genmkfile git-tag-sign; fi
+  ## pattern requires this verify to fail when HEAD is untagged.
+  ## make_skip_git_describe_output_check (set in derivative-maker's
+  ## debian/make-helper-overrides.bsh) bypasses the check, matching
+  ## make_git_tag_check's existing escape hatch.
+  [ -n "${make_git_describe_output:-}" ] || make_git_describe_output="$(git describe --always --abbrev=1000000000)"
+  if [ "$make_git_tag_version_number" != "$make_git_describe_output" ]; then
+    if [ "${make_skip_git_describe_output_check:-}" != "true" ]; then
+      die "Failed! Current git head is not at a signed tag! $running_as_root_maybe make_git_tag_version_number $make_git_tag_version_number differs from make_git_describe_output $make_git_describe_output"
+    fi
+  fi
   [ -n "${sq_git_trust_root:-}" ] || sq_git_trust_root="$(git rev-parse --verify "refs/tags/${make_git_tag_version_number}^{commit}")"
   sq_git_run "refs/tags/$make_git_tag_version_number"
 }
