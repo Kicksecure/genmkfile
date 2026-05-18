@@ -836,7 +836,8 @@ make_debinstfile() {
 }
 
 make_debinstfile_create() {
-  local new_file filename_without_hash cleaned_filename_without_hash pkg_name \
+  local new_file filename_without_dot filename_without_hash \
+    cleaned_filename_without_hash pkg_name \
     temp_deb_install_file real_deb_install_file
   local -a find_cmd
   local -A delete_yet
@@ -863,7 +864,11 @@ make_debinstfile_create() {
         pkg_name="${file_name#*#}"
         temp_deb_install_file="${genmkfile_temp_dir}/${pkg_name}.install"
 
-        if [ -z "${delete_yet[$pkg_name]}" ]; then
+        ## ${arr[k]:-} default needed because nounset raises on a
+        ## key the associative array has never seen. 'local -A
+        ## delete_yet' declares the array, but the per-key entries
+        ## are still unbound until first write.
+        if [ -z "${delete_yet[${pkg_name}]:-}" ]; then
           safe-rm --force -- "$temp_deb_install_file"
           delete_yet["${pkg_name}"]=true
           printf "%s\n" "\
