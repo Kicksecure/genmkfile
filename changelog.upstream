@@ -1,3 +1,214 @@
+commit 04322535b67063926617926b3000520232cc8572
+Merge: 185377f 94ca564
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon May 18 06:01:32 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 94ca5644ac191975074a4816c3b369e563262164
+Merge: 185377f 5883ee6
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Mon May 18 06:00:06 2026 -0400
+
+    Merge pull request #18 from org-ai-assisted/claude/fix-genmkfile-exit-codes-Xi0NP
+
+    make_function_run: exit on failure to stop swallowing nested rcs
+
+commit 5883ee627d662264fab8bd2c592d555098a150a4
+Author: Claude <noreply@anthropic.com>
+Date:   Sun May 17 21:37:15 2026 +0000
+
+    make_function_run: exit on failure (don't swallow nested rcs)
+
+    Repro: 'genmkfile git-tag-verify' on a repo where 'sq-git log'
+    fails (e.g. an unsigned/missing tag) exits 0 instead of
+    propagating sq-git's non-zero rc.
+
+    Trace through the call chain when 'make_function_run X' wraps a
+    function X that itself calls 'make_function_run Y':
+
+      caller -> make_function_run X
+                  "$X" "$@" || rc=$?     # || suppresses errexit in X
+                  -> X
+                      -> make_function_run Y
+                           "$Y" "$@" || rc=$?
+                           -> Y fails, rc=1
+                           returns 1
+                      # Y's failure ignored; X continues
+                      # X returns 0 (or last command's rc, often 0)
+                  # rc captured as 0
+                  returns 0
+
+    Bash propagates errexit-suppression from a parent '||'/'if'/'!'
+    into every shell function called from that context, and the
+    suppression sticks across recursion. 'make_parse_cmd' (called via
+    'make_function_run make_parse_cmd "$@"') is therefore unable to
+    propagate failures from the per-target 'make_function_run
+    "$target_fn"' it dispatches; the rc gets dropped on the floor and
+    the script falls through to a clean exit 0.
+
+    Fix: have 'make_function_run' 'exit' (not 'return') on failure.
+    'exit' bypasses errexit-suppression unconditionally and ends the
+    script with the inner command's exit code.
+
+    The one caller that intentionally catches a failure ('if !
+    make_function_run sq_git_run "HEAD"' in make_git_commit_verify,
+    to attach a context-specific 'die' message) needs the called
+    function to be able to return non-zero without exiting. Move that
+    caller -- and sq_git_run itself -- off the make_function_run
+    wrapper so the 'if !' branch can fire. Hooks for an external
+    binary like 'sq-git' (function name with a dash) wouldn't have
+    fired in practice anyway.
+
+    Verified end-to-end with mocked sq-git: failure paths now propagate
+    the inner rc (1, 42, etc.); success paths still exit 0; the custom
+    "head commit is unsigned" die-message in make_git_commit_verify
+    still prints.
+
+commit 185377fdc787a5b24860e77c4115a8b836d46a8e
+Merge: f598bac 855100f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 17 12:47:02 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 855100fd3ae39ea660f0e3ad78a1d982776a9c90
+Merge: fed66cf f38fba7
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 17 10:18:10 2026 -0400
+
+    Merge pull request #17 from org-ai-assisted/claude/document-special-repos-9nUfg
+
+    genmkfile: fix special-repo path past make-helper.bsh preamble
+
+commit f38fba7a6858cb9aded2aa08cc8574f5838ce85d
+Author: Claude <noreply@anthropic.com>
+Date:   Sun May 17 12:51:16 2026 +0000
+
+    genmkfile: fix special-repo path past the make-helper.bsh preamble
+
+    Two real bugs in PR #15's earlier landing surfaced once `genmkfile
+    git-tag-show` was actually exercised on a special repo (no
+    debian/control, override file in place):
+
+    1. shared.bsh's make_shared_function is called by make-helper.bsh:56
+       BEFORE override files get sourced (make-helper.bsh needs
+       dpkg_print_architecture for cross-arch defaults). At that point
+       make_use_git_describe_for_version was unset, so the flag-gated
+       branch fell through to the `test -f debian/control` failure -
+       same die mode as before PR #15.
+
+       Drop the flag-gated branch. Just probe debian/control directly:
+       set both path variables to empty when the file is absent, don't
+       die. Downstream consumers that genuinely need the file
+       (make_get_dependencies grep-dctrl, make_get_variables
+       dpkg-parsechangelog) already handle empty paths or die with a
+       clear message. The flag itself remains in scope for
+       make_get_variables, which is what actually picks the
+       version-source strategy.
+
+    2. make_get_variables' special-repo branch did not set
+       make_source_package_name. make_git_tag_shared (line 1784) reads
+       it under errexit/nounset just to compare with "derivative-maker",
+       so any tag-related target hit `unbound variable`. Set it to the
+       repo's directory basename ("qubes-template-kicksecure" etc.),
+       matching the convention genmkfile already uses elsewhere. Also
+       set make_package_list to a one-element array of the same name,
+       for symmetry with the regular branch.
+
+    Verified end-to-end:
+    - genmkfile git-tag-show on qubes-template-kicksecure with an
+      annotated tag at HEAD now prints "commit_<sha>".
+    - Without any tag, dies with the helpful
+      "no git tag reachable from HEAD; sign one with
+      dm-quickgittagsign first" message added in PR #15.
+    - Regular packages with debian/control: unchanged behavior.
+
+commit fed66cf216a8bf6df9559b88e7b9fa1c2d14cad1
+Merge: 670f431 ce24570
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sun May 17 08:43:13 2026 -0400
+
+    Merge pull request #16 from org-ai-assisted/claude/document-special-repos-9nUfg
+
+    make_git_tag_sign: dispatch on make_use_git_describe_for_version
+
+commit ce24570986cc378d30295ad16bcfd7c600b07b55
+Author: Claude <noreply@anthropic.com>
+Date:   Sun May 17 11:26:57 2026 +0000
+
+    make_git_tag_sign: dispatch on make_use_git_describe_for_version
+
+    Special repos opted in via make_use_git_describe_for_version (qubes
+    templates, Whonix-Installer, Whonix-Starter) previously had to be
+    tagged via a separate dm-quickgittagsign call in
+    dm-packaging-helper-script's pkg_git_sign_tags, because the genmkfile
+    make_git_tag_sign would attempt to create a tag named after
+    make_git_tag_version_number = `git describe --abbrev=0` (the existing
+    nearest tag) and fail.
+
+    Move the polymorphism here: when make_use_git_describe_for_version is
+    set, make_git_tag_sign overrides make_git_tag_version_number to
+    commit_<HEAD-sha> and short-circuits if such a tag already exists at
+    HEAD. Same SHA-encoded scheme dm-quickgittagsign(1) uses, so the two
+    producers stay consistent; the prefix is `commit_` (was `adrelanos_`
+    in the standalone script).
+
+    Callers can now invoke `genmkfile git-tag-sign` uniformly for both
+    kinds of repo; no in-caller dispatch needed.
+
+commit f598bac22415847d9ef8197edb25ec64930c9fcf
+Merge: 9c32171 670f431
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat May 16 17:13:39 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit 670f431f7aeab3e53c6caafe1fb73add600ceea9
+Merge: 9c32171 99632c3
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Sat May 16 16:20:28 2026 -0400
+
+    Merge pull request #15 from org-ai-assisted/claude/document-special-repos-9nUfg
+
+    git-verify: support repos without debian/control
+
+commit 99632c3570e5c84b1779358b41bdd522bc301052
+Author: Claude <noreply@anthropic.com>
+Date:   Sat May 16 20:01:38 2026 +0000
+
+    git-verify: support repos without debian/control
+
+    Adds opt-in flag make_use_git_describe_for_version. When set via
+    ./make-helper-overrides.bsh, make_shared_function skips the
+    debian/control existence check, make_get_dependencies short-circuits
+    on empty control path, and make_get_variables derives
+    make_git_tag_version_number from `git describe --abbrev=0` instead of
+    dpkg-parsechangelog. The downstream make_git_tag_check still asserts
+    HEAD is AT the tag via its `git describe --abbrev=1000000000`
+    comparison, so the "signed tag points at HEAD" policy is enforced
+    uniformly across regular and special repos
+    (qubes-template-{kicksecure,whonix}, Whonix-Installer,
+    Whonix-Starter).
+
+commit 9c3217100baaacdf78b792641e24fa84d669a848
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat May 16 06:08:33 2026 -0400
+
+    add .github/dependabot.yml
+
+commit 9ccf4d163554c9a2cee0e3d35d45b95e521b0d5b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat May 16 06:01:48 2026 -0400
+
+    update .github/workflows/consumer-claude-code.yml
+
+commit 34e2160aacc5781094a9d03cf2482c612df7ba09
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri May 15 18:38:48 2026 +0000
+
+    bumped changelog version
+
 commit 0d8ae0ca089162a8222b8aeaee47fc48a5aea75f
 Merge: 2eee9b3 e9b9d70
 Author: Patrick Schleizer <adrelanos@whonix.org>
