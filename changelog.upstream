@@ -1,3 +1,49 @@
+commit 2529912c79182b159062f615085664837b8eeaa5
+Merge: 708ec63 985bd65
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon May 18 06:12:23 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/claude/fix-genmkfile-exit-codes-Xi0NP'
+
+commit 985bd65cc0bd447a6e9485f6d8aae3f56b16d7d0
+Author: Claude <noreply@anthropic.com>
+Date:   Mon May 18 10:08:53 2026 +0000
+
+    make_debinstfile_create: nounset-safe associative-array read
+
+    Repro: 'genmkfile debinstfile' on a multi-package repo (one or
+    more files in the source tree with a '#packagename' suffix) dies:
+
+      /usr/share/genmkfile/make-helper-one.bsh: line 866:
+      delete_yet[$pkg_name]: unbound variable
+      cp: cannot stat '/tmp/.../tmp.XXXX/*.install': No such file or directory
+
+    'local -A delete_yet' declares the array but does not bind any
+    keys; reading '${delete_yet[$pkg_name]}' before the first write
+    trips nounset (R-025 in the bash style guide: an associative
+    array's *keys* are individually unbound until first assignment).
+    Use the '${arr[k]:-}' default form for the read.
+
+    The subshell-bound while-loop fails on the unbound-key read and
+    exits early; the outer for-loop then sees no '*.install' files
+    under '$genmkfile_temp_dir', the glob falls through to the
+    literal pattern, and 'cp' reports cannot-stat. The errexit that
+    should have aborted at the original failure is suppressed by the
+    'make_function_run' chain (the same suppression class the prior
+    PR fixed for return paths; reads-under-nounset are not affected
+    by that fix because the subshell's failure is propagated via
+    pipefail rather than 'return').
+
+    Also declared 'filename_without_dot' in the 'local ...' list; it
+    is set at line 860 but was previously inheriting from the calling
+    scope.
+
+commit 708ec63de176c23160ca7f6621ab5268f34a5501
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon May 18 10:03:02 2026 +0000
+
+    bumped changelog version
+
 commit 04322535b67063926617926b3000520232cc8572
 Merge: 185377f 94ca564
 Author: Patrick Schleizer <adrelanos@whonix.org>
