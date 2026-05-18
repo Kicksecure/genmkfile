@@ -1860,7 +1860,11 @@ sq_git_run() {
   [ -n "${sq_git_policy_file:-}" ] || sq_git_policy_file="$HOME/derivative-maker/buildconfig.d/openpgp-policy.toml"
   cmd=(sq-git log --policy-file "${sq_git_policy_file}" --trust-root "${sq_git_trust_root}" -- "${1}")
   printf "%s\n" "$0: ${green}INFO:${reset} ${cmd[*]}"
-  make_function_run "${cmd[@]}"
+  ## Direct call (no make_function_run wrapper) so make_git_commit_verify
+  ## can 'if ! sq_git_run "HEAD"' to catch failures and print a
+  ## context-specific 'die' message. make_function_run 'exit's on
+  ## failure and would skip the if-branch.
+  "${cmd[@]}"
 }
 
 make_git_tag_check() {
@@ -1882,10 +1886,9 @@ make_git_tag_check() {
 
 make_git_commit_verify() {
   make_function_run make_git_tag_shared
-  ## Inline: verify HEAD via sq_git_run. The old internal helper
-  ## 'make_git_commit_verify(ref)' only existed to translate the
-  ## target name into a sq_git_run call.
-  if ! make_function_run sq_git_run "HEAD"; then
+  ## Direct call (no make_function_run wrapper) so this if-branch can
+  ## fire; make_function_run 'exit's on failure.
+  if ! sq_git_run "HEAD"; then
     die "Failed! Current git head commit is unsigned! $running_as_root_maybe"
   fi
   printf "%s\n" "$0: ${green}INFO:${reset} Ok, current git head commit is signed."
@@ -2041,15 +2044,21 @@ make_function_run() {
   if type -t "${function_name}_hook_pre" >/dev/null; then
     "${function_name}_hook_pre" "$@"
   fi
-  ## Capture the exit code without tripping errexit. 'cmd; rc=$?'
-  ## would never reach the assignment when cmd failed, because
-  ## errexit would have killed the shell first. 'cmd || rc=$?'
-  ## disables errexit for cmd and the RHS sees cmd's exit status.
+  ## 'cmd || rc=$?' captures the exit code without tripping errexit,
+  ## but it also suppresses errexit INSIDE 'cmd' and every function
+  ## 'cmd' transitively calls. Combined with this helper recursing
+  ## (make_function_run X -> X -> make_function_run Y) the
+  ## suppression sticks for the whole chain, so an inner failure can
+  ## 'return 1' all the way back up and still get swallowed by any
+  ## caller that does not check the rc. 'exit' bypasses the
+  ## suppression unconditionally; the one caller that wants to
+  ## intercept a failure (make_git_commit_verify) calls the target
+  ## function directly instead of going through this wrapper.
   function_name_return_code=0
   "$function_name" "$@" || function_name_return_code="$?"
   if [ "$function_name_return_code" != "0" ]; then
     true "${green}INFO:${reset} function_name_return_code: $function_name_return_code"
-    return "$function_name_return_code"
+    exit "$function_name_return_code"
   fi
   if type -t "${function_name}_hook_post" >/dev/null; then
     "${function_name}_hook_post" "$@"
