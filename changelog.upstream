@@ -1,3 +1,15 @@
+commit 8119c386dcd699e518c3701651d5c4cc913c9f34
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 20 16:42:48 2026 -0400
+
+    genmkfile uch (generate upstream changelog): remove unicode
+
+commit 4efeb6119465e2b0c2048d0a1b1e4ad1a43445db
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon May 18 10:41:59 2026 +0000
+
+    bumped changelog version
+
 commit c509642e15a57a5795ed5f6b5ab4e64f859db995
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Mon May 18 06:38:32 2026 -0400
@@ -3793,7 +3805,7 @@ Date:   Fri Jun 21 05:12:03 2019 +0000
     https://github.com/Whonix/security-misc/pull/8
 
 commit 2761a59b2e17c0ad1007b0736de8ff65743141ca
-Author: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+Author: Marek Marczykowski-G_recki <marmarek@invisiblethingslab.com>
 Date:   Fri Jun 21 04:50:16 2019 +0200
 
     Add rpm packaging
@@ -3801,7 +3813,7 @@ Date:   Fri Jun 21 04:50:16 2019 +0200
     QubesOS/qubes-issues#1885
 
 commit aa8c30b8586c7922c12ab5aee5ef06a4cdf1e4f6
-Author: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+Author: Marek Marczykowski-G_recki <marmarek@invisiblethingslab.com>
 Date:   Fri Jun 21 04:49:34 2019 +0200
 
     Add Makefile.builder for qubes-builder
@@ -4256,7 +4268,7 @@ Date:   Wed Mar 8 14:26:43 2017 +0000
 
     https://phabricator.whonix.org/T643
 
-    Thanks to Ole-Morten Ω Duesund (@olemd) for pointing me to a solution!
+    Thanks to Ole-Morten _ Duesund (@olemd) for pointing me to a solution!
 
 commit d6deafe9ab85cb046ecd8de00adae509061b0331
 Author: Patrick Schleizer <adrelanos@riseup.net>
