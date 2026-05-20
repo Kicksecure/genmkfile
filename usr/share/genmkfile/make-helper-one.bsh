@@ -954,8 +954,12 @@ make_uch() {
     return 0
   fi
   make_require git sponge
-  git log | sed 's/[[:space:]]\+$//' | sponge -- "$PWD/changelog.upstream"
+  git log | \
+    sed 's/[[:space:]]\+$//' | \
+    stcat | \
+    sponge -- "$PWD/changelog.upstream"
   test -f "$PWD/changelog.upstream"
+  unicode-show "$PWD/changelog.upstream"
 }
 
 make_distclean() {
