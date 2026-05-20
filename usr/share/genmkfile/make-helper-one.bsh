@@ -985,7 +985,7 @@ make_deb_shared_dep() {
 
   make_require sudo apt-get
 
-  msg="sudo apt-get ${APTGETOPT[*]} --yes --no-install-recommends --allow-downgrades install -- $make_deb_shared_dependencies"
+  msg="sudo apt-get ${DIST_APTGETOPT[*]} --yes --no-install-recommends --allow-downgrades install -- $make_deb_shared_dependencies"
   printf "%s\n" "$msg"
 
   apt_get_exit_code="0"
@@ -995,7 +995,7 @@ make_deb_shared_dep() {
   # shellcheck disable=SC2086
   sudo \
     apt-get \
-    "${APTGETOPT[@]}" \
+    "${DIST_APTGETOPT[@]}" \
     --yes \
     --no-install-recommends \
     --allow-downgrades \
@@ -1339,7 +1339,7 @@ make_deb_install() {
     ## systemcheck is already the newest version (3:25.1-1).
     make_log_and_run sudo \
       apt-get \
-      "${APTGETOPT[@]}" \
+      "${DIST_APTGETOPT[@]}" \
       --yes \
       --no-install-recommends \
       --allow-downgrades \
@@ -2104,10 +2104,10 @@ if was_executed "${BASH_SOURCE[0]}"; then
   set -o errtrace
   shopt -s inherit_errexit
 
-  if [ -n "${APTGETOPT_SERIALIZED:-}" ]; then
-    mapfile -t APTGETOPT <<<"$APTGETOPT_SERIALIZED"
+  if [ -n "${DIST_APTGETOPT_SERIALIZED:-}" ]; then
+    mapfile -t DIST_APTGETOPT <<<"$DIST_APTGETOPT_SERIALIZED"
   else
-    APTGETOPT=()
+    DIST_APTGETOPT=()
   fi
 
   make_function_run make_init
