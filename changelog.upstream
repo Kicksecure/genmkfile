@@ -1,8 +1,44 @@
+commit c2cc3d6cc67448acddce62b6fa10897a752bc5e0
+Merge: fd414bc e82cdb4
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 20 17:05:52 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/org-ai-assisted/master'
+
+commit fd414bceff7f0b874d44daf14533bc107c8fdc4a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 20 16:56:48 2026 -0400
+
+    genmkfile uch
+
 commit 8119c386dcd699e518c3701651d5c4cc913c9f34
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed May 20 16:42:48 2026 -0400
 
     genmkfile uch (generate upstream changelog): remove unicode
+
+commit e82cdb44e748f7bd19e1fa22b77c44694811c7a7
+Merge: 4efeb61 9adbf74
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Wed May 20 16:40:56 2026 -0400
+
+    Merge pull request #22 from org-ai-assisted/claude/refactor-apt-variables-MPyww
+
+    Rename APTGETOPT to DIST_APTGETOPT to avoid pbuilder collision
+
+commit 9adbf7437db6c72b997f8878188a6308792efd23
+Author: Claude <noreply@anthropic.com>
+Date:   Wed May 20 20:28:04 2026 +0000
+
+    Rename APTGETOPT to DIST_APTGETOPT to avoid pbuilder collision
+
+    The APTGETOPT / APTGETOPT_SERIALIZED names collide with pbuilder/cowbuilder's
+    own APTGETOPT array variable. make-helper-one.bsh reconstructs the array from
+    the DIST_APTGETOPT_SERIALIZED environment variable passed by derivative-maker;
+    rename it in lockstep with derivative-maker, usability-misc and
+    developer-meta-files.
+
+    https://claude.ai/code/session_015NXhWb2m9F7wnHKtkedtKS
 
 commit 4efeb6119465e2b0c2048d0a1b1e4ad1a43445db
 Author: Patrick Schleizer <adrelanos@whonix.org>
