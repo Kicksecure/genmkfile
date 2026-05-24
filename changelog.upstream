@@ -1,3 +1,23 @@
+commit 24cf8dbc96bc41dd4eecf54b33baade10db2ccaf
+Merge: 133380e cd17bac
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 24 14:42:55 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/ArrayBolt3/arraybolt3/trixie'
+
+commit cd17bac1b1c90734b626bbd2f68e234825a02e57
+Merge: 10555b9 133380e
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Wed May 20 20:02:49 2026 -0400
+
+    Merge branch 'master' into arraybolt3/trixie
+
+commit 133380e877bc4e3cd8463358d5adc05be64cb460
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 20 22:02:53 2026 +0000
+
+    bumped changelog version
+
 commit c2cc3d6cc67448acddce62b6fa10897a752bc5e0
 Merge: fd414bc e82cdb4
 Author: Patrick Schleizer <adrelanos@whonix.org>
@@ -39,6 +59,12 @@ Date:   Wed May 20 20:28:04 2026 +0000
     developer-meta-files.
 
     https://claude.ai/code/session_015NXhWb2m9F7wnHKtkedtKS
+
+commit 10555b9a65206f82a366abb3b59e97ad70d45d0f
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Wed May 20 00:39:55 2026 -0400
+
+    minor
 
 commit 4efeb6119465e2b0c2048d0a1b1e4ad1a43445db
 Author: Patrick Schleizer <adrelanos@whonix.org>
