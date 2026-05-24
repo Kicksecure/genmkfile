@@ -860,10 +860,6 @@ make_debinstfile_create() {
         pkg_name="${file_name#*#}"
         temp_deb_install_file="${genmkfile_temp_dir}/${pkg_name}.install"
 
-        ## ${arr[k]:-} default needed because nounset raises on a
-        ## key the associative array has never seen. 'local -A
-        ## delete_yet' declares the array, but the per-key entries
-        ## are still unbound until first write.
         if [ -z "${delete_yet[${pkg_name}]:-}" ]; then
           safe-rm --force -- "$temp_deb_install_file"
           delete_yet["${pkg_name}"]=true
@@ -1019,7 +1015,6 @@ make_deb_build_dep() {
   ## here on top of whatever Build-Depends the extractor pulled from
   ## debian/control.
   ##
-  ## dctrl-tools (provides grep-dctrl) is added for the same reason:
   ## make_get_dependencies needs grep-dctrl to parse debian/control,
   ## so any environment that ran us this far must keep it. Hardcoding
   ## here keeps the apt-install path explicit even if a future
@@ -1815,7 +1810,10 @@ make_git_tag_sign() {
   make_function_run make_git_tag_shared
 
   ## Special repos opted in via make_use_git_describe_for_version
-  ## have no debian/changelog version.
+  ## have no debian/changelog version that is potentially newer than
+  ## any existing tag. We want to make a new, non-duplicate tag, so
+  ## override make_git_tag_version_number with a "version" based on
+  ## HEAD's commit hash and create a tag using that.
   if [ "${make_use_git_describe_for_version:-}" = "true" ]; then
     local head_sha
     head_sha="$(git rev-parse --verify HEAD)"
@@ -1855,7 +1853,7 @@ make_git_tag_verify() {
 
   if [ "$make_git_tag_version_number" != "$make_git_describe_output" ]; then
     if [ "${make_skip_git_describe_output_check:-}" != "true" ]; then
-      die "Failed! Current git head is not at a signed tag! $running_as_root_maybe make_git_tag_version_number $make_git_tag_version_number differs from make_git_describe_output $make_git_describe_output"
+      die "Failed! Current git head is not at a signed tag! $running_as_root_maybe make_git_tag_version_number '$make_git_tag_version_number' differs from make_git_describe_output '$make_git_describe_output'"
     fi
   fi
 
