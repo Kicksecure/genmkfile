@@ -1838,6 +1838,12 @@ make_git_tag_sign() {
   make_function_run make_git_tag_verify
 }
 
+## FIXME: This function's name implies that it verifies a *tag*, and
+## developer-meta-files uses it as such, but in practice it verifies
+## the commit a tag points to. It should probably verify the actual
+## tag instead. See corresponding TODO near
+## developer-meta-files/usr/libexec/developer-meta-files/git-helpers.bsh
+## function 'internal_git_verify_ref'.
 make_git_tag_verify() {
   make_function_run make_git_tag_shared
   #make_log_and_run git verify-tag -- "$make_git_tag_version_number"
@@ -1887,7 +1893,7 @@ make_git_tag_check() {
   [ -n "${make_git_describe_output:-}" ] || make_git_describe_output="$(git describe --always --abbrev=1000000000)"
   if [ "$make_git_tag_version_number" != "$make_git_describe_output" ]; then
     if [ "${make_skip_git_describe_output_check:-}" != "true" ]; then
-      die "Failed! Current git head is a untagged git tag! $running_as_root_maybe make_git_tag_version_number $make_git_tag_version_number differs from make_git_describe_output $make_git_describe_output"
+      die "Failed! Current git head is a untagged git commit! $running_as_root_maybe make_git_tag_version_number $make_git_tag_version_number differs from make_git_describe_output $make_git_describe_output"
     fi
   fi
 
