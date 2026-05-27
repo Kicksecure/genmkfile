@@ -5,6 +5,8 @@
 
 #set -x
 
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/parallel.bsh"
+
 ## Code duplication. Copied from
 ## helper-scripts/usr/libexec/helper-scripts/check_runtime.bsh.
 ##
@@ -1924,15 +1926,16 @@ make_git_verify() {
 ## Push-cache. Opt-in via make_git_tag_push_cache_dir.
 ##
 ## Layout:
-##   ${make_git_tag_push_cache_dir}/<repo>/<url-hash>-<remote>.txt
-##   Each line: <tag>:<full-40-char-commit-sha>
+##   ${make_git_tag_push_cache_dir}/<repo>/<remote>.txt
+##   Each line: <remote-url>:<tag>:<full-40-char-commit-sha>
 ##
-## url-hash invalidates on 'git remote set-url' (stale cache for
-## same remote name, different destination). Missing folders self-
-## heal: fresh cache misses, every push proceeds, cache rebuilds.
+## Including the remote URL in each line invalidates on 'git remote
+## set-url' (stale entries stay in the file but won't match the new
+## URL, so the push proceeds). Missing folders self-heal: fresh
+## cache misses, every push proceeds, cache rebuilds.
 
 git_tag_push_cache_path() {
-  local remote repo_top repo_name remote_url url_hash
+  local remote repo_top repo_name
 
   remote="$1"
 
@@ -1940,14 +1943,12 @@ git_tag_push_cache_path() {
 
   repo_top="$(git rev-parse --show-toplevel)"
   repo_name="$(basename -- "${repo_top}")"
-  remote_url="$(git remote get-url -- "${remote}")"
-  url_hash="$(printf '%s' "${remote_url}" | sha256sum | cut --characters=1-12)"
 
-  printf "%s\n" "${make_git_tag_push_cache_dir}/${repo_name}/${url_hash}-${remote}.txt"
+  printf "%s\n" "${make_git_tag_push_cache_dir}/${repo_name}/${remote}.txt"
 }
 
 git_tag_push_cache_check() {
-  local remote tag sha cache_file
+  local remote tag sha cache_file remote_url
 
   remote="$1"
   tag="$2"
@@ -1956,11 +1957,12 @@ git_tag_push_cache_check() {
   cache_file="$(git_tag_push_cache_path "${remote}")"
   [ -n "${cache_file}" ] || return 1
   [ -f "${cache_file}" ] || return 1
-  grep --line-regexp --fixed-strings --quiet -- "${tag}:${sha}" "${cache_file}"
+  remote_url="$(git remote get-url -- "${remote}")"
+  grep --line-regexp --fixed-strings --quiet -- "${remote_url}:${tag}:${sha}" "${cache_file}"
 }
 
 git_tag_push_cache_write() {
-  local remote tag sha cache_file cache_dir
+  local remote tag sha cache_file cache_dir remote_url
 
   remote="$1"
   tag="$2"
@@ -1971,7 +1973,8 @@ git_tag_push_cache_write() {
 
   cache_dir="$(dirname -- "${cache_file}")"
   mkdir --parents -- "${cache_dir}"
-  append-once "${cache_file}" "${tag}:${sha}"
+  remote_url="$(git remote get-url -- "${remote}")"
+  append-once "${cache_file}" "${remote_url}:${tag}:${sha}"
 }
 
 ## Backgrounded by make_git_tag_push (one per remote): 'die' kills
@@ -2036,12 +2039,12 @@ git_tag_push_to_remote() {
 ## See 'genmkfile git-tag-push' help text above for the contract
 ## (env vars, default vs configured mode, strict-error rules).
 make_git_tag_push() {
-  local branch remote tag tags_at_tip current_branch pid repo_top repo_name unique_tags_raw
-  local -a branches remotes all_tags unique_tags pids failures
-  local -A pid_to_remote
+  local branch remote tag tags_at_tip current_branch repo_top repo_name unique_tags_raw
+  local -a branches remotes all_tags unique_tags
+  local -A push_label=()
 
   make_function_run make_git_tag_shared
-  make_require append-once sha256sum
+  make_require append-once
 
   repo_top="$(git rev-parse --show-toplevel)"
   repo_name="$(basename -- "${repo_top}")"
@@ -2083,22 +2086,13 @@ make_git_tag_push() {
   unique_tags_raw="$(printf "%s\n" "${all_tags[@]}" | sort --unique)"
   mapfile -t unique_tags <<< "${unique_tags_raw}"
 
-  pids=()
-  pid_to_remote=()
   for remote in "${remotes[@]}"; do
     git_tag_push_to_remote "${remote}" "${branches[@]}" -- "${unique_tags[@]}" &
-    pid="$!"
-    pids+=( "${pid}" )
-    pid_to_remote[${pid}]="${remote}"
+    push_label[$!]="${remote}"
   done
 
-  failures=()
-  for pid in "${pids[@]}"; do
-    wait "${pid}" || failures+=( "${pid_to_remote[${pid}]}" )
-  done
-
-  if [ "${#failures[@]}" -gt 0 ]; then
-    die "atomic push failed: repo=${repo_name} remote(s)=${failures[*]}"
+  if ! parallel_wait push_label; then
+    die "atomic push failed: repo=${repo_name} branches=[${branches[*]}] tags=[${unique_tags[*]}] remote(s)=[${parallel_failures[*]}]"
   fi
 
   printf "%s\n" "$0: ${green}INFO:${reset} atomic push succeeded: repo=${repo_name} branches=[${branches[*]}] tags=[${unique_tags[*]}] remotes=[${remotes[*]}]"
