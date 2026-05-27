@@ -1824,7 +1824,7 @@ make_git_tag_sign() {
     local head_sha
     head_sha="$(git rev-parse --verify HEAD)"
     make_git_tag_version_number="commit_${head_sha}"
-    if git rev-parse --verify --quiet -- "refs/tags/${make_git_tag_version_number}" >/dev/null; then
+    if git rev-parse --verify --quiet "refs/tags/${make_git_tag_version_number}" >/dev/null; then
       printf "%s\n" "$0: ${green}INFO:${reset} tag '${make_git_tag_version_number}' already exists at HEAD - no-op."
       return 0
     fi
@@ -2004,7 +2004,7 @@ git_tag_push_to_remote() {
 
   tags_to_push=()
   for tag in "${tags[@]}"; do
-    tag_sha="$(git rev-parse --verify -- "refs/tags/${tag}^{commit}")"
+    tag_sha="$(git rev-parse --verify "refs/tags/${tag}^{commit}")"
     if git_tag_push_cache_check "${remote}" "${tag}" "${tag_sha}"; then
       printf "%s\n" "$0: ${green}CACHED:${reset} '${tag}' (${tag_sha:0:12}) already pushed to '${remote}'"
     else
@@ -2031,7 +2031,7 @@ git_tag_push_to_remote() {
   fi
 
   for tag in "${tags_to_push[@]}"; do
-    tag_sha="$(git rev-parse --verify -- "refs/tags/${tag}^{commit}")"
+    tag_sha="$(git rev-parse --verify "refs/tags/${tag}^{commit}")"
     git_tag_push_cache_write "${remote}" "${tag}" "${tag_sha}"
   done
 }
