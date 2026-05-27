@@ -153,9 +153,6 @@ git-tag-push:
 git-tag-show-latest:
 	$(GENMKFILE_PATH)/make-helper.bsh git-tag-show-latest
 
-git-tag-push-latest:
-	$(GENMKFILE_PATH)/make-helper.bsh git-tag-push-latest
-
 reprepro-add:
 	$(GENMKFILE_PATH)/make-helper.bsh reprepro-add
 
