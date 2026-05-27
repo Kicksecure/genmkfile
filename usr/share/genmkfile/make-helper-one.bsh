@@ -623,15 +623,19 @@ genmkfile git-verify
    Only a repository sanity check. Not for security purposes!
 
 genmkfile git-tag-push
-   git push latest pkg_version_with_revision from debian/changelog.
-   (Environment variable make_git_tag_push_targets defaults to 'origin'.)
+   Atomic push of (branches + tip tags) to each listed remote, in
+   parallel. Default: current branch + tag at HEAD -> 'origin'.
+   Every listed branch tip must carry a tag (strict; no fallback).
+   Environment variables:
+     make_git_push_branches       space-separated branch list (unset -> current branch)
+     make_git_push_remotes        space-separated remote list (unset -> origin)
+     make_git_tag_push_cache_dir  cache root for skip-already-pushed (unset -> no cache)
+   The caller is responsible for filtering make_git_push_branches /
+   make_git_push_remotes to refs that exist locally; genmkfile errors
+   out on a missing branch or remote.
 
 genmkfile git-tag-show-latest
    Echo the most recent git tag to stdout.
-
-genmkfile git-tag-push-latest
-   git push the most recent git tag.
-   (Environment variable make_git_tag_push_targets defaults to 'origin'.)
 
 genmkfile reprepro-add
    Add the main deb package using the reprepro wrapper
@@ -1796,7 +1800,7 @@ make_git_tag_shared() {
       die "package is '$make_source_package_name' but variable make_git_tag_sign_appendix is empty."
     fi
   fi
-  [ -n "${make_git_tag_push_targets:-}" ] || make_git_tag_push_targets="origin"
+  [ -n "${make_git_push_remotes:-}" ] || make_git_push_remotes="origin"
   make_require git
   make_git_tag_shared_done="true"
 }
@@ -1917,15 +1921,187 @@ make_git_verify() {
   printf "%s\n" "$0: ${green}INFO:${reset} Ok, current git head is a signed git commit and a signed git tag."
 }
 
-make_git_tag_push() {
-  make_function_run make_git_tag_shared
-  local repository
-  for repository in $make_git_tag_push_targets; do
-    ## Explicit refs/tags/ so 'git push' cannot be confused by a
-    ## branch sharing the tag's name.
-    printf "%s\n" "git push -- $repository refs/tags/$make_git_tag_version_number"
-    git push "$repository" -- "refs/tags/$make_git_tag_version_number"
+## Push-cache. Opt-in via make_git_tag_push_cache_dir.
+##
+## Layout:
+##   ${make_git_tag_push_cache_dir}/<repo>/<url-hash>-<remote>.txt
+##   Each line: <tag>:<full-40-char-commit-sha>
+##
+## url-hash invalidates on 'git remote set-url' (stale cache for
+## same remote name, different destination). Missing folders self-
+## heal: fresh cache misses, every push proceeds, cache rebuilds.
+
+git_tag_push_cache_path() {
+  local remote repo_top repo_name remote_url url_hash
+
+  remote="$1"
+
+  [ -n "${make_git_tag_push_cache_dir:-}" ] || return 0
+
+  repo_top="$(git rev-parse --show-toplevel)"
+  repo_name="$(basename -- "${repo_top}")"
+  remote_url="$(git remote get-url -- "${remote}")"
+  url_hash="$(printf '%s' "${remote_url}" | sha256sum | cut --characters=1-12)"
+
+  printf "%s\n" "${make_git_tag_push_cache_dir}/${repo_name}/${url_hash}-${remote}.txt"
+}
+
+git_tag_push_cache_check() {
+  local remote tag sha cache_file
+
+  remote="$1"
+  tag="$2"
+  sha="$3"
+
+  cache_file="$(git_tag_push_cache_path "${remote}")"
+  [ -n "${cache_file}" ] || return 1
+  [ -f "${cache_file}" ] || return 1
+  grep --line-regexp --fixed-strings --quiet -- "${tag}:${sha}" "${cache_file}"
+}
+
+git_tag_push_cache_write() {
+  local remote tag sha cache_file cache_dir
+
+  remote="$1"
+  tag="$2"
+  sha="$3"
+
+  cache_file="$(git_tag_push_cache_path "${remote}")"
+  [ -n "${cache_file}" ] || return 0
+
+  cache_dir="$(dirname -- "${cache_file}")"
+  mkdir --parents -- "${cache_dir}"
+  append-once "${cache_file}" "${tag}:${sha}"
+}
+
+## Backgrounded by make_git_tag_push (one per remote): 'die' kills
+## only the sub-shell; parent's 'wait' aggregates per-remote
+## failures. Args: <remote> <branch>... -- <tag>...
+git_tag_push_to_remote() {
+  local remote branch tag tag_sha push_rc arg sep_seen
+  local -a branches tags tags_to_push refspecs
+
+  remote="$1"
+  shift
+
+  branches=()
+  tags=()
+  sep_seen='false'
+  for arg in "$@"; do
+    if [ "${arg}" = '--' ]; then
+      sep_seen='true'
+      continue
+    fi
+    if [ "${sep_seen}" = 'true' ]; then
+      tags+=( "${arg}" )
+    else
+      branches+=( "${arg}" )
+    fi
   done
+
+  tags_to_push=()
+  for tag in "${tags[@]}"; do
+    tag_sha="$(git rev-parse --verify -- "refs/tags/${tag}^{commit}")"
+    if git_tag_push_cache_check "${remote}" "${tag}" "${tag_sha}"; then
+      printf "%s\n" "$0: ${green}CACHED:${reset} '${tag}' (${tag_sha:0:12}) already pushed to '${remote}'"
+    else
+      tags_to_push+=( "${tag}" )
+    fi
+  done
+
+  refspecs=()
+  for branch in "${branches[@]}"; do
+    refspecs+=( "refs/heads/${branch}:refs/heads/${branch}" )
+  done
+  for tag in "${tags_to_push[@]}"; do
+    refspecs+=( "refs/tags/${tag}:refs/tags/${tag}" )
+  done
+
+  ## make_function_run runs us under '... || rc=$?', suppressing
+  ## errexit for this sub-shell. Without an explicit rc check, a
+  ## failed push would fall through and poison the cache.
+  push_rc=0
+  make_log_and_run git push --atomic --porcelain -- "${remote}" "${refspecs[@]}" \
+    || push_rc="$?"
+  if [ "${push_rc}" -ne 0 ]; then
+    return "${push_rc}"
+  fi
+
+  for tag in "${tags_to_push[@]}"; do
+    tag_sha="$(git rev-parse --verify -- "refs/tags/${tag}^{commit}")"
+    git_tag_push_cache_write "${remote}" "${tag}" "${tag_sha}"
+  done
+}
+
+## See 'genmkfile git-tag-push' help text above for the contract
+## (env vars, default vs configured mode, strict-error rules).
+make_git_tag_push() {
+  local branch remote tag tags_at_tip current_branch pid repo_top repo_name unique_tags_raw
+  local -a branches remotes all_tags unique_tags pids failures
+  local -A pid_to_remote
+
+  make_function_run make_git_tag_shared
+  make_require append-once sha256sum
+
+  repo_top="$(git rev-parse --show-toplevel)"
+  repo_name="$(basename -- "${repo_top}")"
+
+  if [ -n "${make_git_push_branches:-}" ]; then
+    read -r -a branches <<< "${make_git_push_branches}"
+    [ "${#branches[@]}" -gt 0 ] \
+      || die "make_git_push_branches is set but parses to an empty list (whitespace-only?)."
+    for branch in "${branches[@]}"; do
+      git show-ref --verify --quiet -- "refs/heads/${branch}" \
+        || die "branch '${branch}' (from make_git_push_branches) does not exist in this repo."
+    done
+  else
+    current_branch="$(git rev-parse --abbrev-ref HEAD)"
+    [ "${current_branch}" != "HEAD" ] \
+      || die "HEAD is detached; cannot determine current branch. Set make_git_push_branches or check out a branch."
+    branches=( "${current_branch}" )
+  fi
+
+  read -r -a remotes <<< "${make_git_push_remotes}"
+  [ "${#remotes[@]}" -gt 0 ] \
+    || die "make_git_push_remotes is set but parses to an empty list (whitespace-only?)."
+  for remote in "${remotes[@]}"; do
+    git remote get-url -- "${remote}" &>/dev/null \
+      || die "remote '${remote}' (from make_git_push_remotes) does not exist in this repo."
+  done
+
+  all_tags=()
+  for branch in "${branches[@]}"; do
+    tags_at_tip="$(git tag --points-at "refs/heads/${branch}")"
+    [ -n "${tags_at_tip}" ] \
+      || die "no tag at tip of branch '${branch}'; create a signed tag at the tip before pushing."
+    while IFS= read -r tag; do
+      [ -n "${tag}" ] || continue
+      all_tags+=( "${tag}" )
+    done <<< "${tags_at_tip}"
+  done
+
+  unique_tags_raw="$(printf "%s\n" "${all_tags[@]}" | sort --unique)"
+  mapfile -t unique_tags <<< "${unique_tags_raw}"
+
+  pids=()
+  pid_to_remote=()
+  for remote in "${remotes[@]}"; do
+    git_tag_push_to_remote "${remote}" "${branches[@]}" -- "${unique_tags[@]}" &
+    pid="$!"
+    pids+=( "${pid}" )
+    pid_to_remote[${pid}]="${remote}"
+  done
+
+  failures=()
+  for pid in "${pids[@]}"; do
+    wait "${pid}" || failures+=( "${pid_to_remote[${pid}]}" )
+  done
+
+  if [ "${#failures[@]}" -gt 0 ]; then
+    die "atomic push failed: repo=${repo_name} remote(s)=${failures[*]}"
+  fi
+
+  printf "%s\n" "$0: ${green}INFO:${reset} atomic push succeeded: repo=${repo_name} branches=[${branches[*]}] tags=[${unique_tags[*]}] remotes=[${remotes[*]}]"
 }
 
 make_git_tag_show_latest() {
@@ -1938,22 +2114,6 @@ make_git_tag_show_latest() {
   fi
   make_git_tag_latest="$(git describe --tags -- "$latest_tagged_commit")"
   printf "%s\n" "$make_git_tag_latest"
-}
-
-make_git_tag_push_latest() {
-  make_function_run make_git_tag_shared
-  ## Thanks to kilianc - http://stackoverflow.com/a/7979255/2605155
-  local latest_tagged_commit make_git_tag_latest repository
-  latest_tagged_commit="$(git rev-list --tags --max-count=1)"
-  if [ -z "$latest_tagged_commit" ]; then
-    die "no tags exist in this repository."
-  fi
-  make_git_tag_latest="$(git describe --tags -- "$latest_tagged_commit")"
-  for repository in $make_git_tag_push_targets; do
-    ## Explicit refs/tags/ so 'git push' cannot be confused by a
-    ## branch sharing the tag's name.
-    make_log_and_run git push -- "$repository" "refs/tags/$make_git_tag_latest"
-  done
 }
 
 make_reprepro_shared() {
