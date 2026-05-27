@@ -1350,6 +1350,8 @@ make_deb_install() {
     install \
     -- \
     "${make_package_debs_files_list[@]}"
+
+  make_function_run make_installcheck
 }
 
 make_deb_remove() {
