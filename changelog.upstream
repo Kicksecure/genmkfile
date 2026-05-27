@@ -1,3 +1,262 @@
+commit 33311d7897520e692a5e0d891bfdd2c0772b4c8e
+Merge: f1821e2 d59b199
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 27 18:47:34 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/claude/confident-archimedes-2KQwy'
+
+commit d59b199809e509d87033bd70f2cb3b87db1c2cdf
+Author: Claude <noreply@anthropic.com>
+Date:   Wed May 27 22:45:23 2026 +0000
+
+    git-tag-push: drop unsupported '--' from 'git rev-parse --verify'
+
+    'git rev-parse' does not accept '--' as an end-of-options separator
+    (the in-file note at line 1859 already calls this out). With '--'
+    present the command fails:
+
+        $ git rev-parse --verify -- 'refs/tags/X^{commit}'
+        fatal: Needed a single revision
+        rc=128
+
+    In git_tag_push_to_remote (lines 2007, 2034) this made tag_sha empty,
+    so git_tag_push_cache_write emitted lines with a trailing colon and no
+    SHA:
+
+        git@github.com:org-ai-assisted/debug-misc.git:5.8-1:
+
+    The cache 'self-healed' (both reads and writes used the same empty SHA)
+    so failures were silent and re-pushes were skipped against an effectively
+    unbound tag. errexit didn't catch it because make_function_run wraps the
+    whole call chain in 'fn || rc=$?', suspending errexit through the
+    backgrounded git_tag_push_to_remote sub-shell.
+
+    The same broken '--' was also at line 1827 in make_git_tag_sign's
+    'tag already exists at HEAD - no-op' short-circuit; that check silently
+    never fires.
+
+    Removing '--' is safe here: the arguments are always 'refs/tags/...'
+    and never start with '-'. Existing stale cache lines with empty SHAs
+    won't match the new full-SHA lookup, so the next run pushes once,
+    appends a correct line, and the stale entry stays harmless until
+    manually cleaned.
+
+commit f1821e2bffb5c8fc9e57eb3936706b437945630b
+Merge: bbf362d dea8298
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 27 18:28:35 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/master'
+
+commit bbf362d826b3030ce23f1804bda61e2cdbe7122f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 27 18:28:32 2026 -0400
+
+    fix
+
+commit dea829837227ce978ab8511b92e05294fb386e6e
+Merge: f43afb8 ab79ba8
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Wed May 27 18:23:46 2026 -0400
+
+    Merge pull request #25 from org-ai-assisted/claude/kind-fermi-od4IG
+
+    make_function_run: stop suspending errexit; propagate installcheck diff failures
+
+commit ab79ba86c0ee69211b626ace51aa0ced2ba426e2
+Author: Claude <noreply@anthropic.com>
+Date:   Wed May 27 22:23:32 2026 +0000
+
+    make_function_run: drop rc-capture, let errexit propagate
+
+    The wrapper previously captured the rc via
+
+      "$function_name" "$@" || function_name_return_code="$?"
+      if [ "$function_name_return_code" != "0" ]; then
+         exit "$function_name_return_code"
+      fi
+
+    The '|| ...' form suspended errexit throughout the entire call subtree
+    of "$function_name". Any internal command that failed and did not
+    'exit' would have its rc dropped on the floor; the caller saw a
+    successful return. The trip wire that surfaced this: 'genmkfile
+    installcheck' running 'diff -- "$src" "$dst"' would emit
+    'diff: ...: Permission denied' to stderr and still exit 0. Same risk
+    class applied to rsync / chmod / safe-rm / stat inside make_helper.
+
+    Drop the rc capture. A bare '"$function_name" "$@"' call runs under
+    the script's set -o errexit (and inherit_errexit in subshells), so
+    internal failures naturally surface: command fails -> errexit fires
+    -> shell exits with the failing command's rc -> backgrounded
+    subshells exit non-zero and parallel_wait / outer wait -n collects
+    them.
+
+    git_tag_push_to_remote's explicit 'push_rc=$?' workaround for this
+    exact bug (added when atomic-push was wired up) is now redundant
+    and removed in the same patch: errexit fires inside the backgrounded
+    subshell on push failure, the subsequent cache-write loop never runs,
+    and the subshell's non-zero exit is collected by parallel_wait.
+
+    The one caller in the file that intercepts failure
+    (make_git_commit_verify -> 'if ! sq_git_run "HEAD"; then die ...')
+    already calls its target directly rather than via make_function_run,
+    matching the docblock's note. No other call sites wrap
+    make_function_run in '||' / '&&' / 'if !' (grep-confirmed), so
+    nothing else needs adjusting.
+
+commit e3992beb797c036830dcb7b3845e59bbf7e83cb9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 27 16:50:14 2026 -0400
+
+    TODO
+
+commit f43afb8ccf62fe20615e911c2482421f29363788
+Merge: 34d58bd 3529d61
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 27 16:41:58 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/master'
+
+commit 34d58bd0513d0818fc6133c27dfe16a7990c7d66
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 27 16:34:59 2026 -0400
+
+    fix
+
+commit 738d703567ed60d865bd4985de8a595f6020bcee
+Merge: acaae11 902f068
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 27 14:18:59 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/claude/kind-fermi-od4IG'
+
+commit 3529d612eeef3533d646b7395a4cc66cee8222b5
+Merge: bbfb778 902f068
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Wed May 27 14:18:18 2026 -0400
+
+    Merge pull request #24 from org-ai-assisted/claude/kind-fermi-od4IG
+
+    git-tag-push: use parallel_wait helper for per-remote orchestration
+
+commit 902f068681ed668d9a499ad08cd5a0862f4d37f8
+Author: Claude <noreply@anthropic.com>
+Date:   Wed May 27 18:18:12 2026 +0000
+
+    git-tag-push: parallel_wait helper, verbatim-URL cache, matched logs
+
+    Three small cleanups on top of #23:
+
+    1) Source helper-scripts/parallel.bsh unconditionally and replace
+       the manual pids[]/pid_to_remote[]/wait loop in
+       make_git_tag_push with parallel_wait + parallel_failures.
+       Matches the dmf idiom; -7 lines.
+
+    2) Cache layout simplifies from
+         ${cache_dir}/<repo>/<url-hash>-<remote>.txt
+           <tag>:<sha>
+       to
+         ${cache_dir}/<repo>/<remote>.txt
+           <remote-url>:<tag>:<sha>
+       Including the URL in each line still catches the 'git remote
+       set-url' case (stale entries don't match the new URL, push
+       proceeds) and the cache file is human-readable. Drops
+       sha256sum + awk from the pipeline; drops 'sha256sum' from
+       make_require too.
+
+    3) The 'atomic push failed' die message now carries the same
+       field set as the success log (branches=[], tags=[], plus the
+       failed remote list in brackets) for consistent grep-ability
+       in dm-push runs.
+
+commit acaae11178e8edc8508806739d5cf149290895d4
+Merge: 54da8ed bbfb778
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed May 27 13:59:01 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/master'
+
+commit bbfb7785b8389da1aa4e9879ac6b53147cd80371
+Merge: 54da8ed 67b4c10
+Author: assisted-by-ai (Bot Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Wed May 27 13:45:30 2026 -0400
+
+    Merge pull request #23 from org-ai-assisted/claude/kind-fermi-od4IG
+
+    git-tag-push: atomic per-remote push of branches + tip tags
+
+commit 67b4c10852cbe4738de117c5011e3dadeaeafe66
+Author: Claude <noreply@anthropic.com>
+Date:   Wed May 27 17:44:54 2026 +0000
+
+    git-tag-push: atomic per-remote push of branches + tip tags
+
+    Replace the single-tag-per-call, sequential-per-remote loop with a
+    unified atomic-push entry point. Every invocation bundles all
+    listed branches and their tip tags into one 'git push --atomic
+    --porcelain' call per remote, with remotes pushed in parallel.
+
+    Default mode (no env vars):
+      branches = current branch (errors if HEAD is detached)
+      remotes  = origin
+    Configured mode (env vars typically set by dm-packaging-helper-
+    script):
+      branches from make_git_push_branches
+      remotes  from make_git_push_remotes
+
+    Strict semantics (no fallbacks):
+      - Every listed branch must exist locally, else die.
+      - Every listed remote must exist locally, else die.
+      - Every listed branch tip must carry a tag, else die.
+    Caller is responsible for filtering env-var values to refs that
+    exist in the repo.
+
+    Skip-already-pushed cache (opt-in via make_git_tag_push_cache_dir):
+      Layout: ${cache_dir}/<repo>/<url-hash>-<remote>.txt
+      Lines:  <tag>:<full-40-char-commit-sha>
+      url-hash catches 'git remote set-url' (stale cache for same
+      remote name, different destination). Two clones with the same
+      remote URL share the cache; two with different URLs do not.
+      Push rc captured before cache-write loop so a failed push does
+      not poison the cache. append-once + sha256sum required at
+      function start (genmkfile's downstream consumers always have
+      helper-scripts).
+
+    Removed:
+      - make_git_tag_push_latest (chronologically-latest-tag push;
+        conflicts with the strict no-fallback rule)
+      - git-tag-push-latest target in makefile-full
+      - help text entry for git-tag-push-latest
+
+    Renamed:
+      - make_git_tag_push_targets -> make_git_push_remotes
+        (no external callers found)
+
+commit 54da8edc927c206904c0974dfcaddd26cc4fb884
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue May 26 07:24:14 2026 -0400
+
+    cleanup
+
+commit 1e73167523e82931e4b5fd2745c0fd25627fb39d
+Merge: 4ba6be9 def0ae0
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue May 26 07:23:56 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/ArrayBolt3/arraybolt3/trixie'
+
+commit def0ae08144274ace474a5148d6f7fb810e030dd
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Mon May 25 23:56:48 2026 -0400
+
+    String fix, FIXME
+
+commit 4ba6be99f1eaccfca7182a6b7dc91af08c1e3adb
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 24 19:08:08 2026 +0000
+
+    bumped changelog version
+
 commit 24cf8dbc96bc41dd4eecf54b33baade10db2ccaf
 Merge: 133380e cd17bac
 Author: Patrick Schleizer <adrelanos@whonix.org>
