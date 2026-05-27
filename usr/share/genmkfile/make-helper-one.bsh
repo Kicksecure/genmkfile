@@ -1336,9 +1336,10 @@ make_deb_install() {
       die "File '$package' does not exist. Have you run 'genmkfile deb-pkg' already?"
     fi
   done
-  ## --reinstall is required otherwise apt-get would refuse to install the package with the following error message:
+  ## '--reinstall' is required otherwise apt-get would refuse to install the package with the following error message:
   ## Note, selecting 'systemcheck' instead of '/home/user/derivative-binary/genmkfile-packages-result/systemcheck_25.1-1_all.deb'
   ## systemcheck is already the newest version (3:25.1-1).
+  ## TODO: '--reinstall' does not fully fix this.
   make_log_and_run sudo \
     apt-get \
     "${DIST_APTGETOPT[@]}" \
