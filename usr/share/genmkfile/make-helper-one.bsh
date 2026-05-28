@@ -254,9 +254,9 @@ make_get_variables() {
   local my_user_id
   my_user_id="$(id -u)"
   if [ "$my_user_id" = "0" ]; then
-    running_as_root_maybe="Running as ${under}root${eunder}. ($my_user_id)"
+    running_as_root_maybe="Running under account '${under}root${eunder}'. (uid '$my_user_id')"
   else
-    running_as_root_maybe="Running as ${under}user${eunder}. ($my_user_id)"
+    running_as_root_maybe="Running under account '${under}user${eunder}'. (uid) '$my_user_id')"
   fi
 
   ## Deterministic.
