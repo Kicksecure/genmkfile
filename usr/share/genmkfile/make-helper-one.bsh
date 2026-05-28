@@ -2016,12 +2016,6 @@ git_tag_push_to_remote() {
   done
 
   refspecs=()
-  ## Branch skip uses the remote-tracking ref maintained by git itself
-  ## (refs/remotes/<remote>/<branch>); no on-disk cache needed because
-  ## git already accounts for branch pushes. A missing or stale tracking
-  ## ref falls through to push -- correct under all states except "we
-  ## haven't fetched yet and the remote moved forward", which is not
-  ## something this skip is trying to handle.
   for branch in "${branches[@]}"; do
     local_sha="$(git rev-parse --verify "refs/heads/${branch}^{commit}")"
     tracking_ref="refs/remotes/${remote}/${branch}"
