@@ -6,6 +6,8 @@
 #set -x
 
 source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/parallel.bsh"
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/trace.bsh"
+source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/has.sh"
 
 ## Code duplication. Copied from
 ## helper-scripts/usr/libexec/helper-scripts/check_runtime.bsh.
@@ -24,44 +26,47 @@ if [ "${GENMKFILE_DEBUG:-}" = "1" ]; then
   set -x
 fi
 
+make_output_info() {
+  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${green}INFO:${reset} ${*}"
+}
+
+make_output_warn() {
+  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${red}WARNING:${reset} ${*}" >&2
+}
+
+make_output_cached() {
+  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${green}CACHED:${reset} ${*}"
+}
+
+make_output_debug() {
+  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${green}DEBUG:${reset} ${*}"
+}
+
 make_log_and_run() {
-  printf "%s\n" "${green}$0: running:${reset} $*"
-  "$@"
+  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${green}running:${reset} ${*}"
+  "${@}"
 }
 
-## CODE DUPLICATION: /usr/libexec/helper-scripts/has.sh
-## This is just a simple wrapper around 'command -v' to avoid
-## spamming '>/dev/null' throughout this function. This also guards
-## against aliases and functions.
-## https://github.com/dylanaraps/pfetch/blob/master/pfetch#L53
-has() {
-  local _cmd
-  _cmd="$(command -v "${1}")" 2>/dev/null || return 1
-  test -x "${_cmd}" || return 1
+make_output_error() {
+  local trace
+
+  trace="$(function_trace)"
+  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${red}${bold}ERROR:${reset} ${*}" >&2
+  printf "%s\n" "${trace}" >&2
 }
 
-## Print a red ERROR: line to stderr, tagged with the calling
-## function, then exit 1. The '${FUNCNAME[1]:-main}' expansion shows
-## the caller of die(), not die() itself.
 die() {
-  printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '${FUNCNAME[1]:-main}') $*" >&2
+  make_output_error "${@}"
   exit 1
 }
 
-## Abort with a clear error if any of the given commands is missing.
-## Points the user at 'genmkfile deb-build-dep' so they can install the
-## project's declared dependencies (plus build-essential) in one go.
 make_require() {
   local cmd
-  for cmd in "$@"; do
-    if ! has "$cmd"; then
-      ## Use printf directly rather than die() because we want
-      ## the caller of make_require (not make_require itself or
-      ## die itself) in the FUNCNAME tag, and the message is
-      ## multi-line with a help pointer.
-      printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '${FUNCNAME[1]:-main}') required command '$cmd' not found in PATH.
-If '$cmd' is listed in debian/control, try:
-  sudo genmkfile deb-build-dep" >&2
+  for cmd in "${@}"; do
+    if ! has "${cmd}"; then
+      make_output_error "required command '${cmd}' not found in PATH.
+If '${cmd}' is listed in debian/control, try:
+  sudo genmkfile deb-build-dep"
       exit 1
     fi
   done
@@ -692,13 +697,13 @@ make_dist() {
 '${empty_directories}'"
   fi
 
-  printf "%s\n" "$0: DEBUG manual reproduction:
+  make_output_debug "manual reproduction:
 cd $PWD"
 
   ## Excluding '/debian' folder from upstream tarball to avoid lintian warning
   ## 'no-debian-changes'.
 
-  msg="DEBUG manual reproduction:
+  msg="manual reproduction:
 find \
       '.' \
       -not -path '*/\.git/*' \
@@ -721,7 +726,7 @@ find \
    "
 
   msg="$(printf "%s\n" "$msg" | sed 's/  */ /g')"
-  printf "%s\n" "$msg"
+  make_output_debug "$msg"
 
   find \
     '.' \
@@ -919,7 +924,7 @@ make_debinstfile_create() {
 make_test() {
   ## Automatically run by debhelper. To prevent debhelper from failing,
   ## implemented a dummy function here.
-  printf "%s\n" "${green}$0: INFO:${reset} ${FUNCNAME[0]} not implemented"
+  make_output_info "${FUNCNAME[0]} not implemented"
 }
 
 make_manpages() {
@@ -965,7 +970,7 @@ make_uch() {
 }
 
 make_distclean() {
-  printf "%s\n" "$0: ${green}INFO:${reset} (internal) genmkfile distclean"
+  make_output_info "(internal) genmkfile distclean"
   make_function_run make_clean
 }
 
@@ -974,10 +979,10 @@ make_clean() {
     make -f "$PWD/Makefile_orig" clean
   else
     if make --dry-run clean &>/dev/null; then
-      printf "%s\n" "$0: ${green}INFO:${reset} (internal) make clean"
+      make_output_info "(internal) make clean"
       make clean
     else
-      printf "%s\n" "$0: ${green}INFO:${reset} no target 'make clean', ok."
+      make_output_info "no target 'make clean', ok."
     fi
   fi
 }
@@ -988,7 +993,7 @@ make_deb_shared_dep() {
   make_require sudo apt-get
 
   msg="sudo apt-get ${DIST_APTGETOPT[*]} --yes --no-install-recommends --allow-downgrades install -- $make_deb_shared_dependencies"
-  printf "%s\n" "$msg"
+  make_output_info "running: $msg"
 
   apt_get_exit_code="0"
   ## $make_deb_shared_dependencies is intentionally unquoted: the
@@ -1203,7 +1208,7 @@ sudo genmkfile deb-all-dep"
       "$@"
   fi
 
-  printf "%s\n" "$0: INFO: make_use_debsign: '${make_use_debsign:-}' | make_debsign_opts: '${make_debsign_opts:-}' | whoami: '$(whoami)' | DEBEMAIL: '${DEBEMAIL:-}'"
+  make_output_info "make_use_debsign: '${make_use_debsign:-}' | make_debsign_opts: '${make_debsign_opts:-}' | whoami: '$(whoami)' | DEBEMAIL: '${DEBEMAIL:-}'"
   if [ "${make_use_debsign:-}" = "true" ]; then
     make_require debsign sq
     deb_variables_check
@@ -1238,21 +1243,21 @@ sudo genmkfile deb-all-dep"
     if ! test -f "$package"; then
       die "File '$package' does not exist."
     fi
-    printf "%s\n" "$0: ${green}INFO:${reset} You can find your deb file here: ${bold}$package${reset}"
+    make_output_info "You can find your deb file here: ${bold}$package${reset}"
   done
 
   if [ "${make_use_lintian:-}" = "false" ]; then
-    printf "%s\n" "$0: ${green}INFO:${reset} make_use_lintian=false - skipping lintian."
+    make_output_info "make_use_lintian=false - skipping lintian."
   elif [ "${make_use_lintian:-}" = "true" ]; then
-    printf "%s\n" "$0: ${green}INFO:${reset} make_use_lintian=true - running lintian..."
+    make_output_info "make_use_lintian=true - running lintian..."
     make_function_run make_lintian
   else
-    printf "%s\n" "$0: ${green}INFO:${reset} make_use_lintian='' - Autodetecting if lintian is installed..."
+    make_output_info "make_use_lintian='' - Autodetecting if lintian is installed..."
     if has lintian; then
-      printf "%s\n" "$0: ${green}INFO:${reset} lintian auto detected, using it..."
+      make_output_info "lintian auto detected, using it..."
       make_function_run make_lintian
     else
-      printf "%s\n" "$0: ${green}INFO:${reset} lintian not installed, skipping."
+      make_output_info "lintian not installed, skipping."
     fi
   fi
 }
@@ -1260,10 +1265,10 @@ sudo genmkfile deb-all-dep"
 make_lintian_on_warning() {
   local lintian_exit_code="${1:-0}"
   if [ "${make_lintian_fail_open_versus_closed:-}" = "open" ]; then
-    printf "%s\n" "$0: ${red}WARNING:${reset} lintian warning. make_lintian_fail_open_versus_closed=open - Therefore, failing open." >&2
+    make_output_warn "lintian warning. make_lintian_fail_open_versus_closed=open - failing open."
     return 0
   fi
-  printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '${FUNCNAME[0]}') lintian warning. make_lintian_fail_open_versus_closed is not set to 'open' - Therefore, failing closed." >&2
+  make_output_error "lintian warning. make_lintian_fail_open_versus_closed is not set to 'open' - failing closed."
   ## If lintian itself exited 0 but we got here because of warning
   ## output, still exit 1 to signal the failure.
   [ "$lintian_exit_code" = "0" ] && lintian_exit_code=1
@@ -1296,7 +1301,7 @@ make_lintian() {
   fi
   local make_lintian_exit_code="0"
   local lintian_output
-  printf "%s\n" "lintian ${genmkfile_lintian_pre_opts:-} $DEBUILD_LINTIAN_OPTS ${genmkfile_lintian_post_opts:-} \"$make_main_changes_file\""
+  make_output_info "running: lintian ${genmkfile_lintian_pre_opts:-} $DEBUILD_LINTIAN_OPTS ${genmkfile_lintian_post_opts:-} \"$make_main_changes_file\""
   ## Capture the exit code in the parent shell. A previous idiom
   ## assigned it inside the $(...) subshell, where the assignment was
   ## thrown away when the subshell exited and the code was never seen.
@@ -1306,8 +1311,8 @@ make_lintian() {
   lintian_output="$(lintian ${genmkfile_lintian_pre_opts:-} $DEBUILD_LINTIAN_OPTS ${genmkfile_lintian_post_opts:-} "$make_main_changes_file" 2>&1)" || make_lintian_exit_code="$?"
   if [ -n "$lintian_output" ]; then
     if ! test -o xtrace; then
-      printf "%s\n" "$0: ${green}INFO:${reset} lintian exit code: $make_lintian_exit_code"
-      printf "%s\n" "$0: ${green}INFO:${reset} lintian output:"
+      make_output_info "lintian exit code: $make_lintian_exit_code"
+      make_output_info "lintian output:"
       printf "%s\n" "################################################################################"
       printf "%s\n" "$lintian_output"
       printf "%s\n" "################################################################################"
@@ -1317,7 +1322,7 @@ make_lintian() {
   if [ "$make_lintian_exit_code" != "0" ]; then
     make_lintian_on_warning "$make_lintian_exit_code"
   else
-    printf "%s\n" "$0: ${green}INFO:${reset} lintian ok."
+    make_output_info "lintian ok."
   fi
 }
 
@@ -1541,9 +1546,9 @@ make_helper() {
 
   if [ "$make_installsim_" = "true" ]; then
     if ! test -d "$DESTDIR"; then
-      printf "%s\n" "${green}$0: INFO:${reset} would create DESTDIR '$DESTDIR': mkdir --parents -- '$DESTDIR'"
+      make_output_info "would create DESTDIR '$DESTDIR': mkdir --parents -- '$DESTDIR'"
     else
-      printf "%s\n" "${green}$0: INFO:${reset} No need to run, because folder DESTDIR '$DESTDIR' already exists: mkdir --parents -- '$DESTDIR'"
+      make_output_info "No need to run, because folder DESTDIR '$DESTDIR' already exists: mkdir --parents -- '$DESTDIR'"
     fi
   fi
 
@@ -1582,7 +1587,7 @@ make_helper() {
               true "calling...: in_array |$file_without_pwd| |${folder_permission_skip_list[*]}|"
               if ! in_array "$file_without_pwd" "${folder_permission_skip_list[@]}"; then
                 true "in_array did not match, therefore continuing..."
-                printf "%s\n" "$0: INFO: chmod change on folder might(!) be required, consider running the following command: chmod -- 755 '$file_with_destdir'"
+                make_output_info "chmod change on folder may be required, consider: chmod 755 -- '$file_with_destdir'"
                 ## Not safe due to folders such as '/etc/sudoers.d' which have chmod '700' as per Debian default.
                 #chmod -- 755 "$file_with_destdir"
               fi
@@ -1620,12 +1625,12 @@ make_helper() {
             fi
             if test -x "$source_fso" || [ "$genmkfile_force_exec" = "true" ]; then
               if [ "$fso_with_destdir_stat" != "755" ]; then
-                printf "%s\n" "$0: INFO: executable file found, running command...: chmod -- 755 '$file_with_destdir'"
+                make_output_info "chmod 755 -- '$file_with_destdir' (executable, wrong mode)"
                 chmod -- 755 "$file_with_destdir"
               fi
             else
               if [ "$fso_with_destdir_stat" != "644" ]; then
-                printf "%s\n" "$0: INFO: non-executable file found, running command...: chmod -- 644 '$file_with_destdir'"
+                make_output_info "chmod 644 -- '$file_with_destdir' (non-executable, wrong mode)"
                 chmod -- 644 "$file_with_destdir"
               fi
             fi
@@ -1634,14 +1639,14 @@ make_helper() {
       elif [ "$make_installsim_" = "true" ]; then
         if [ "$rsync_done" != "true" ]; then
           ## use '[*]' to trat as single line and avoid newlines in output
-          printf "%s\n" "${green}$0: INFO:${reset} would do: rsync --dry-run ${genmkfile_rsync_opts[*]} -- \"$source_directory\" \"$DESTDIR\""
+          make_output_info "would do: rsync --dry-run ${genmkfile_rsync_opts[*]} -- \"$source_directory\" \"$DESTDIR\""
           rsync --dry-run "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
           rsync_done=true
         fi
         ## chmod cannot be simulated because actually no file gets copied.
       elif [ "$make_uninstallcheck_" = "true" ]; then
         if test -f "$file_with_destdir"; then
-          printf "%s\n" "${red}${bold}$0: ERROR:${reset} (FUNCNAME: '${FUNCNAME[0]}') file $file_with_destdir still installed." >&2
+          make_output_error "file '$file_with_destdir' still installed."
           still_installed="true"
         fi
       elif [ "$make_installcheck_" = "true" ]; then
@@ -1650,7 +1655,7 @@ make_helper() {
         fi
       elif [ "$make_uninstallsim_" = "true" ]; then
         if test -f "$file_with_destdir"; then
-          printf "%s\n" "${green}$0: INFO:${reset} would do: safe-rm --verbose -- \"$file_with_destdir\""
+          make_output_info "would do: safe-rm --verbose -- \"$file_with_destdir\""
         fi
       elif [ "$make_uninstall_" = "true" ]; then
         if test -f "$file_with_destdir"; then
@@ -1756,8 +1761,8 @@ make_deb_chl_bumpup() {
       new_changelog_version="$make_epoch:$new_upstream_version-$new_revision"
     fi
   elif [ "${make_bump_type:-}" = "manual" ]; then
-    printf "%s\n" "$0: INFO: Current version number: $make_changelog_version"
-    printf "%s\n" "Please enter new version number!"
+    make_output_info "Current version number: $make_changelog_version"
+    make_output_info "Please enter new version number:"
     read -r new_changelog_version
   else
     die "make_bump_type '${make_bump_type:-}' is neither 'major' nor 'manual'."
@@ -1828,7 +1833,7 @@ make_git_tag_sign() {
     head_sha="$(git rev-parse --verify HEAD)"
     make_git_tag_version_number="commit_${head_sha}"
     if git rev-parse --verify --quiet "refs/tags/${make_git_tag_version_number}" >/dev/null; then
-      printf "%s\n" "$0: ${green}INFO:${reset} tag '${make_git_tag_version_number}' already exists at HEAD - no-op."
+      make_output_info "tag '${make_git_tag_version_number}' already exists at HEAD - no-op."
       return 0
     fi
   fi
@@ -1885,7 +1890,7 @@ sq_git_run() {
   ## XXX: hardcoded
   [ -n "${sq_git_policy_file:-}" ] || sq_git_policy_file="$HOME/derivative-maker/buildconfig.d/openpgp-policy.toml"
   cmd=(sq-git log --policy-file "${sq_git_policy_file}" --trust-root "${sq_git_trust_root}" -- "${1}")
-  printf "%s\n" "$0: ${green}INFO:${reset} ${cmd[*]}"
+  make_output_info "running: ${cmd[*]}"
   ## Direct call (no make_function_run wrapper) so make_git_commit_verify
   ## can 'if ! sq_git_run "HEAD"' to catch failures and print a
   ## context-specific 'die' message. make_function_run 'exit's on
@@ -1907,7 +1912,7 @@ make_git_tag_check() {
   fi
 
   make_function_run make_git_tag_verify
-  printf "%s\n" "$0: ${green}INFO:${reset} Ok, current git head is a signed git tag."
+  make_output_info "current git head is a signed git tag."
 }
 
 make_git_commit_verify() {
@@ -1917,13 +1922,13 @@ make_git_commit_verify() {
   if ! sq_git_run "HEAD"; then
     die "Failed! Current git head commit is unsigned! $running_as_root_maybe"
   fi
-  printf "%s\n" "$0: ${green}INFO:${reset} Ok, current git head commit is signed."
+  make_output_info "current git head commit is signed."
 }
 
 make_git_verify() {
   make_function_run make_git_commit_verify
   make_function_run make_git_tag_check
-  printf "%s\n" "$0: ${green}INFO:${reset} Ok, current git head is a signed git commit and a signed git tag."
+  make_output_info "current git head is a signed git commit and a signed git tag."
 }
 
 ## Push-cache. Opt-in via make_git_tag_push_cache_dir.
@@ -2009,7 +2014,7 @@ git_tag_push_to_remote() {
   for tag in "${tags[@]}"; do
     tag_sha="$(git rev-parse --verify "refs/tags/${tag}^{commit}")"
     if git_tag_push_cache_check "${remote}" "${tag}" "${tag_sha}"; then
-      printf "%s\n" "$0: ${green}CACHED:${reset} '${tag}' (${tag_sha:0:12}) already pushed to '${remote}'"
+      make_output_cached "tag '${tag}' (${tag_sha:0:12}) already pushed to '${remote}'"
     else
       tags_to_push+=( "${tag}" )
     fi
@@ -2021,7 +2026,7 @@ git_tag_push_to_remote() {
     tracking_ref="refs/remotes/${remote}/${branch}"
     if git show-ref --verify --quiet -- "${tracking_ref}" \
         && [ "$(git rev-parse --verify "${tracking_ref}^{commit}")" = "${local_sha}" ]; then
-      printf "%s\n" "$0: ${green}CACHED:${reset} branch '${branch}' (${local_sha:0:12}) already at remote '${remote}' tip"
+      make_output_cached "branch '${branch}' (${local_sha:0:12}) already at remote '${remote}' tip"
       continue
     fi
     refspecs+=( "refs/heads/${branch}:refs/heads/${branch}" )
@@ -2031,7 +2036,7 @@ git_tag_push_to_remote() {
   done
 
   if [ "${#refspecs[@]}" -eq 0 ]; then
-    printf "%s\n" "$0: ${green}CACHED:${reset} nothing to push to '${remote}' (all branches at remote tip, all tags cached)"
+    make_output_cached "nothing to push to '${remote}' (all branches at remote tip, all tags cached)"
     return 0
   fi
 
@@ -2046,15 +2051,12 @@ git_tag_push_to_remote() {
 ## See 'genmkfile git-tag-push' help text above for the contract
 ## (env vars, default vs configured mode, strict-error rules).
 make_git_tag_push() {
-  local branch remote tag tags_at_tip current_branch repo_top repo_name unique_tags_raw
+  local branch remote tag tags_at_tip current_branch unique_tags_raw
   local -a branches remotes all_tags unique_tags
   local -A push_label=()
 
   make_function_run make_git_tag_shared
   make_require append-once
-
-  repo_top="$(git rev-parse --show-toplevel)"
-  repo_name="$(basename -- "${repo_top}")"
 
   if [ -n "${make_git_push_branches:-}" ]; then
     read -r -a branches <<< "${make_git_push_branches}"
@@ -2099,10 +2101,10 @@ make_git_tag_push() {
   done
 
   if ! parallel_wait push_label; then
-    die "atomic push failed: repo=${repo_name} branches=[${branches[*]}] tags=[${unique_tags[*]}] remote(s)=[${parallel_failures[*]}]"
+    die "atomic push failed: branches=[${branches[*]}] tags=[${unique_tags[*]}] remote(s)=[${parallel_failures[*]}]"
   fi
 
-  printf "%s\n" "$0: ${green}INFO:${reset} atomic push succeeded: repo=${repo_name} branches=[${branches[*]}] tags=[${unique_tags[*]}] remotes=[${remotes[*]}]"
+  make_output_info "atomic push succeeded: branches=[${branches[*]}] tags=[${unique_tags[*]}] remotes=[${remotes[*]}]"
 }
 
 make_git_tag_show_latest() {
@@ -2243,9 +2245,9 @@ if was_executed "${BASH_SOURCE[0]}"; then
 
   temp="$*"
   if [ -z "$temp" ]; then
-    printf "%s\n" "$0: ${green}INFO:${reset} called without parameters."
+    make_output_info "called without parameters."
   else
-    printf "%s\n" "$0: ${green}INFO:${reset} $*"
+    make_output_info "$*"
   fi
 
   set -o errexit
