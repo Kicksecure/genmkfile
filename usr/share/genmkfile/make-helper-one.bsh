@@ -27,23 +27,23 @@ if [ "${GENMKFILE_DEBUG:-}" = "1" ]; then
 fi
 
 make_output_info() {
-  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${green}INFO:${reset} ${*}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}INFO:${reset} ${*}"
 }
 
 make_output_warn() {
-  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${red}WARNING:${reset} ${*}" >&2
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${red}WARNING:${reset} ${*}" >&2
 }
 
 make_output_cached() {
-  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${green}CACHED:${reset} ${*}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}CACHED:${reset} ${*}"
 }
 
 make_output_debug() {
-  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${green}DEBUG:${reset} ${*}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}DEBUG:${reset} ${*}"
 }
 
 make_log_and_run() {
-  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${green}running:${reset} ${*}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}running:${reset} ${*}"
   "${@}"
 }
 
@@ -51,7 +51,7 @@ make_output_error() {
   local trace
 
   trace="$(function_trace)"
-  printf "%s\n" "${0}: [${make_source_package_name:-${PWD##*/}}] ${red}${bold}ERROR:${reset} ${*}" >&2
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${red}${bold}ERROR:${reset} ${*}" >&2
   printf "%s\n" "${trace}" >&2
 }
 
