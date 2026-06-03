@@ -1587,7 +1587,7 @@ make_helper() {
               true "calling...: in_array |$file_without_pwd| |${folder_permission_skip_list[*]}|"
               if ! in_array "$file_without_pwd" "${folder_permission_skip_list[@]}"; then
                 true "in_array did not match, therefore continuing..."
-                make_output_info "chmod change on folder may be required, consider: chmod 755 -- '$file_with_destdir'"
+                make_output_info "chmod change on folder may be required, consider: chmod -- 755 '$file_with_destdir'"
                 ## Not safe due to folders such as '/etc/sudoers.d' which have chmod '700' as per Debian default.
                 #chmod -- 755 "$file_with_destdir"
               fi
@@ -1643,7 +1643,7 @@ make_helper() {
           rsync --dry-run "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
           rsync_done=true
         fi
-        ## chmod cannot be simulated because actually no file gets copied.
+        ## 'chmod' cannot be simulated because actually no file gets copied.
       elif [ "$make_uninstallcheck_" = "true" ]; then
         if test -f "$file_with_destdir"; then
           make_output_error "file '$file_with_destdir' still installed."
