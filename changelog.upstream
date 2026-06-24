@@ -1,3 +1,31 @@
+commit 00baedc8e09e82bb859cc302ee2546c5dbd5b35a
+Merge: d7070e1 35c4025
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 24 19:44:39 2026 -0400
+
+    Merge remote-tracking branch 'gitlab-adrelanos/master'
+
+commit 35c40251f6cfcd67366e2cfac43a93886ba2b26c
+Author: claude <noreply@anthropic.com>
+Date:   Wed Jun 24 17:51:31 2026 -0400
+
+    claude: add genmkfile usage skill (SKILL.md at repo root), unpackaged
+
+    SKILL.md sits at the repo root so it rides genmkfile's git diff and is reviewed
+    alongside tool changes. The root is not an FHS install prefix
+    (make_folder_list_for_un_and_install), so it is excluded from the .deb; it does
+    ship in the 'genmkfile dist' source tarball (accepted upstream tradeoff).
+    Deployed by symlinking ~/.claude/skills/genmkfile to this repo root. ASCII only.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_01ER9YYa7mzZVjH29b3RcuXG
+
+commit d7070e134ddacd9296c8ebf06e6cd29390c2df3b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 3 16:53:57 2026 +0000
+
+    bumped changelog version
+
 commit b5433e4965fc19843c0ec14d2bdde6234133b85b
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Jun 3 11:49:33 2026 -0400
