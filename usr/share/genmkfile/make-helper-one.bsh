@@ -1638,7 +1638,7 @@ make_helper() {
         fi
       elif [ "$make_installsim_" = "true" ]; then
         if [ "$rsync_done" != "true" ]; then
-          ## use '[*]' to trat as single line and avoid newlines in output
+          ## use '[*]' to treat  as single line and avoid newlines in output
           make_output_info "would do: rsync --dry-run ${genmkfile_rsync_opts[*]} -- \"$source_directory\" \"$DESTDIR\""
           rsync --dry-run "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
           rsync_done=true
@@ -1651,7 +1651,18 @@ make_helper() {
         fi
       elif [ "$make_installcheck_" = "true" ]; then
         if test -f "$source_fso"; then
-          diff -- "$source_fso" "$file_with_destdir"
+          ## make_deb_install runs make_installcheck but configuration files may have changed on the system.
+          ##
+          ## TODO: How do we handle files in sudoers.d? (See also 'folder_permission_skip_list'.)
+          ##       Run make_installcheck as root?
+          ## diff: /etc/sudoers.d/pwfeedback: Permission denied
+          if [ "/$source_directory" = "/etc" ]; then
+            diff -- "$source_fso" "$file_with_destdir" || make_output_info "'$file_with_destdir' changed in /etc"
+          elif [ "/$source_directory" = "/usr/local/etc" ]; then
+            diff -- "$source_fso" "$file_with_destdir" || make_output_info "'$file_with_destdir' changed in /usr/local/etc"
+          else
+            diff -- "$source_fso" "$file_with_destdir"
+          fi
         fi
       elif [ "$make_uninstallsim_" = "true" ]; then
         if test -f "$file_with_destdir"; then
@@ -2221,6 +2232,12 @@ make_function_run() {
   local function_name
   function_name="$1"
   shift
+
+  if [ "$function_name" = "make_helper" ]; then
+    true "${FUNCNAME[0]}: $function_name"
+  else
+    make_output_info "${FUNCNAME[0]}: $function_name"
+  fi
   if type -t "${function_name}_hook_pre" >/dev/null; then
     "${function_name}_hook_pre" "$@"
   fi
@@ -2247,7 +2264,7 @@ if was_executed "${BASH_SOURCE[0]}"; then
   if [ -z "$temp" ]; then
     make_output_info "called without parameters."
   else
-    make_output_info "$*"
+    make_output_info "command: $*"
   fi
 
   set -o errexit
