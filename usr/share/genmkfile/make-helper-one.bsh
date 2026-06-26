@@ -5,9 +5,16 @@
 
 #set -x
 
-source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/parallel.bsh"
-source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/trace.bsh"
-source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/has.sh"
+#source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/has.sh"
+## CODE DUPLICATION
+has() {
+  local _cmd _name
+
+  for _name in "$@"; do
+    _cmd="$(command -v "${_name}")" 2>/dev/null || return 1
+    [ -x "${_cmd}" ] || return 1
+  done
+}
 
 ## Code duplication. Copied from
 ## helper-scripts/usr/libexec/helper-scripts/check_runtime.bsh.
@@ -49,8 +56,9 @@ make_log_and_run() {
 
 make_output_error() {
   local trace
-
-  trace="$(function_trace)"
+  source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/trace.bsh" || true
+  ## override in case 'function_trace' unavailable.
+  trace="$(function_trace)" || true
   printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${red}${bold}ERROR:${reset} ${*}" >&2
   printf "%s\n" "${trace}" >&2
 }
@@ -2065,6 +2073,8 @@ make_git_tag_push() {
   local branch remote tag tags_at_tip current_branch unique_tags_raw
   local -a branches remotes all_tags unique_tags
   local -A push_label=()
+
+  source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/parallel.bsh"
 
   make_function_run make_git_tag_shared
   make_require append-once
