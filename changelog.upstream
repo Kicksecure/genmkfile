@@ -1,3 +1,15 @@
+commit b7d0c218a489cd12cfbddf8b499275218b453ffc
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Jun 26 07:06:39 2026 -0400
+
+    improve installcheck
+
+commit 62bce0ab0748e21f873c396f557190ed7ae5c875
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 24 23:46:33 2026 +0000
+
+    bumped changelog version
+
 commit 00baedc8e09e82bb859cc302ee2546c5dbd5b35a
 Merge: d7070e1 35c4025
 Author: Patrick Schleizer <adrelanos@whonix.org>
