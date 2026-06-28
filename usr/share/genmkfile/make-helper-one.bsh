@@ -2308,7 +2308,7 @@ if was_executed "${BASH_SOURCE[0]}"; then
   for __arg in "$@"; do
     case "$__arg" in
     "" | help | --) ;;
-    deb-build-dep | deb-run-dep | deb-all-dep | deb-cleanup)
+    deb-build-dep | deb-run-dep | deb-all-dep | deb-cleanup | reprepro-remove | reprepro-add)
       __needs_dependencies=true
       ;;
     *)
