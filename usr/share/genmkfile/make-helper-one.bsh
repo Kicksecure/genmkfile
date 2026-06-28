@@ -431,7 +431,9 @@ make_get_variables() {
   make_debian_tarball="${DISTDIR}/$make_debian_tarball_file_name"
   if [ "${make_debdist_tolower:-}" != "false" ]; then
     make_debian_tarball_file_name="${make_debian_tarball_file_name,,}"
-    make_debian_tarball="${make_debian_tarball,,}"
+    ## Lowercase only the file name (the package name must be lowercase),
+    ## not DISTDIR: lowercasing the whole path breaks an uppercase DISTDIR.
+    make_debian_tarball="${DISTDIR}/$make_debian_tarball_file_name"
   fi
   make_debian_tarball_absolute_path="$(realpath -- "$make_debian_tarball")"
 
@@ -439,7 +441,8 @@ make_get_variables() {
   make_upstream_tarball_relative_path="${DISTDIR}/$make_upstream_tarball_relative_path_file_name"
   if [ "${make_upstream_tarball_relative_path_tolower:-}" != "false" ]; then
     make_upstream_tarball_relative_path_file_name="${make_upstream_tarball_relative_path_file_name,,}"
-    make_upstream_tarball_relative_path="${make_upstream_tarball_relative_path,,}"
+    ## Lowercase only the file name, not DISTDIR (see make_debian_tarball above).
+    make_upstream_tarball_relative_path="${DISTDIR}/$make_upstream_tarball_relative_path_file_name"
   fi
   make_upstream_tarball_real_path="$(realpath -- "$make_upstream_tarball_relative_path")"
 
