@@ -1,3 +1,70 @@
+commit 7441184f08d7944b6b07d37e7d3c259d972ee919
+Merge: dd08ea8 a052aef
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 29 04:22:20 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/claude/fix-deb-cleanup-needs-variables'
+
+commit a052aef95a57f9f19b23857c92f5ca5cb4e1b2b0
+Author: claude (dev22 c20093f1-1b30-4397-87b6-9586321c87df) <noreply@anthropic.com>
+Date:   Sun Jun 28 13:15:13 2026 -0400
+
+    fix: tolower only the tarball file name, not DISTDIR
+
+    make_get_variables lowercased the WHOLE make_debian_tarball /
+    make_upstream_tarball_relative_path strings, DISTDIR included:
+
+      make_debian_tarball="${make_debian_tarball,,}"
+
+    The package name must be lowercase, but DISTDIR must not be touched. When
+    DISTDIR contained any uppercase character the lowercased parent no longer
+    existed and the immediately following
+
+      realpath -- "$make_debian_tarball"
+
+    aborted the build with "No such file or directory". Real build DISTDIRs
+    are lowercase so it never bit in practice, but any uppercase DISTDIR
+    (e.g. a mktemp -d path) broke every version-info target.
+
+    Lowercase only the file name and re-prefix the untouched DISTDIR, exactly
+    as the non-tolower branch already builds the path.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_018bezwAzE9uxSX1xrH7okFV
+
+commit 97ec64930352fb231bd809407db571d559dd6bba
+Author: claude (dev22 c20093f1-1b30-4397-87b6-9586321c87df) <noreply@anthropic.com>
+Date:   Sun Jun 28 11:42:54 2026 -0400
+
+    fix: deb-cleanup/reprepro-remove/reprepro-add need make_get_variables, not just dependencies
+
+    Commits 367298e (deb-cleanup) and 4283612 (reprepro-remove, reprepro-add)
+    added these targets to the __needs_dependencies group, which calls only
+    make_get_dependencies and skips make_get_variables. But all three depend on
+    variables that only make_get_variables sets:
+
+      - make_deb_cleanup -> make_undist/make_undebdist/make_undebdsc/make_deb_clean
+        use make_upstream_tarball_relative_path, make_debian_tarball_absolute_path,
+        make_main_dsc_file and make_package_list.
+      - make_reprepro_shared uses make_main_changes_file and make_package_list.
+
+    Running e.g. 'genmkfile deb-cleanup' therefore aborted with:
+      make_upstream_tarball_relative_path: unbound variable
+
+    None of these targets reference any dependency-only variable, and
+    make_get_variables itself runs make_get_dependencies when needed, so the fix
+    is simply to let them fall through to the version-info default. Only
+    deb-build-dep/deb-run-dep/deb-all-dep are genuinely dependencies-only.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_018bezwAzE9uxSX1xrH7okFV
+
+commit dd08ea8e3e7b7ff05d1ae7cb6eae08ad0d15cff5
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jun 28 12:05:55 2026 +0000
+
+    bumped changelog version
+
 commit 428361263ced9621eecf496dd130fef9276ed624
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Jun 28 08:02:06 2026 -0400
