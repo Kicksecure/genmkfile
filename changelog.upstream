@@ -1,3 +1,51 @@
+commit e809ab88c1e635face936f341aee8da99ab86897
+Merge: 2847102 6f8a748
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 29 19:28:10 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/master'
+
+commit 6f8a7484c9431000b6aafb335a90298c655b31fc
+Author: claude (dev22 c20093f1-1b30-4397-87b6-9586321c87df) <noreply@anthropic.com>
+Date:   Mon Jun 29 14:23:35 2026 -0400
+
+    make_get_variables: set deb variables for git-describe repos that have debian/control
+
+    make_use_git_describe_for_version is meant for special repos with no
+    debian/control (Whonix-Installer, Whonix-Starter, qubes-template-*): they
+    have no deb to build, so make_get_variables derived the git tag version
+    from `git describe` and short-circuited before setting the upstream/debian
+    tarball and .dsc path variables.
+
+    live-build sets the same flag (to keep `genmkfile git-verify` working
+    against its commit_<sha> tags) but DOES ship debian/control and is built
+    as a .deb via `genmkfile deb-icup`. The unconditional short-circuit left
+    make_upstream_tarball_relative_path et al. unset, so deb-cleanup ->
+    make_undist aborted under `set -o nounset`:
+      make-helper-one.bsh: make_upstream_tarball_relative_path: unbound variable
+
+    Gate the short-circuit on the actual absence of debian/control (via
+    make_debian_control_file_absolute_path, set by make_shared_function): a
+    flagged repo that ships debian/control now falls through to the normal
+    path and gets the deb variables, while the git-describe tag version
+    computed above is preserved (the normal path's changelog-derived
+    make_git_tag_version_number assignment is skipped while the flag is set),
+    so git-verify still compares against the commit_<sha> tag.
+
+    Verified: deb-cleanup on a flag+control fixture no longer trips the unbound
+    variable and exits 0; git-tag-show still reports the commit_<sha> tag, not
+    the changelog version; the control-less special-repo path is unchanged.
+    Regression test added to the dist-ai genmkfile-tests suite.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_018bezwAzE9uxSX1xrH7okFV
+
+commit 2847102595be70b2247b6eb3be79da562cde296c
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 29 15:22:19 2026 +0000
+
+    bumped changelog version
+
 commit 7441184f08d7944b6b07d37e7d3c259d972ee919
 Merge: dd08ea8 a052aef
 Author: Patrick Schleizer <adrelanos@whonix.org>
