@@ -280,23 +280,17 @@ make_get_variables() {
   ## make_get_dependencies short-circuits on empty
   ## make_debian_control_file_absolute_path.
   if [ "${make_use_git_describe_for_version:-}" = "true" ]; then
+    ## make_get_dependencies runs make_shared_function, which sets
+    ## make_debian_control_file_absolute_path (empty when there is no
+    ## debian/control). The control-present check below branches on it.
     make_function_run make_get_dependencies
 
-    make_changelog_version=""
-    make_pkg_revision=""
-    make_pkg_version=""
-    make_epoch=""
-    make_pkg_version_with_revision=""
-
-    ## Downstream make_git_tag_shared reads make_source_package_name
-    ## under `set -o nounset` (just to check whether it equals
-    ## "derivative-maker"). The regular branch sets it from
-    ## `dpkg-parsechangelog --show-field Source`; for special repos
-    ## there's no changelog, so use the repo's directory basename
-    ## ("qubes-template-kicksecure", "Whonix-Installer", ...).
-    make_source_package_name="$(basename -- "$PWD")"
-    make_package_list=("$make_source_package_name")
-
+    ## Derive the git tag version from the nearest signed git tag (created
+    ## as commit_<sha> by make_git_tag_sign) rather than from
+    ## debian/changelog, so `genmkfile git-verify` / `git-tag` work for
+    ## repos that tag by commit. This is independent of any deb version
+    ## and is preserved even when the repo is also built as a .deb (see
+    ## the control-present fall-through below).
     if ! make_git_tag_version_number="$(git describe --abbrev=0 2>/dev/null)"; then
       die "make_use_git_describe_for_version=true but no git tag reachable from HEAD; sign one with dm-quickgittagsign first."
     fi
@@ -304,7 +298,36 @@ make_get_variables() {
       || die "make_use_git_describe_for_version=true but 'git describe --abbrev=0' returned empty."
     make_git_tag_version_number="${make_git_tag_version_number}${make_git_tag_sign_appendix:-}"
     true "make_git_tag_version_number (from git describe): $make_git_tag_version_number"
-    return 0
+
+    ## A repo with no debian/control has no deb to build: there is no
+    ## changelog version to parse and no source/debian tarball or .dsc to
+    ## name. Blank the deb-version variables and short-circuit. This is
+    ## the original special-repo path (Whonix-Installer, Whonix-Starter,
+    ## qubes-template-{kicksecure,whonix}, ...).
+    if [ -z "${make_debian_control_file_absolute_path:-}" ]; then
+      make_changelog_version=""
+      make_pkg_revision=""
+      make_pkg_version=""
+      make_epoch=""
+      make_pkg_version_with_revision=""
+
+      ## Downstream make_git_tag_shared reads make_source_package_name
+      ## under `set -o nounset` (just to check whether it equals
+      ## "derivative-maker"). The regular branch sets it from
+      ## `dpkg-parsechangelog --show-field Source`; for special repos
+      ## there's no changelog, so use the repo's directory basename
+      ## ("qubes-template-kicksecure", "Whonix-Installer", ...).
+      make_source_package_name="$(basename -- "$PWD")"
+      make_package_list=("$make_source_package_name")
+      return 0
+    fi
+
+    ## Otherwise this repo opted into git-describe versioning but DOES
+    ## ship debian/control (e.g. live-build) and is still built as a .deb
+    ## via genmkfile. Fall through to the normal path below so the
+    ## changelog version and the tarball / .dsc variables get set; the
+    ## git-describe tag version computed above is kept (the changelog
+    ## version assignment below is skipped while this flag is set).
   fi
 
   local temp
@@ -353,15 +376,23 @@ make_get_variables() {
 
   make_pkg_version_with_revision="${make_pkg_version}${make_pkg_revision}"
 
-  if [ "${make_pkg_use_pkg_version_without_revision_for_git_version:-}" = "true" ]; then
-    ## used for derivative-maker
-    make_git_tag_version_number="$make_pkg_version"
+  if [ "${make_use_git_describe_for_version:-}" = "true" ]; then
+    ## Tag version already derived from git describe above (with the
+    ## appendix applied there). Keep it; do not override with the
+    ## changelog version. The tag scheme for these repos is commit_<sha>,
+    ## so git-verify must compare against that, not the changelog version.
+    true "make_git_tag_version_number (git describe, kept): $make_git_tag_version_number"
   else
-    ## default for all packages
-    make_git_tag_version_number="$make_pkg_version_with_revision"
+    if [ "${make_pkg_use_pkg_version_without_revision_for_git_version:-}" = "true" ]; then
+      ## used for derivative-maker
+      make_git_tag_version_number="$make_pkg_version"
+    else
+      ## default for all packages
+      make_git_tag_version_number="$make_pkg_version_with_revision"
+    fi
+    ## make_git_tag_sign_appendix gets set by dm-bump-derivative-maker-version
+    make_git_tag_version_number="${make_git_tag_version_number}${make_git_tag_sign_appendix:-}"
   fi
-  ## make_git_tag_sign_appendix gets set by dm-bump-derivative-maker-version
-  make_git_tag_version_number="${make_git_tag_version_number}${make_git_tag_sign_appendix:-}"
 
   [ -n "${host_architecture:-}" ] || host_architecture="$dpkg_print_architecture"
   [ -n "${target_architecture:-}" ] || target_architecture="$dpkg_print_architecture"
