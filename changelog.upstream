@@ -1,3 +1,70 @@
+commit ba358450c92b12d2583034f9efa20ee759d299c9
+Merge: 1d07352 b2535fa
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Jun 30 19:26:24 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/claude/installcheck-opt-out'
+
+commit b2535fab6ea27135141e3f20e75e856dd911688f
+Author: claude (dev22 c20093f1-1b30-4397-87b6-9586321c87df) <noreply@anthropic.com>
+Date:   Tue Jun 30 19:20:39 2026 -0400
+
+    SKILL: document cowbuilder --execute env-passing + cowdancer hardlink trap
+
+    Two cowbuilder gotchas learned while removing the vbox chroot env-files:
+
+    - 'cowbuilder --execute' forwards the caller's environment into the chroot
+      script; sudo --preserve-env=<list> only carries EXPORTED variables, so a
+      set-but-unexported entry is dropped. Export the vars and rely on
+      --preserve-env rather than serializing a declare-p env-file to source.
+
+    - The buildplace is a 'cp -al base' hardlink farm; cowdancer breaks a hardlink
+      before a write to protect the base, but sudo's env_reset strips the cowdancer
+      LD_PRELOAD/ilist, so a sudo step inside the chroot writes through hardlinks
+      and corrupts the shared base. Do not reuse a base across runs after a
+      non-cowdancer mutation; and run in-chroot root commands without sudo to keep
+      the cowdancer env intact.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_018bezwAzE9uxSX1xrH7okFV
+
+commit 1d07352ad415a3d79234e3f3314d6a9dcc55db36
+Merge: a613861 8183f3b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Jun 30 18:33:00 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/claude/installcheck-opt-out'
+
+commit 8183f3bec7b7c86aa651d6b3812ffbdde7a00f53
+Author: claude (dev22 c20093f1-1b30-4397-87b6-9586321c87df) <noreply@anthropic.com>
+Date:   Tue Jun 30 09:07:28 2026 -0400
+
+    make_deb_install: allow opting out of installcheck via make_use_installcheck
+
+    make_installcheck (make_helper) diffs a package's files at native FHS
+    paths (bin/ etc/ usr/ ...) found in the source tree against what got
+    installed -- a check that only fits genmkfile-native packages. A
+    dh-packaged repo such as live-build keeps its source under share/,
+    functions/, data/, frontend/ and maps it into the .deb via debian/rules,
+    so there are no native-FHS files in the source tree; make_helper matches
+    nothing and aborts with "Nothing has been copied" even though the .deb
+    built and installed fine.
+
+    Gate the post-install make_installcheck on make_use_installcheck (mirrors
+    the existing make_use_lintian opt-out): default keeps running it, repos
+    that do not fit the native model set make_use_installcheck=false in their
+    overrides. Verified: 'genmkfile deb-install' on live-build now installs
+    the deb and skips installcheck (exit 0) instead of dying.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_018bezwAzE9uxSX1xrH7okFV
+
+commit a613861df3383066e48ee4522b253c5df6f3654d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 29 23:34:36 2026 +0000
+
+    bumped changelog version
+
 commit e809ab88c1e635face936f341aee8da99ab86897
 Merge: 2847102 6f8a748
 Author: Patrick Schleizer <adrelanos@whonix.org>
