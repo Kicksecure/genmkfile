@@ -1398,7 +1398,18 @@ make_deb_install() {
     -- \
     "${make_package_debs_files_list[@]}"
 
-  make_function_run make_installcheck
+  ## make_installcheck diffs the package's files at native FHS paths
+  ## (bin/ etc/ usr/ ...) in the source tree against what was installed,
+  ## which only fits genmkfile-native packages. A dh-packaged repo (e.g.
+  ## live-build: source under share/, functions/, data/, mapped into the
+  ## deb by debian/rules) has no such native-FHS files, so make_helper
+  ## matches nothing and aborts with "Nothing has been copied". Let such
+  ## a repo opt out via make_use_installcheck=false in its overrides.
+  if [ "${make_use_installcheck:-}" = "false" ]; then
+    make_output_info "make_use_installcheck=false - skipping installcheck."
+  else
+    make_function_run make_installcheck
+  fi
 }
 
 make_deb_remove() {
