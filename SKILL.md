@@ -153,3 +153,36 @@ Non-executable override files are skipped. Prefer this over editing the engine.
   the error tells you which tarball is missing.
 - The dm apt-cacher (`127.0.0.1:9977`) is only up during a dm build session;
   when it's down, set `make_cowbuilder_mirror=https://deb.debian.org/debian`.
+
+### cowbuilder `--execute`: passing variables into a chroot script
+
+`cowbuilder --execute -- <script>` runs `<script>` inside the chroot with the
+*caller's* environment, as far as sudo lets it through. derivative-maker's
+`$SUDO_TO_ROOT` already appends `--preserve-env=$env_vars_keep_list`
+(`help-steps/variables`), and `cowbuilder` forwards that environment into the
+`--execute` script (verified: a `--preserve-env`'d, exported variable is visible
+inside the chroot).
+
+- `--preserve-env=<list>` only carries **exported** variables. A set-but-unexported
+  shell variable named in the list is silently dropped. So to hand a chroot script
+  its inputs, `export` them and rely on `--preserve-env` -- there is no need to
+  serialize them to a file and `source` it (which would be runtime-generated code).
+  Several `env_vars_keep_list` entries are set but not exported, which is exactly
+  why the old vbox chroot scripts ferried them through a generated `declare -p`
+  env-file; exporting them is the fix.
+
+### cowdancer COW + the hardlink-bypass trap
+
+The buildplace is a fresh per-invocation `cp -al <base>` into `cow.<PID>` (hardlinks
+into the base), torn down afterwards unless `--save-after-login`. cowdancer
+(`libcowdancer` via `LD_PRELOAD` + `COWDANCER_ILISTFILE`) breaks a file's hardlink
+before a write so the base is preserved. But `sudo`'s `env_reset` strips both, so
+anything run via `sudo` inside the chroot runs **without** cowdancer -- its
+writes/unlinks hit the hardlinked-into-base inode directly and **corrupt the shared
+base**. Harmless for a one-shot `--execute` (the buildplace is discarded), but do
+NOT reuse a base across runs if a non-cowdancer step mutated files in it (e.g.
+`VBoxManage unregistervm --delete` deleting a VM whose disk/registry are hardlinked
+into the base). This is also why a root command run via `sudo` inside the chroot can
+fail with `cp: ... Cannot allocate memory`: `libcowdancer` stays `LD_PRELOAD`'ed
+while `COWDANCER_ILISTFILE` is gone, leaving the COW layer half-initialized -- run
+such commands directly (without sudo) so the inherited cowdancer env stays intact.
