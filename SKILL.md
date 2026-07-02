@@ -7,7 +7,7 @@ license: MIT
 # genmkfile: building derivative-maker / Kicksecure Debian packages
 
 `genmkfile` is a generic Makefile generator used by Kicksecure / Whonix /
-derivative-maker packages. It removes hand-written `debian/*.install` and
+derivative-maker packages. It replaces hand-written `debian/*.install` and
 `make install` targets: files laid out as `usr/...`, `etc/...` in the package
 root install to `/usr/...`, `/etc/...`. The engine is a big bash script
 (`/usr/share/genmkfile/make-helper-one.bsh`); a thin `/usr/bin/genmkfile` wrapper
