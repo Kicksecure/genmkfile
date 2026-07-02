@@ -91,10 +91,10 @@ deb_variables_check() {
     ## Otherwise e-mail address in debian/changelog would default to
     ## user@host.localdomain and then lintian would complain and exit with
     ## failure code.
-    die "environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+    die 1 "environment variable DEBEMAIL may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
   fi
   if [ -z "${DEBFULLNAME:-}" ]; then
-    die "environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
+    die 1 "environment variable DEBFULLNAME may not be empty! Both, DEBEMAIL and DEBFULLNAME need to be set!"
   fi
 
   ## TODO: DEBSIGN_KEYID ?
@@ -147,7 +147,7 @@ make_parse_cmd() {
       break
       ;;
     -*)
-      die "unknown option: $arg"
+      die 1 "unknown option: $arg"
       ;;
     esac
 
@@ -294,10 +294,10 @@ make_get_variables() {
     ## and is preserved even when the repo is also built as a .deb (see
     ## the control-present fall-through below).
     if ! make_git_tag_version_number="$(git describe --abbrev=0 2>/dev/null)"; then
-      die "make_use_git_describe_for_version=true but no git tag reachable from HEAD; sign one with dm-quickgittagsign first."
+      die 1 "make_use_git_describe_for_version=true but no git tag reachable from HEAD; sign one with dm-quickgittagsign first."
     fi
     [ -n "${make_git_tag_version_number}" ] \
-      || die "make_use_git_describe_for_version=true but 'git describe --abbrev=0' returned empty."
+      || die 1 "make_use_git_describe_for_version=true but 'git describe --abbrev=0' returned empty."
     make_git_tag_version_number="${make_git_tag_version_number}${make_git_tag_sign_appendix:-}"
     true "make_git_tag_version_number (from git describe): $make_git_tag_version_number"
 
@@ -333,7 +333,7 @@ make_get_variables() {
 
   local temp
   if ! has dpkg-parsechangelog; then
-    die "dpkg-parsechangelog not found (provided by 'dpkg-dev'). Run: sudo genmkfile deb-build-dep"
+    die 1 "dpkg-parsechangelog not found (provided by 'dpkg-dev'). Run: sudo genmkfile deb-build-dep"
   fi
 
   make_function_run make_get_dependencies
@@ -372,7 +372,7 @@ make_get_variables() {
   true "make_epoch: $make_epoch"
 
   if [ -z "$make_pkg_version" ]; then
-    die "variable make_pkg_version is empty."
+    die 1 "variable make_pkg_version is empty."
   fi
 
   make_pkg_version_with_revision="${make_pkg_version}${make_pkg_revision}"
@@ -499,22 +499,22 @@ make_get_distdir() {
 
   if [ "${make_use_cowbuilder:-}" = "true" ]; then
     if [ -z "${make_cowbuilder_dist_folder:-}" ]; then
-      die "make_use_cowbuilder=$make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set! For example:
+      die 1 "make_use_cowbuilder=$make_use_cowbuilder, so environment variable make_cowbuilder_dist_folder needs to be set! For example:
 make_use_cowbuilder=$make_use_cowbuilder make_cowbuilder_dist_folder=~/genmkfile-packages-result"
     fi
     DISTDIR="$make_cowbuilder_dist_folder"
 
     if ! test -d "$make_cowbuilder_dist_folder"; then
-      die "make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
+      die 1 "make_cowbuilder_dist_folder $make_cowbuilder_dist_folder does not exist! Run:
 mkdir -p -- $make_cowbuilder_dist_folder"
     fi
   fi
 
   if ! test -d "$DISTDIR"; then
-    die "DISTDIR '$DISTDIR' does not exist!"
+    die 1 "DISTDIR '$DISTDIR' does not exist!"
   fi
   if ! test -w "$DISTDIR"; then
-    die "DISTDIR '$DISTDIR' is not writeable!"
+    die 1 "DISTDIR '$DISTDIR' is not writeable!"
   fi
 }
 
@@ -721,10 +721,10 @@ make_dist() {
   ## (Important for 'corridor' package.)
 
   if ! test -d "$DISTDIR"; then
-    die "DISTDIR '$DISTDIR' does not exist!"
+    die 1 "DISTDIR '$DISTDIR' does not exist!"
   fi
   if ! test -w "$DISTDIR"; then
-    die "DISTDIR '$DISTDIR' is not writeable!"
+    die 1 "DISTDIR '$DISTDIR' is not writeable!"
   fi
 
   ## Debugging.
@@ -736,7 +736,7 @@ make_dist() {
   empty_directories="$(find "." -not -ipath '*.git*' -type d -empty)"
 
   if [ -n "${empty_directories}" ]; then
-    die "Empty directory found! empty_directories:
+    die 1 "Empty directory found! empty_directories:
 '${empty_directories}'"
   fi
 
@@ -833,10 +833,10 @@ make_undist() {
 make_debdsc() {
   make_require dpkg-source
   if ! test -d "$DISTDIR"; then
-    die "DISTDIR '$DISTDIR' does not exist!"
+    die 1 "DISTDIR '$DISTDIR' does not exist!"
   fi
   if ! test -w "$DISTDIR"; then
-    die "DISTDIR '$DISTDIR' is not writeable!"
+    die 1 "DISTDIR '$DISTDIR' is not writeable!"
   fi
 
   pushd -- "$DISTDIR" >/dev/null
@@ -1095,21 +1095,21 @@ make_deb_pkg_build_shared() {
   if [ "${make_use_cowbuilder:-}" = "true" ]; then
     make_require sudo cowbuilder
     if ! test -f "$make_upstream_tarball_real_path"; then
-      die "upstream tarball $make_upstream_tarball_real_path does not exist.
+      die 1 "upstream tarball $make_upstream_tarball_real_path does not exist.
 Did you run
 genmkfile dist && genmkfile debdist && genmkfile debdsc
 beforehand?"
     fi
 
     if ! test -f "$make_debian_tarball_absolute_path"; then
-      die "debian tarball $make_debian_tarball_absolute_path does not exist.
+      die 1 "debian tarball $make_debian_tarball_absolute_path does not exist.
 Did you run
 genmkfile dist && genmkfile debdist && genmkfile debdsc
 beforehand?"
     fi
 
     if ! test -f "$make_main_dsc_file"; then
-      die "dsc file $make_main_dsc_file does not exist.
+      die 1 "dsc file $make_main_dsc_file does not exist.
 Did you run
 genmkfile dist && genmkfile debdist && genmkfile debdsc
 beforehand?"
@@ -1233,7 +1233,7 @@ beforehand?"
     make_require debuild dpkg-checkbuilddeps
 
     if ! dpkg-checkbuilddeps; then
-      die "dpkg-checkbuilddeps reported missing build dependencies.
+      die 1 "dpkg-checkbuilddeps reported missing build dependencies.
 To install all dependencies, try running:
 sudo genmkfile deb-all-dep"
     fi
@@ -1284,7 +1284,7 @@ sudo genmkfile deb-all-dep"
 
   for package in "${make_package_debs_files_list[@]}"; do
     if ! test -f "$package"; then
-      die "File '$package' does not exist."
+      die 1 "File '$package' does not exist."
     fi
     make_output_info "You can find your deb file here: ${bold}$package${reset}"
   done
@@ -1320,7 +1320,7 @@ make_lintian_on_warning() {
 
 make_lintian() {
   if ! test -f "$make_main_changes_file"; then
-    die "make_main_changes_file '$make_main_changes_file' does not exist."
+    die 1 "make_main_changes_file '$make_main_changes_file' does not exist."
   fi
   if [ -z "${DEBUILD_LINTIAN_OPTS:-}" ]; then
     ## https://github.com/openwall/lkrg/pull/105
@@ -1381,7 +1381,7 @@ make_deb_install() {
   make_require sudo apt-get
   for package in "${make_package_debs_files_list[@]}"; do
     if ! test -f "$package"; then
-      die "File '$package' does not exist. Have you run 'genmkfile deb-pkg' already?"
+      die 1 "File '$package' does not exist. Have you run 'genmkfile deb-pkg' already?"
     fi
   done
   ## '--reinstall' is required otherwise apt-get would refuse to install the package with the following error message:
@@ -1567,12 +1567,12 @@ make_helper() {
   local make_uninstallsim_="${make_uninstallsim_:-false}"
 
   if ! test -d "$DESTDIR"; then
-    die "DESTDIR '$DESTDIR' does not exist!"
+    die 1 "DESTDIR '$DESTDIR' does not exist!"
   fi
 
   if [ "$make_installcheck_" != "true" ]; then
     if ! test -w "$DESTDIR"; then
-      die "DESTDIR '$DESTDIR' is not writeable!"
+      die 1 "DESTDIR '$DESTDIR' is not writeable!"
     fi
   fi
 
@@ -1727,7 +1727,7 @@ make_helper() {
           safe-rm --verbose -- "$file_with_destdir"
         fi
       else
-        die "error 2 in ${FUNCNAME[0]}!"
+        die 1 "error 2 in ${FUNCNAME[0]}!"
       fi
     done
   done
@@ -1736,7 +1736,7 @@ make_helper() {
     exit 1
   fi
   if [ "$genmkfile_file_has_been_copied" = "false" ]; then
-    die "Nothing has been copied."
+    die 1 "Nothing has been copied."
   fi
 }
 
@@ -1830,7 +1830,7 @@ make_deb_chl_bumpup() {
     make_output_info "Please enter new version number:"
     read -r new_changelog_version
   else
-    die "make_bump_type '${make_bump_type:-}' is neither 'major' nor 'manual'."
+    die 1 "make_bump_type '${make_bump_type:-}' is neither 'major' nor 'manual'."
   fi
 
   true "\
@@ -1839,7 +1839,7 @@ $make_changelog_version
 $new_changelog_version"
 
   if [[ "$new_changelog_version" == *error* ]]; then
-    die "Failed!"
+    die 1 "Failed!"
   fi
 
   [ -n "${DEBCHANGE_MSG:-}" ] || DEBCHANGE_MSG="New upstream version (local package)."
@@ -1872,7 +1872,7 @@ make_git_tag_shared() {
   if [ "$make_source_package_name" = "derivative-maker" ]; then
     ## make_git_tag_sign_appendix gets set by dm-bump-derivative-maker-version
     if [ -z "${make_git_tag_sign_appendix:-}" ]; then
-      die "package is '$make_source_package_name' but variable make_git_tag_sign_appendix is empty."
+      die 1 "package is '$make_source_package_name' but variable make_git_tag_sign_appendix is empty."
     fi
   fi
   [ -n "${make_git_push_remotes:-}" ] || make_git_push_remotes="origin"
@@ -1909,7 +1909,7 @@ make_git_tag_sign() {
   ## operation that takes a bare ref name ('git push origin X',
   ## 'git rev-parse X', ...) becomes ambiguous.
   if git show-ref --verify --quiet -- "refs/heads/$make_git_tag_version_number"; then
-    die "A branch named '$make_git_tag_version_number' already exists. Refusing to create a tag with the same name; rename the branch or delete it first."
+    die 1 "A branch named '$make_git_tag_version_number' already exists. Refusing to create a tag with the same name; rename the branch or delete it first."
   fi
 
   make_log_and_run git tag -s -m "." -- "$make_git_tag_version_number"
@@ -1938,7 +1938,7 @@ make_git_tag_verify() {
 
   if [ "$make_git_tag_version_number" != "$make_git_describe_output" ]; then
     if [ "${make_skip_git_describe_output_check:-}" != "true" ]; then
-      die "Failed! Current git head is not at a signed tag! $running_as_root_maybe make_git_tag_version_number '$make_git_tag_version_number' differs from make_git_describe_output '$make_git_describe_output'"
+      die 1 "Failed! Current git head is not at a signed tag! $running_as_root_maybe make_git_tag_version_number '$make_git_tag_version_number' differs from make_git_describe_output '$make_git_describe_output'"
     fi
   fi
 
@@ -1972,7 +1972,7 @@ make_git_tag_check() {
   [ -n "${make_git_describe_output:-}" ] || make_git_describe_output="$(git describe --always --abbrev=1000000000)"
   if [ "$make_git_tag_version_number" != "$make_git_describe_output" ]; then
     if [ "${make_skip_git_describe_output_check:-}" != "true" ]; then
-      die "Failed! Current git head is a untagged git commit! $running_as_root_maybe make_git_tag_version_number $make_git_tag_version_number differs from make_git_describe_output $make_git_describe_output"
+      die 1 "Failed! Current git head is a untagged git commit! $running_as_root_maybe make_git_tag_version_number $make_git_tag_version_number differs from make_git_describe_output $make_git_describe_output"
     fi
   fi
 
@@ -1985,7 +1985,7 @@ make_git_commit_verify() {
   ## Direct call (no make_function_run wrapper) so this if-branch can
   ## fire; make_function_run 'exit's on failure.
   if ! sq_git_run "HEAD"; then
-    die "Failed! Current git head commit is unsigned! $running_as_root_maybe"
+    die 1 "Failed! Current git head commit is unsigned! $running_as_root_maybe"
   fi
   make_output_info "current git head commit is signed."
 }
@@ -2130,31 +2130,31 @@ make_git_tag_push() {
   if [ -n "${make_git_push_branches:-}" ]; then
     read -r -a branches <<< "${make_git_push_branches}"
     [ "${#branches[@]}" -gt 0 ] \
-      || die "make_git_push_branches is set but parses to an empty list (whitespace-only?)."
+      || die 1 "make_git_push_branches is set but parses to an empty list (whitespace-only?)."
     for branch in "${branches[@]}"; do
       git show-ref --verify --quiet -- "refs/heads/${branch}" \
-        || die "branch '${branch}' (from make_git_push_branches) does not exist in this repo."
+        || die 1 "branch '${branch}' (from make_git_push_branches) does not exist in this repo."
     done
   else
     current_branch="$(git rev-parse --abbrev-ref HEAD)"
     [ "${current_branch}" != "HEAD" ] \
-      || die "HEAD is detached; cannot determine current branch. Set make_git_push_branches or check out a branch."
+      || die 1 "HEAD is detached; cannot determine current branch. Set make_git_push_branches or check out a branch."
     branches=( "${current_branch}" )
   fi
 
   read -r -a remotes <<< "${make_git_push_remotes}"
   [ "${#remotes[@]}" -gt 0 ] \
-    || die "make_git_push_remotes is set but parses to an empty list (whitespace-only?)."
+    || die 1 "make_git_push_remotes is set but parses to an empty list (whitespace-only?)."
   for remote in "${remotes[@]}"; do
     git remote get-url -- "${remote}" &>/dev/null \
-      || die "remote '${remote}' (from make_git_push_remotes) does not exist in this repo."
+      || die 1 "remote '${remote}' (from make_git_push_remotes) does not exist in this repo."
   done
 
   all_tags=()
   for branch in "${branches[@]}"; do
     tags_at_tip="$(git tag --points-at "refs/heads/${branch}")"
     [ -n "${tags_at_tip}" ] \
-      || die "no tag at tip of branch '${branch}'; create a signed tag at the tip before pushing."
+      || die 1 "no tag at tip of branch '${branch}'; create a signed tag at the tip before pushing."
     while IFS= read -r tag; do
       [ -n "${tag}" ] || continue
       all_tags+=( "${tag}" )
@@ -2170,7 +2170,7 @@ make_git_tag_push() {
   done
 
   if ! parallel_wait push_label; then
-    die "atomic push failed: branches=[${branches[*]}] tags=[${unique_tags[*]}] remote(s)=[${parallel_failures[*]}]"
+    die 1 "atomic push failed: branches=[${branches[*]}] tags=[${unique_tags[*]}] remote(s)=[${parallel_failures[*]}]"
   fi
 
   make_output_info "atomic push succeeded: branches=[${branches[*]}] tags=[${unique_tags[*]}] remotes=[${remotes[*]}]"
@@ -2182,7 +2182,7 @@ make_git_tag_show_latest() {
   local latest_tagged_commit make_git_tag_latest
   latest_tagged_commit="$(git rev-list --tags --max-count=1)"
   if [ -z "$latest_tagged_commit" ]; then
-    die "no tags exist in this repository."
+    die 1 "no tags exist in this repository."
   fi
   make_git_tag_latest="$(git describe --tags -- "$latest_tagged_commit")"
   printf "%s\n" "$make_git_tag_latest"
