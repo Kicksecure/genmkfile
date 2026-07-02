@@ -5,8 +5,11 @@
 
 #set -x
 
-#source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/has.sh"
-## CODE DUPLICATION
+## Code duplication. Copied from
+## helper-scripts//usr/libexec/helper-scripts/has.sh.
+##
+## Because has.sh cannot be sources here (the build host may not have
+## helper-scripts installed).
 has() {
   local _cmd _name
 
@@ -19,8 +22,7 @@ has() {
 ## Code duplication. Copied from
 ## helper-scripts/usr/libexec/helper-scripts/check_runtime.bsh.
 ##
-## Because check_runtime.bsh cannot be sourced here (the build host may not
-## have helper-scripts installed).
+## Because check_runtime.bsh cannot be sourced here, see above.
 was_executed() {
   local caller_bash_source_zero="${1}"
   if [[ "${caller_bash_source_zero}" == "${0}" ]] ||
@@ -264,7 +266,7 @@ make_get_variables() {
   if [ "$my_user_id" = "0" ]; then
     running_as_root_maybe="Running under account '${under}root${eunder}'. (uid '$my_user_id')"
   else
-    running_as_root_maybe="Running under account '${under}user${eunder}'. (uid) '$my_user_id')"
+    running_as_root_maybe="Running under account '${under}user${eunder}'. (uid '$my_user_id')"
   fi
 
   ## Deterministic.
@@ -299,10 +301,9 @@ make_get_variables() {
     make_git_tag_version_number="${make_git_tag_version_number}${make_git_tag_sign_appendix:-}"
     true "make_git_tag_version_number (from git describe): $make_git_tag_version_number"
 
-    ## A repo with no debian/control has no deb to build: there is no
-    ## changelog version to parse and no source/debian tarball or .dsc to
-    ## name. Blank the deb-version variables and short-circuit. This is
-    ## the original special-repo path (Whonix-Installer, Whonix-Starter,
+    ## A repo with no debian/control has no deb to build. Blank the deb
+    ## details variables and short-circuit. This is the original special-repo
+    ## path (Whonix-Installer, Whonix-Starter,
     ## qubes-template-{kicksecure,whonix}, ...).
     if [ -z "${make_debian_control_file_absolute_path:-}" ]; then
       make_changelog_version=""
@@ -672,9 +673,9 @@ genmkfile git-verify
    Only a repository sanity check. Not for security purposes!
 
 genmkfile git-tag-push
-   Atomic push of (branches + tip tags) to each listed remote, in
+   Atomic push of branches + tip tags to each listed remote, in
    parallel. Default: current branch + tag at HEAD -> 'origin'.
-   Every listed branch tip must carry a tag (strict; no fallback).
+   Every listed branch tip must carry a tag.
    Environment variables:
      make_git_push_branches       space-separated branch list (unset -> current branch)
      make_git_push_remotes        space-separated remote list (unset -> origin)
@@ -1678,12 +1679,12 @@ make_helper() {
             fi
             if test -x "$source_fso" || [ "$genmkfile_force_exec" = "true" ]; then
               if [ "$fso_with_destdir_stat" != "755" ]; then
-                make_output_info "chmod 755 -- '$file_with_destdir' (executable, wrong mode)"
+                make_output_info "chmod -- 755 '$file_with_destdir' (executable, wrong mode)"
                 chmod -- 755 "$file_with_destdir"
               fi
             else
               if [ "$fso_with_destdir_stat" != "644" ]; then
-                make_output_info "chmod 644 -- '$file_with_destdir' (non-executable, wrong mode)"
+                make_output_info "chmod -- 644 '$file_with_destdir' (non-executable, wrong mode)"
                 chmod -- 644 "$file_with_destdir"
               fi
             fi
@@ -1691,7 +1692,7 @@ make_helper() {
         fi
       elif [ "$make_installsim_" = "true" ]; then
         if [ "$rsync_done" != "true" ]; then
-          ## use '[*]' to treat  as single line and avoid newlines in output
+          ## use '[*]' to treat as single line and avoid newlines in output
           make_output_info "would do: rsync --dry-run ${genmkfile_rsync_opts[*]} -- \"$source_directory\" \"$DESTDIR\""
           rsync --dry-run "${genmkfile_rsync_opts[@]}" -- "$source_directory" "$DESTDIR"
           rsync_done=true
@@ -2052,6 +2053,8 @@ git_tag_push_cache_write() {
 ## Backgrounded by make_git_tag_push (one per remote): 'die' kills
 ## only the sub-shell; parent's 'wait' aggregates per-remote
 ## failures. Args: <remote> <branch>... -- <tag>...
+##
+## FIXME: This function's name is wrong, it pushes branches as well as tags.
 git_tag_push_to_remote() {
   local remote branch tag tag_sha local_sha tracking_ref arg sep_seen
   local -a branches tags tags_to_push refspecs
