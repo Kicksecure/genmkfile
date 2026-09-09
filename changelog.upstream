@@ -1,3 +1,115 @@
+commit bdc71d842c25b8b1f7e52210417c293db74fe85b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 9 07:02:25 2026 -0400
+
+    fix
+
+commit e1b32b2b3e299836245c2e1e515a233948728c67
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 9 06:03:44 2026 -0400
+
+    fix
+
+commit ec4f74b562cd124337d5dbe406d38c9837d17243
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 9 05:42:56 2026 -0400
+
+    fix
+
+commit 83c56fbe743795329337997f2db423f2ac9606e4
+Merge: 89fb1e3 9e2a647
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 9 05:26:58 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/ai'
+
+commit 9e2a647b601154ab91aab1501e336245f664328f
+Merge: 94fcfe2 ec64745
+Author: claude <noreply@anthropic.com>
+Date:   Tue Sep 8 13:58:27 2026 -0400
+
+    Merge branch 'master' into ai
+
+commit ec647452739a726839cafb6fff0198ed7279ec48
+Merge: 9feda7c 89fb1e3
+Author: claude <noreply@anthropic.com>
+Date:   Tue Sep 8 13:58:27 2026 -0400
+
+    Merge remote-tracking branch 'upstream/master'
+
+commit 89fb1e3502e81b4ecf63b86eed7b9367ca19f815
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 8 15:25:43 2026 +0000
+
+    bumped changelog version
+
+commit 94fcfe2f02ae403d0462833423f6177b566b449b
+Author: claude (dev483 d206676f-4970-4838-9078-31736a2517d8) <noreply@anthropic.com>
+Date:   Mon Sep 7 23:46:47 2026 -0400
+
+    Anchor multi-package pkg-name guard first char
+
+    - '#.evil' tag produced a '.evil.install' hidden/traversal path; the
+      bare '[-a-z0-9+.]+' accepted a leading dot. Same fix as the parse
+      stanza guard (41c19f5).
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit c2ffdee5e8b611813a9bdeed21254f8053001fa8
+Merge: 41c19f5 9feda7c
+Author: claude (dev483 d206676f-4970-4838-9078-31736a2517d8) <noreply@anthropic.com>
+Date:   Mon Sep 7 23:32:36 2026 -0400
+
+    Merge remote-tracking branch 'org-ai-assisted/master' into ai
+
+commit 41c19f5da06f46f67cc912479fac636af5d93b2d
+Author: claude (dev483 d206676f-4970-4838-9078-31736a2517d8) <noreply@anthropic.com>
+Date:   Mon Sep 7 23:31:48 2026 -0400
+
+    Flush the last debian/control stanza; tighten pkg-name guard
+
+    - make_get_variables_parse_stanzas flushes a stanza only on a following blank
+      line, but "$(grep-dctrl ...)" strips grep-dctrl's trailing blank, so the LAST
+      stanza was never flushed: a single-binary package (e.g. developer-meta-files)
+      got an EMPTY make_package_debs_files_list, so deb-install installed nothing and
+      installcheck then failed on a shipped-but-absent file. Re-add a terminator.
+    - The package-name guard accepted a bare '..' (regex '^[-a-z0-9+.]+$'); anchor the
+      first character to an alphanumeric per Debian policy so a name that feeds a
+      deletion path cannot be '..'/'.'-prefixed.
+
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+
+commit 9feda7ca2aeb931ccdbb4ee13355100f1452eab2
+Merge: 4590346 6fc8907
+Author: assisted-by-ai (Bot Account) (Machine Account) <228987186+assisted-by-ai@users.noreply.github.com>
+Date:   Mon Sep 7 22:12:44 2026 -0400
+
+    Merge pull request #44 from org-ai-assisted/ai
+
+    rename has.sh -> has.bsh (bashism convention)
+
+commit 6fc890782559e837fe670d837d03fe3e24803fad
+Author: claude (dev474 c7439536-fad8-4884-b71a-d2f3c4c23905) <noreply@anthropic.com>
+Date:   Mon Sep 7 11:06:43 2026 -0400
+
+    rename has.sh to has.bsh (bashism convention)
+
+    Sourced helper-scripts lib uses bashisms; .bsh marks it. Path-only edit.
+
+commit 4590346d01d7e24a5ffc2d901e0bf7f45885e1fb
+Merge: 1372314 a0db9fe
+Author: claude (dev474 c7439536-fad8-4884-b71a-d2f3c4c23905) <noreply@anthropic.com>
+Date:   Mon Sep 7 11:06:43 2026 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit 3855d9e25635dd14431ba1aa5c50fd66ca7d07ee
+Merge: fc253d7 4590346
+Author: claude (dev474 c7439536-fad8-4884-b71a-d2f3c4c23905) <noreply@anthropic.com>
+Date:   Mon Sep 7 11:06:43 2026 -0400
+
+    Merge branch 'master' into ai
+
 commit 4ceece8d9ef0cccb9797be4b94b28362605fa3e9
 Merge: cbaa672 a0db9fe
 Author: Patrick Schleizer <adrelanos@whonix.org>
