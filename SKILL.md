@@ -133,11 +133,20 @@ sudo cowbuilder --create \
   --basepath /var/cache/pbuilder/base.cow_amd64 \
   --distribution trixie \
   --architecture amd64 \
+  --extrapackages aptitude \
   --mirror https://deb.debian.org/debian \
   [--configfile ~/derivative-binary/pbuilder.conf]
 ```
 
 - Update it later with `--update --basepath ...`.
+- **`--extrapackages aptitude` is REQUIRED.** pbuilder's DEFAULT satisfydepends is the shipped
+  `/usr/lib/pbuilder/pbuilder-satisfydepends` -> `-aptitude` symlink, and aptitude is NOT a
+  pbuilder dependency, so a fresh debootstrap base lacks it: without the flag a `deb-pkg` (with no
+  config that swaps in the native-apt resolver) dies `env: 'aptitude': No such file` ->
+  `E: pbuilder-satisfydepends failed`. A build passing dm's `pbuilder.conf`
+  (`PBUILDERSATISFYDEPENDSCMD=.../pbuilder-satisfydepends-apt`) avoids it; a RAW `genmkfile
+  deb-pkg` with no `dist_build_pbuilder_config_file` falls to the aptitude default. (The safe tool
+  `ensure-cowbuilder-base`, which boot-durable-deb uses, already passes the flag.)
 - Build-deps (e.g. `debhelper`) must be reachable from `--mirror`; the package's *runtime* deps are NOT needed at build time.
 - So `Architecture: all` packages whose only build-dep is debhelper build against a plain `deb.debian.org` base even if runtime deps (signal-cli, etc.) live elsewhere.
 - `libpam-tmpdir` (which sets `TMPDIR=/tmp/user/0`) is handled by genmkfile's build-time
@@ -180,6 +189,13 @@ sudo cowbuilder --create \
 - Run from the package root. Tarballs/build outputs go to `$DISTDIR`: `..` by default, but reassigned to `make_cowbuilder_dist_folder` whenever `make_use_cowbuilder=true` (which is then also `--buildresult`). genmkfile hand-rolls `tar` precisely BECAUSE `dpkg-source` can only target `../`.
 - `deb-pkg` does NOT need `dist`/`debdist`/`debdsc` run first -- it runs them itself. The "did you run genmkfile dist" error belongs to `deb-pkg-build`, which is the build step on its own.
 - The dm apt-cacher (`127.0.0.1:9977`) is only up during a dm build session; when it's down, set `make_cowbuilder_mirror=https://deb.debian.org/debian`.
+- `Could not open file /var/cache/apt/archives/partial/<pkg>.deb - No such file` then
+  `pbuilder-satisfydepends failed` is NOT the shared aptcache: pbuilder hardlinks `*.deb` in from
+  `$APTCACHE` (`APTCACHEHARDLINK=yes`, `BINDMOUNTS=""`) and never bind-mounts it, so the chroot's
+  `partial/` comes from the base cow. The real cause is a WEDGED or CONCURRENT cowbuilder build
+  sharing one `cow.cow_<arch>` buildplace (this machine runs parallel sessions) -- kill the wedged
+  tree by PID (it loops `Retrying to unmount dev/pts in 5s`), then serialize or give each build a
+  `make_cow_suffix`. NOT a genmkfile bug; do NOT mkdir the shared aptcache.
 
 ### cowbuilder `--execute`: passing variables into a chroot script
 
@@ -215,8 +231,8 @@ sudo cowbuilder --create \
 - **cowbuilder essentials:** `make_use_cowbuilder=true` AND `make_cowbuilder_dist_folder` are
   BOTH required, or the cowbuilder-guard refuses it as an in-place build. Base
   `/var/cache/pbuilder/base.cow_<arch>` (`cow.cow_<arch>` is scratch); `/var` resets at boot,
-  recreate ~4min (`cowbuilder --create --basepath ... --distribution trixie --mirror
-  https://deb.debian.org/debian`). `make_use_lintian=false` skips pre-existing findings.
+  recreate ~4min (`cowbuilder --create --basepath ... --distribution trixie --extrapackages
+  aptitude --mirror https://deb.debian.org/debian`). `make_use_lintian=false` skips pre-existing findings.
   `genmkfile dist` tars the WORKING tree -- confirm `git status` clean first.
 - **NEVER hand-edit `debian/changelog`** in genmkfile packages -- it is AUTO-GENERATED and
   gate-enforced (`check_changelog_no_manual`): a commit touching it HARD-FAILS unless it is a

@@ -43,7 +43,14 @@ if [ "${GENMKFILE_DEBUG:-}" = "1" ]; then
 fi
 
 make_output_info() {
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}INFO:${reset} ${*}"
+  ## Diagnostics go to stdout normally. The deb-*-dep-echo targets set
+  ## make_quiet_stdout=true so INFO goes to stderr instead, leaving stdout a clean
+  ## machine-readable dependency list for the caller to capture.
+  local __info_fd=1
+  if [ "${make_quiet_stdout:-}" = "true" ]; then
+    __info_fd=2
+  fi
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}INFO:${reset} ${*}" >&"${__info_fd}"
 }
 
 make_output_warn() {
@@ -343,7 +350,7 @@ make_parse_changelog_version() {
 ## make_cross_build_platform_list, target_architecture, DISTDIR, and
 ## make_debian_control_file_absolute_path from the caller.
 make_get_variables_parse_stanzas() {
-  local package binary_package_architecture line skip_debs_artifact
+  local package binary_package_architecture line skip_debs_artifact architecture_token
   local package_name_architecture temp stanza_list
   package=""
   binary_package_architecture=""
@@ -351,9 +358,9 @@ make_get_variables_parse_stanzas() {
   ## according to
   ## https://www.debian.org/doc/debian-policy/ch-controlfields.html,
   ## therefore no need to handle continuation lines for them.
-  make_require safe-rm
   if ! stanza_list="$(grep-dctrl --show-field=Package,Architecture '' "${make_debian_control_file_absolute_path}")"; then
-    safe-rm --force -- "${stanza_list}"
+    ## stanza_list holds grep-dctrl's captured stdout, not a temp-file path -- there
+    ## is nothing to clean up here (no mktemp in this function).
     exit_with_error 1 "parsing debian/control failed (grep-dctrl) -- malformed control?"
   fi
   while IFS= read -r line; do
@@ -407,11 +414,19 @@ make_get_variables_parse_stanzas() {
           ## no-op (exit 0), so this is safe.
           true "INFO: not expecting a .deb for binary package '${package}': Architecture '${binary_package_architecture}' does not cover target architecture '${target_architecture}'."
           skip_debs_artifact="true"
+          ## binary_package_architecture may itself be a multi-arch list, so
+          ## test each token for membership in the cross-build set -- a whole-
+          ## string match misses e.g. 'arm64 riscv64' against ' amd64 arm64 '
+          ## and would wrongly leave all_target_debs_are_arch_all true,
+          ## silently skipping a needed cross-build leg.
           ## make_cross_build_platform_list is set by make-helper.bsh.
-          # shellcheck disable=SC2154
-          if [[ " ${make_cross_build_platform_list} " = *" ${binary_package_architecture} "* ]]; then
-            all_target_debs_are_arch_all="false"
-          fi
+          # shellcheck disable=SC2154,SC2086
+          for architecture_token in ${binary_package_architecture}; do
+            if [[ " ${make_cross_build_platform_list} " = *" ${architecture_token} "* ]]; then
+              all_target_debs_are_arch_all="false"
+              break
+            fi
+          done
         fi
         if [ "${skip_debs_artifact}" = "false" ]; then
           ## Example architecture independent "all" package:
@@ -615,7 +630,7 @@ make_get_destdir() {
   if [ -z "${DESTDIR:-}" ]; then
     DESTDIR="/"
   fi
-  if type -t make_hook_at_the_end_of_get_destdir; then
+  if type -t make_hook_at_the_end_of_get_destdir >/dev/null; then
     make_hook_at_the_end_of_get_destdir
   fi
 }
@@ -708,6 +723,18 @@ genmkfile deb-run-dep
 
 genmkfile deb-all-dep
    Combination of deb-build-dep and deb-run-dep.
+
+genmkfile deb-build-dep-echo
+   Echo (to stdout, one package per line) the build dependencies that deb-build-dep
+   would install, WITHOUT installing them. genmkfile's own diagnostics go to stderr, so
+   stdout is a clean list to capture into a variable for a later batch install.
+
+genmkfile deb-run-dep-echo
+   Echo the runtime dependencies that deb-run-dep would install, WITHOUT installing them.
+
+genmkfile deb-all-dep-echo
+   Echo the combined build + runtime dependencies (what deb-all-dep would install),
+   WITHOUT installing -- for collecting several packages' deps into one batch install.
 
 genmkfile deb-pkg-build
    Create a deb, which will be stored in the parent folder.
@@ -1099,6 +1126,11 @@ ${untagged_list}"
       filename_hash_base="${file_name##*/}"
       filename_without_hash="${filename_hash_dir}/${filename_hash_base%#*}"
       absolute_filename_without_hash="${filename_without_hash/#.\//\/}"
+      ## KNOWN LIMITATION: '#' is the reserved '<path>#<pkgname>' tag separator;
+      ## only the LAST '#' splits. A source filename with a literal '#' that is
+      ## not a package tag is misparsed into a bogus package. The source folder
+      ## must be trusted -- its filenames come from the packager, not untrusted
+      ## input. The pkg-name regex below rejects the grossest garbage only.
       pkg_name="${file_name##*/}"
       pkg_name="${pkg_name##*#}"
       ## Package name regex based upon the restrictions specified by
@@ -1289,6 +1321,37 @@ make_deb_all_dep() {
   ## are added here.
   local make_deb_shared_dependencies="build-essential dctrl-tools ${make_deb_build_dependencies} ${make_deb_runtime_dependencies}"
   make_function_run make_deb_shared_dep
+}
+
+make_deb_shared_dep_echo() {
+  ## Echo the dependency package names to stdout, one per line, WITHOUT installing, so a
+  ## caller can capture them into a variable (e.g. to batch-install several packages' deps
+  ## in a single apt-get). make_quiet_stdout keeps genmkfile's INFO on stderr, so stdout is
+  ## exactly this list. The extractor output is space-separated; one-per-line makes it easy
+  ## for the caller to collect + dedup (e.g. 'sort --unique') across packages.
+  local dep
+  ## $make_deb_shared_dependencies is a space-separated list; word-split it intentionally.
+  # shellcheck disable=SC2086
+  for dep in ${make_deb_shared_dependencies}; do
+    printf '%s\n' "${dep}"
+  done
+}
+
+make_deb_build_dep_echo() {
+  ## Echoes what make_deb_build_dep would install (build-essential + dctrl-tools injected;
+  ## see make_deb_build_dep) instead of installing it.
+  local make_deb_shared_dependencies="build-essential dctrl-tools ${make_deb_build_dependencies}"
+  make_function_run make_deb_shared_dep_echo
+}
+
+make_deb_run_dep_echo() {
+  local make_deb_shared_dependencies="${make_deb_runtime_dependencies}"
+  make_function_run make_deb_shared_dep_echo
+}
+
+make_deb_all_dep_echo() {
+  local make_deb_shared_dependencies="build-essential dctrl-tools ${make_deb_build_dependencies} ${make_deb_runtime_dependencies}"
+  make_function_run make_deb_shared_dep_echo
 }
 
 make_deb_pkg_build_shared() {
@@ -1654,6 +1717,7 @@ make_deb_install() {
   ## Note, selecting 'systemcheck' instead of '/home/user/derivative-binary/genmkfile-packages-result/systemcheck_25.1-1_all.deb'
   ## systemcheck is already the newest version (3:25.1-1).
   ## TODO: '--reinstall' does not fully fix this.
+  # shellcheck disable=SC2086
   make_log_and_run \
     ${SUDO_TO_ROOT} \
     apt-get \
@@ -1846,6 +1910,12 @@ genmkfile_path_present() {
 
 genmkfile_install_exclude_patterns=(
   '__pycache__' '.mypy_cache' '.pytest_cache' '.hypothesis' '*.pyc' '*.pyo'
+  ## VCS files are excluded from the BUILT package (find_pkgfiles_args), so exclude them
+  ## from install + installcheck too. Otherwise a source-tree .gitignore (common under
+  ## usr/share/<pkg>/) is copied by 'make install' yet absent from the .deb, and 'deb-icup'
+  ## installcheck then diffs it against a path the package never shipped:
+  ##   diff: /usr/share/<pkg>/.gitignore: No such file or directory
+  '.gitignore' '.git'
 )
 
 genmkfile_install_path_excluded() {
@@ -1896,7 +1966,17 @@ make_helper() {
     exit_with_error 1 "DESTDIR '${DESTDIR}' does not exist!"
   fi
 
-  if [ "${make_installcheck_}" != "true" ]; then
+  ## Only the modes that actually WRITE to DESTDIR need it writable. installcheck,
+  ## uninstallcheck, installsim and uninstallsim are read-only or dry-run (a stat, an
+  ## rsync --dry-run, or a "would do" print), so requiring a writable DESTDIR for them
+  ## wrongly aborts an unprivileged 'genmkfile uninstallcheck' / installsim / uninstallsim
+  ## against the default DESTDIR=/ -- only install and uninstall write.
+  ## Only the modes that actually WRITE to DESTDIR need it writable. installcheck,
+  ## uninstallcheck, installsim and uninstallsim are read-only or dry-run (a stat, an
+  ## rsync --dry-run, or a "would do" print), so requiring a writable DESTDIR for them
+  ## wrongly aborts an unprivileged 'genmkfile uninstallcheck' / installsim / uninstallsim
+  ## against the default DESTDIR=/ -- only install and uninstall write.
+  if [ "${make_install_}" = "true" ] || [ "${make_uninstall_}" = "true" ]; then
     if ! test -w "${DESTDIR}"; then
       exit_with_error 1 "DESTDIR '${DESTDIR}' is not writeable!"
     fi
@@ -1909,6 +1989,8 @@ make_helper() {
   #genmkfile_rsync_opts+=("--executability")
 
   genmkfile_rsync_opts+=("--recursive")     ## recurse into directories
+  ## By design: DESTDIR is a build-controlled staging tree, so following a
+  ## symlinked directory on the receiver into its target is intended here.
   genmkfile_rsync_opts+=("--keep-dirlinks") ## treat symlinked dir on receiver as dir
   genmkfile_rsync_opts+=("--links")         ## copy symlinks as symlinks
   genmkfile_rsync_opts+=("--hard-links")    ## preserve hard links
@@ -1990,9 +2072,18 @@ make_helper() {
         ## Need to check first if it is a file...
         ## ...before checking if it is an executable.
         ## Because folders can also have executable bit.
-        fso_with_destdir_stat="$(stat -c "%a" -- "${file_with_destdir}")"
         #echo "source_fso: $source_fso"
-        if test -d "${source_fso}"; then
+        if test -L "${source_fso}" || test -L "${file_with_destdir}"; then
+          ## A symlink's own permission bits are meaningless on Linux, and
+          ## 'stat'/'chmod' DEREFERENCE, chmod'ing whatever the link points at.
+          ## Skip if EITHER side is a symlink: a source symlink into /etc/sudoers.d
+          ## would drop the real 0440 sudoers file to 644 (bypassing
+          ## folder_permission_skip_list), and a destination that is (or became) a
+          ## symlink would redirect the chmod onto an unintended file. Leave it as
+          ## rsync installed it.
+          true "INFO: not mode-fixing symlink '${file_with_destdir}'."
+        elif test -d "${source_fso}"; then
+          fso_with_destdir_stat="$(stat -c "%a" -- "${file_with_destdir}")"
           if [ "${fso_with_destdir_stat}" != "755" ]; then
             if [ "${DESTDIR}" = "/" ]; then
               true "calling...: in_array |${file_without_pwd}| |${folder_permission_skip_list[*]}|"
@@ -2005,6 +2096,7 @@ make_helper() {
             fi
           fi
         elif test -f "${source_fso}"; then
+          fso_with_destdir_stat="$(stat -c "%a" -- "${file_with_destdir}")"
           true "calling...: path_is_within_any '${file_without_pwd}' '${folder_permission_skip_list[*]}'"
           if ! path_is_within_any "${file_without_pwd}" "${folder_permission_skip_list[@]}"; then
             true "path_is_within_any did not match, therefore continuing..."
@@ -2066,16 +2158,34 @@ make_helper() {
         if test -f "${source_fso}"; then
           ## make_deb_install runs make_installcheck but configuration files may have changed on the system.
           ##
-          ## TODO: How do we handle files in sudoers.d? (See also 'folder_permission_skip_list'.)
-          ##       Run make_installcheck as root?
-          ## diff: /etc/sudoers.d/pwfeedback: Permission denied
-          if [ "/${source_directory}" = "/etc" ]; then
-            diff -- "${source_fso}" "${file_with_destdir}" || make_output_info "'${file_with_destdir}' changed in /etc"
-          elif [ "/${source_directory}" = "/usr/local/etc" ]; then
-            diff -- "${source_fso}" "${file_with_destdir}" || make_output_info "'${file_with_destdir}' changed in /usr/local/etc"
-          else
-            diff -- "${source_fso}" "${file_with_destdir}"
+          ## Root-owned installed config (e.g. '/etc/sudoers.d', mode 0440) is
+          ## unreadable to a non-root installcheck, so a bare 'diff' fails
+          ## "Permission denied" and misreports an unchanged file as changed.
+          ## Read the installed copy via sudo into a temp file for the diff.
+          ## If even sudo cannot read it, say so and skip -- never a false
+          ## "changed", never a hard failure that aborts installcheck.
+          local installcheck_installed installcheck_tmp
+          installcheck_installed="${file_with_destdir}"
+          installcheck_tmp=""
+          if ! [ -r "${file_with_destdir}" ]; then
+            installcheck_tmp="$(mktemp)"
+            # shellcheck disable=SC2086
+            if ${SUDO_TO_ROOT:-sudo} --non-interactive cat -- "${file_with_destdir}" >"${installcheck_tmp}" 2>/dev/null; then
+              installcheck_installed="${installcheck_tmp}"
+            else
+              safe-rm --force -- "${installcheck_tmp}"
+              make_output_info "'${file_with_destdir}' not readable (root-owned); re-run installcheck as root to verify"
+              continue
+            fi
           fi
+          if [ "/${source_directory}" = "/etc" ]; then
+            diff -- "${source_fso}" "${installcheck_installed}" || make_output_info "'${file_with_destdir}' changed in /etc"
+          elif [ "/${source_directory}" = "/usr/local/etc" ]; then
+            diff -- "${source_fso}" "${installcheck_installed}" || make_output_info "'${file_with_destdir}' changed in /usr/local/etc"
+          else
+            diff -- "${source_fso}" "${installcheck_installed}"
+          fi
+          [ -z "${installcheck_tmp}" ] || safe-rm --force -- "${installcheck_tmp}"
         fi
       elif [ "${make_uninstallsim_}" = "true" ]; then
         if genmkfile_path_present "${file_with_destdir}"; then
@@ -2308,19 +2418,24 @@ make_git_tag_verify() {
     fi
   fi
 
-  [ -n "${sq_git_trust_root:-}" ] || sq_git_trust_root="$(git rev-parse --verify "refs/tags/${make_git_tag_version_number}^{commit}")"
+  local trust_root
+  trust_root="${sq_git_trust_root:-}"
+  [ -n "${trust_root}" ] || trust_root="$(git rev-parse --verify "refs/tags/${make_git_tag_version_number}^{commit}")"
 
-  sq_git_run "refs/tags/${make_git_tag_version_number}"
+  sq_git_run "refs/tags/${make_git_tag_version_number}" "${trust_root}"
 }
 
 sq_git_run() {
-  local cmd
+  local pathspec trust_root policy_file cmd
+  pathspec="$1"
   make_require sq-git
-  ## XXX: hardcoded
-  [ -n "${sq_git_trust_root:-}" ] || sq_git_trust_root="HEAD"
-  ## XXX: hardcoded
-  [ -n "${sq_git_policy_file:-}" ] || sq_git_policy_file="${HOME}/derivative-maker/buildconfig.d/openpgp-policy.toml"
-  cmd=(sq-git log --policy-file "${sq_git_policy_file}" --trust-root "${sq_git_trust_root}" -- "${1}")
+  ## Function-local, so a prior verify's trust root cannot leak into a later
+  ## one (make_git_verify runs a 'HEAD' commit-verify then a tag-verify in the
+  ## same shell). Precedence: explicit 2nd arg > caller/env preset > HEAD.
+  trust_root="${2:-${sq_git_trust_root:-HEAD}}"
+  ## XXX: hardcoded default; overridable via the environment.
+  policy_file="${sq_git_policy_file:-${HOME}/derivative-maker/buildconfig.d/openpgp-policy.toml}"
+  cmd=(sq-git log --policy-file "${policy_file}" --trust-root "${trust_root}" -- "${pathspec}")
   make_output_info "running: ${cmd[*]}"
   ## Direct call (no make_function_run wrapper) so make_git_commit_verify
   ## can 'if ! sq_git_run "HEAD"' to catch failures and print a
@@ -2720,6 +2835,16 @@ if was_executed "${BASH_SOURCE[0]}"; then
   : "${red:=}" "${green:=}" "${bold:=}" "${reset:=}" \
     "${cyan:=}" "${under:=}" "${eunder:=}"
 
+  ## The deb-*-dep-echo targets print ONLY the dependency list on stdout (for capture into
+  ## a variable). Route genmkfile's own diagnostics to stderr for the whole run when such a
+  ## target is requested, so stdout stays clean. Set before the first make_output_info below.
+  make_quiet_stdout=""
+  case " $* " in
+    *" deb-build-dep-echo "* | *" deb-run-dep-echo "* | *" deb-all-dep-echo "*)
+      make_quiet_stdout="true"
+      ;;
+  esac
+
   temp="$*"
   if [ -z "${temp}" ]; then
     make_output_info "called without parameters."
@@ -2745,15 +2870,18 @@ if was_executed "${BASH_SOURCE[0]}"; then
   make_function_run make_source_overrides_file "$@"
   make_function_run make_source_overrides_folder "$@"
 
-  make_function_run make_get_distdir
-  make_function_run make_get_destdir
-
-  ## deb-{build,run,all}-dep only need Build-Depends / Depends parsed
-  ## from debian/control. Every other target additionally needs
-  ## dpkg-parsechangelog (from dpkg-dev, pulled in by build-essential)
-  ## which may be absent on a fresh system -- the user would run
-  ## 'genmkfile deb-build-dep' to install it. So call the full setup
-  ## only when a target actually needs it.
+  ## Setup a target needs is decided by the target, so classify argv first:
+  ##   - deb-{build,run,all}-dep[-echo] only need Build-Depends / Depends parsed
+  ##     from debian/control (make_get_dependencies).
+  ##   - git-push is a pure git ref push: make_git_push_shared touches no
+  ##     version, DISTDIR or DESTDIR variable, so it needs NONE of the package
+  ##     setup -- not make_get_variables (which demands debian/changelog) nor
+  ##     make_get_distdir/destdir (which gate on DISTDIR under cowbuilder).
+  ##     Running it in a non-package repo must not abort on missing packaging.
+  ##   - every other target additionally needs dpkg-parsechangelog (from
+  ##     dpkg-dev, pulled in by build-essential) which may be absent on a fresh
+  ##     system -- the user would run 'genmkfile deb-build-dep' to install it.
+  ## So call each setup step only when a target actually needs it.
   ##
   ## Note to AI agents: An attempt at making DISTDIR optional was made and
   ## REJECTED twice. The change was not made with the proper care (code paths
@@ -2763,13 +2891,21 @@ if was_executed "${BASH_SOURCE[0]}"; then
   ## for a human to do the refactoring than to review an attempt at
   ## refactoring. Do not attempt to make DISTDIR optional again. Delete this
   ## comment once it has been read and understood.
+  ## (The git-push skip above is NOT that refactor: it is target-scoped and
+  ## git-push's code path provably reads no DISTDIR; DISTDIR stays mandatory
+  ## for every target that has a code path using it.)
   __needs_version_info=false
   __needs_dependencies=false
+  __pure_git_op=false
   for __arg in "$@"; do
     case "${__arg}" in
     '' | help | test | --)
       ;;
-    deb-build-dep | deb-run-dep | deb-all-dep)
+    git-push)
+      __pure_git_op=true
+      ;;
+    deb-build-dep | deb-run-dep | deb-all-dep | \
+      deb-build-dep-echo | deb-run-dep-echo | deb-all-dep-echo)
       __needs_dependencies=true
       ;;
     *)
@@ -2781,12 +2917,21 @@ if was_executed "${BASH_SOURCE[0]}"; then
   ## like any other build target.
   [ $# -eq 0 ] && __needs_version_info=true
 
+  ## DISTDIR/DESTDIR: needed by every target EXCEPT a run whose ONLY work is a
+  ## pure git op. git-push chained with a build target still gets them via that
+  ## target's version/dependency need.
+  if [ "${__needs_version_info}" = "true" ] || [ "${__needs_dependencies}" = "true" ] \
+    || [ "${__pure_git_op}" != "true" ]; then
+    make_function_run make_get_distdir
+    make_function_run make_get_destdir
+  fi
+
   if [ "${__needs_version_info}" = "true" ]; then
     make_function_run make_get_variables
   elif [ "${__needs_dependencies}" = "true" ]; then
     make_function_run make_get_dependencies
   fi
-  unset __arg __needs_version_info __needs_dependencies
+  unset __arg __needs_version_info __needs_dependencies __pure_git_op
 
   make_function_run make_parse_cmd "$@"
   make_function_run make_deinit
