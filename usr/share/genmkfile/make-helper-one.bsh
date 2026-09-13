@@ -350,7 +350,7 @@ make_parse_changelog_version() {
 ## make_cross_build_platform_list, target_architecture, DISTDIR, and
 ## make_debian_control_file_absolute_path from the caller.
 make_get_variables_parse_stanzas() {
-  local package binary_package_architecture line skip_debs_artifact
+  local package binary_package_architecture line skip_debs_artifact architecture_token
   local package_name_architecture temp stanza_list
   package=""
   binary_package_architecture=""
@@ -417,11 +417,19 @@ make_get_variables_parse_stanzas() {
           ## no-op (exit 0), so this is safe.
           true "INFO: not expecting a .deb for binary package '${package}': Architecture '${binary_package_architecture}' does not cover target architecture '${target_architecture}'."
           skip_debs_artifact="true"
+          ## binary_package_architecture may itself be a multi-arch list, so
+          ## test each token for membership in the cross-build set -- a whole-
+          ## string match misses e.g. 'arm64 riscv64' against ' amd64 arm64 '
+          ## and would wrongly leave all_target_debs_are_arch_all true,
+          ## silently skipping a needed cross-build leg.
           ## make_cross_build_platform_list is set by make-helper.bsh.
-          # shellcheck disable=SC2154
-          if [[ " ${make_cross_build_platform_list} " = *" ${binary_package_architecture} "* ]]; then
-            all_target_debs_are_arch_all="false"
-          fi
+          # shellcheck disable=SC2154,SC2086
+          for architecture_token in ${binary_package_architecture}; do
+            if [[ " ${make_cross_build_platform_list} " = *" ${architecture_token} "* ]]; then
+              all_target_debs_are_arch_all="false"
+              break
+            fi
+          done
         fi
         if [ "${skip_debs_artifact}" = "false" ]; then
           ## Example architecture independent "all" package:
@@ -627,7 +635,7 @@ make_get_destdir() {
   if [ -z "${DESTDIR:-}" ]; then
     DESTDIR="/"
   fi
-  if type -t make_hook_at_the_end_of_get_destdir; then
+  if type -t make_hook_at_the_end_of_get_destdir >/dev/null; then
     make_hook_at_the_end_of_get_destdir
   fi
 }
