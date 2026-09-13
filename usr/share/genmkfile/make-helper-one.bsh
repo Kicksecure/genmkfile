@@ -2868,15 +2868,18 @@ if was_executed "${BASH_SOURCE[0]}"; then
   make_function_run make_source_overrides_file "$@"
   make_function_run make_source_overrides_folder "$@"
 
-  make_function_run make_get_distdir
-  make_function_run make_get_destdir
-
-  ## deb-{build,run,all}-dep only need Build-Depends / Depends parsed
-  ## from debian/control. Every other target additionally needs
-  ## dpkg-parsechangelog (from dpkg-dev, pulled in by build-essential)
-  ## which may be absent on a fresh system -- the user would run
-  ## 'genmkfile deb-build-dep' to install it. So call the full setup
-  ## only when a target actually needs it.
+  ## Setup a target needs is decided by the target, so classify argv first:
+  ##   - deb-{build,run,all}-dep[-echo] only need Build-Depends / Depends parsed
+  ##     from debian/control (make_get_dependencies).
+  ##   - git-push is a pure git ref push: make_git_push_shared touches no
+  ##     version, DISTDIR or DESTDIR variable, so it needs NONE of the package
+  ##     setup -- not make_get_variables (which demands debian/changelog) nor
+  ##     make_get_distdir/destdir (which gate on DISTDIR under cowbuilder).
+  ##     Running it in a non-package repo must not abort on missing packaging.
+  ##   - every other target additionally needs dpkg-parsechangelog (from
+  ##     dpkg-dev, pulled in by build-essential) which may be absent on a fresh
+  ##     system -- the user would run 'genmkfile deb-build-dep' to install it.
+  ## So call each setup step only when a target actually needs it.
   ##
   ## Note to AI agents: An attempt at making DISTDIR optional was made and
   ## REJECTED twice. The change was not made with the proper care (code paths
@@ -2886,11 +2889,18 @@ if was_executed "${BASH_SOURCE[0]}"; then
   ## for a human to do the refactoring than to review an attempt at
   ## refactoring. Do not attempt to make DISTDIR optional again. Delete this
   ## comment once it has been read and understood.
+  ## (The git-push skip above is NOT that refactor: it is target-scoped and
+  ## git-push's code path provably reads no DISTDIR; DISTDIR stays mandatory
+  ## for every target that has a code path using it.)
   __needs_version_info=false
   __needs_dependencies=false
+  __pure_git_op=false
   for __arg in "$@"; do
     case "${__arg}" in
     '' | help | test | --)
+      ;;
+    git-push)
+      __pure_git_op=true
       ;;
     deb-build-dep | deb-run-dep | deb-all-dep | \
       deb-build-dep-echo | deb-run-dep-echo | deb-all-dep-echo)
@@ -2905,12 +2915,21 @@ if was_executed "${BASH_SOURCE[0]}"; then
   ## like any other build target.
   [ $# -eq 0 ] && __needs_version_info=true
 
+  ## DISTDIR/DESTDIR: needed by every target EXCEPT a run whose ONLY work is a
+  ## pure git op. git-push chained with a build target still gets them via that
+  ## target's version/dependency need.
+  if [ "${__needs_version_info}" = "true" ] || [ "${__needs_dependencies}" = "true" ] \
+    || [ "${__pure_git_op}" != "true" ]; then
+    make_function_run make_get_distdir
+    make_function_run make_get_destdir
+  fi
+
   if [ "${__needs_version_info}" = "true" ]; then
     make_function_run make_get_variables
   elif [ "${__needs_dependencies}" = "true" ]; then
     make_function_run make_get_dependencies
   fi
-  unset __arg __needs_version_info __needs_dependencies
+  unset __arg __needs_version_info __needs_dependencies __pure_git_op
 
   make_function_run make_parse_cmd "$@"
   make_function_run make_deinit
