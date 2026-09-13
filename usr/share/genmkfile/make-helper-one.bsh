@@ -13,9 +13,9 @@
 #set -x
 
 ## Code duplication. Copied from
-## helper-scripts//usr/libexec/helper-scripts/has.bsh.
+## helper-scripts/usr/libexec/helper-scripts/has.bsh.
 ##
-## Because has.bsh cannot be sources here (the build host may not have
+## Because has.bsh cannot be sourced here (the build host may not have
 ## helper-scripts installed).
 has() {
   local _cmd _name
@@ -369,10 +369,7 @@ make_get_variables_parse_stanzas() {
         ## Validate the control-derived binary package name before it is
         ## interpolated into deletion paths.
         ##
-        ## Debian policy: a package name is at least two characters and MUST
-        ## start with an alphanumeric (then lower-case letters, digits, +, -, .).
-        ## Anchoring the first character rejects a name like '..' or '.x' that a
-        ## bare '[-a-z0-9+.]+' would accept and that could escape a deletion path.
+        ## Package name regex based upon the restrictions specified by
         ## https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-source
         if [ -z "${package}" ] || ! [[ "${package}" =~ ^[a-z0-9][a-z0-9+.-]+$ ]]; then
           exit_with_error 1 "invalid binary package name '${package}' in debian/control."
@@ -430,11 +427,9 @@ make_get_variables_parse_stanzas() {
         binary_package_architecture=""
       ;;
     esac
-  ## A stanza is flushed only when the loop reads the blank line AFTER it, but
-  ## '$(grep-dctrl ...)' strips grep-dctrl's trailing blank line, so without a
-  ## re-added terminator the LAST stanza is never flushed -- dropping the .deb of
-  ## a single-binary package (empty install list -> deb-install installs nothing
-  ## -> installcheck fails) or the last binary of a multi-binary one.
+  ## A stanza is finished when a blank line or EOF is encountered, but we only
+  ## process a new stanza when a blank line is encountered, so we need an extra
+  ## blank line before EOF.
   done <<< "${stanza_list}"$'\n'
 }
 
@@ -1106,9 +1101,8 @@ ${untagged_list}"
       absolute_filename_without_hash="${filename_without_hash/#.\//\/}"
       pkg_name="${file_name##*/}"
       pkg_name="${pkg_name##*#}"
-      ## Debian policy: start with an alphanumeric (min two chars). Anchoring the
-      ## first character rejects a '#.evil' tag whose '.evil.install' would be a
-      ## hidden/traversal path, which a bare '[-a-z0-9+.]+' accepted.
+      ## Package name regex based upon the restrictions specified by
+      ## https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-source
       if [ -z "${pkg_name}" ] || ! [[ "${pkg_name}" =~ ^[a-z0-9][a-z0-9+.-]+$ ]]; then
         exit_with_error 1 "invalid package name '${pkg_name}' from multi-package filename '${file_name}' (expected '<path>#<pkgname>')"
       fi
