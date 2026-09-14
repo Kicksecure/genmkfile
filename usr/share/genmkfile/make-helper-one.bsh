@@ -2870,7 +2870,7 @@ if was_executed "${BASH_SOURCE[0]}"; then
     exit_with_error 1 "Internal error, __git_only and __needs_dependencies cannot both be 'true'!"
   fi
 
-  if [ "${_git_only}" != "true" ]; then
+  if [ "${__git_only}" != "true" ]; then
     make_function_run make_get_distdir
     make_function_run make_get_destdir
   fi
