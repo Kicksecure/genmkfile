@@ -42,28 +42,38 @@ if [ "${GENMKFILE_DEBUG:-}" = "1" ]; then
   set -x
 fi
 
+make_source_package_name_init() {
+  ## Provisional source package label for log output and nounset-safe reads
+  ## before make_get_variables derives the authoritative name from
+  ## debian/changelog. Idempotent: honors an already-set value, else falls
+  ## back to the working directory basename. make_get_variables overrides it
+  ## with the changelog 'Source' field once known. Git-only targets
+  ## (git-push, git-tag-push) skip make_get_variables and rely on this label.
+  make_source_package_name="${make_source_package_name:-${PWD##*/}}"
+}
+
 make_output_info() {
   local info_fd=1
   if [ "${make_quiet_stdout:-}" = "true" ]; then
     info_fd=2
   fi
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}INFO:${reset} ${*}" >&"${info_fd}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${green}INFO:${reset} ${*}" >&"${info_fd}"
 }
 
 make_output_warn() {
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${red}WARNING:${reset} ${*}" >&2
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${red}WARNING:${reset} ${*}" >&2
 }
 
 make_output_cached() {
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}CACHED:${reset} ${*}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${green}CACHED:${reset} ${*}"
 }
 
 make_output_debug() {
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}DEBUG:${reset} ${*}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${green}DEBUG:${reset} ${*}"
 }
 
 make_log_and_run() {
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}running:${reset} ${*}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${green}running:${reset} ${*}"
   "${@}"
 }
 
@@ -73,7 +83,7 @@ make_output_error() {
   source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/trace.bsh" || true
   ## override in case 'function_trace' unavailable.
   trace="$(function_trace)" || true
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${red}${bold}ERROR:${reset} ${*}" >&2
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${red}${bold}ERROR:${reset} ${*}" >&2
   printf "%s\n" "${trace}" >&2
 }
 
@@ -2796,6 +2806,10 @@ if was_executed "${BASH_SOURCE[0]}"; then
   ## strings so printf calls do not fail under nounset.
   : "${red:=}" "${green:=}" "${bold:=}" "${reset:=}" \
     "${cyan:=}" "${under:=}" "${eunder:=}"
+
+  ## Set the provisional package label before the first log line and before
+  ## any target (git-only ones skip make_get_variables) reads it under nounset.
+  make_source_package_name_init
 
   ## We have to set make_quiet_stdout if needed here, since it will influence
   ## the behavior of all functions run in a batch operation.
