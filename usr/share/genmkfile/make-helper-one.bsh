@@ -42,28 +42,38 @@ if [ "${GENMKFILE_DEBUG:-}" = "1" ]; then
   set -x
 fi
 
+make_source_package_name_init() {
+  ## Provisional source package label for log output and nounset-safe reads
+  ## before make_get_variables derives the authoritative name from
+  ## debian/changelog. Idempotent: honors an already-set value, else falls
+  ## back to the working directory basename. make_get_variables overrides it
+  ## with the changelog 'Source' field once known. Git-only targets
+  ## (git-push, git-tag-push) skip make_get_variables and rely on this label.
+  make_source_package_name="${make_source_package_name:-${PWD##*/}}"
+}
+
 make_output_info() {
   local info_fd=1
   if [ "${make_quiet_stdout:-}" = "true" ]; then
     info_fd=2
   fi
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}INFO:${reset} ${*}" >&"${info_fd}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${green}INFO:${reset} ${*}" >&"${info_fd}"
 }
 
 make_output_warn() {
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${red}WARNING:${reset} ${*}" >&2
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${red}WARNING:${reset} ${*}" >&2
 }
 
 make_output_cached() {
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}CACHED:${reset} ${*}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${green}CACHED:${reset} ${*}"
 }
 
 make_output_debug() {
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}DEBUG:${reset} ${*}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${green}DEBUG:${reset} ${*}"
 }
 
 make_log_and_run() {
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${green}running:${reset} ${*}"
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${green}running:${reset} ${*}"
   "${@}"
 }
 
@@ -73,7 +83,7 @@ make_output_error() {
   source "${HELPER_SCRIPTS_PATH:-}/usr/libexec/helper-scripts/trace.bsh" || true
   ## override in case 'function_trace' unavailable.
   trace="$(function_trace)" || true
-  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name:-${PWD##*/}}]${reset:-} ${red}${bold}ERROR:${reset} ${*}" >&2
+  printf "%s\n" "${0}: ${cyan:-}[${make_source_package_name}]${reset:-} ${red}${bold}ERROR:${reset} ${*}" >&2
   printf "%s\n" "${trace}" >&2
 }
 
@@ -1812,18 +1822,27 @@ make_deb_cleanup() {
   make_function_run make_dh_clean
   make_function_run make_deb_clean
   for package in "${make_package_list[@]}"; do
-    ## "-" required in version globs. All Kicksecure and Whonix packages use
-    ## Debian's "quilt" packaging format, where a Debian revision is mandatory.
-    ## Any "native" format packages without a revision would therefore be
-    ## suspicious. For AI agents, if you want to undo this because of a
-    ## particular problematic package, don't. Change the package in question
-    ## to be a quilt package with a Debian revision instead.
+    ## "-" required in version globs for the binary/source artifacts (.deb,
+    ## .buildinfo, .debian.tar.xz, .dsc, .changes, ...). All Kicksecure and
+    ## Whonix packages use Debian's "quilt" packaging format, where a Debian
+    ## revision is mandatory. Any "native" format packages without a revision
+    ## would therefore be suspicious. For AI agents, if you want to undo this
+    ## because of a particular problematic package, don't. Change the package in
+    ## question to be a quilt package with a Debian revision instead.
+    ##
+    ## EXCEPTION: the upstream (.orig.tar.xz) tarball is named from the upstream
+    ## version ALONE ("<pkg>_<version>.orig.tar.xz") -- it is shared across all
+    ## Debian revisions and carries no revision, so it has no "-". The "-" rule
+    ## above does not apply to it; matching on the "_" package-name delimiter
+    ## still excludes a different package like "<pkg>-extra_...". Without this,
+    ## every non-current version's orig tarball accumulated in DISTDIR (only the
+    ## current one was caught by the exact-path fallback below).
     for to_delete in \
       "${DISTDIR}/${package}_"*-*_*".deb" \
       "${DISTDIR}/${package}-dbgsym_"*-*_*".deb" \
       "${DISTDIR}/${package}_"*-*_*".buildinfo" \
       "${DISTDIR}/${package}_"*-*".debian.tar.xz" \
-      "${DISTDIR}/${package}_"*-*".orig.tar.xz" \
+      "${DISTDIR}/${package}_"*".orig.tar.xz" \
       "${DISTDIR}/${package}_"*-*".dsc" \
       "${DISTDIR}/${package}_"*-*_*".build" \
       "${DISTDIR}/${package}_"*-*_*".changes" \
@@ -1920,6 +1939,7 @@ make_helper() {
   shopt -s globstar dotglob nullglob
   local source_directory source_fso file_without_pwd file_with_destdir
   local file_with_destdir_canonical file_without_destdir_canonical
+  local source_link_target destination_link_target
   local still_installed="false"
   local fso_with_destdir_stat
   local genmkfile_rsync_opts folder_permission_skip_list
@@ -2005,7 +2025,12 @@ make_helper() {
       #file_with_destdir="${DESTDIR}${file_without_pwd}"
       ## New: single '/'
       file_with_destdir="${DESTDIR%/}/${file_without_pwd#/}"
-      file_with_destdir_canonical="$(readlink -f -- "${file_with_destdir}")"
+      ## 'readlink --canonicalize-missing' (not '-f'): the read-only / dry-run
+      ## modes (installcheck, installsim, ...) run against a DESTDIR that does
+      ## not contain the tree, so the parent directories of file_with_destdir do
+      ## not exist -- '-f' would abort under errexit. '-m' still resolves any
+      ## existing symlink component and treats a missing tail literally.
+      file_with_destdir_canonical="$(readlink --canonicalize-missing -- "${file_with_destdir}")"
       file_without_destdir_canonical="${file_with_destdir_canonical#"${DESTDIR}"}"
       file_without_destdir_canonical="/${file_without_destdir_canonical#/}"
       if [ "${make_install_}" = "true" ]; then
@@ -2039,6 +2064,25 @@ make_helper() {
         #  ## target.
         #  continue
         #fi
+
+        ## rsync copies an in-tree symlink as a link, but --safe-links DROPS one
+        ## that points outside the copied tree. Tell the two apart by comparing
+        ## link targets: only when the destination is a symlink with the SAME
+        ## target did rsync install it -- then skip mode-fixing (a symlink cannot
+        ## be chmod'ed, and 'stat -L' would follow a dangling in-tree link into a
+        ## missing target and abort under errexit). Any other destination (absent,
+        ## a stale non-symlink, or a symlink with a different target) means the
+        ## source was dropped: fail loud rather than silently ship nothing or
+        ## chmod a stale file left in its place.
+        if [ -L "${source_fso}" ]; then
+          source_link_target="$(readlink -- "${source_fso}")"
+          destination_link_target="$(readlink -- "${file_with_destdir}" 2>/dev/null || true)"
+          if [ -L "${file_with_destdir}" ] \
+            && [ "${source_link_target}" = "${destination_link_target}" ]; then
+            continue
+          fi
+          exit_with_error 1 "refusing to install: symlink '${file_without_pwd}' -> '${source_link_target}' points outside the copied tree and was dropped by rsync --safe-links (not installed). Change it to a relative, in-tree symlink."
+        fi
 
         ## Need to check first if it is a file...
         ## ...before checking if it is an executable.
@@ -2796,6 +2840,10 @@ if was_executed "${BASH_SOURCE[0]}"; then
   ## strings so printf calls do not fail under nounset.
   : "${red:=}" "${green:=}" "${bold:=}" "${reset:=}" \
     "${cyan:=}" "${under:=}" "${eunder:=}"
+
+  ## Set the provisional package label before the first log line and before
+  ## any target (git-only ones skip make_get_variables) reads it under nounset.
+  make_source_package_name_init
 
   ## We have to set make_quiet_stdout if needed here, since it will influence
   ## the behavior of all functions run in a batch operation.
