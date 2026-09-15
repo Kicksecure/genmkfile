@@ -1,8 +1,229 @@
+commit 6579cbb292b70276c159e0eaeaf9dce3a35da33f
+Merge: 47579ab cf17128
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 15 07:45:19 2026 -0400
+
+    Merge remote-tracking branch 'ArrayBolt3/arraybolt3/trixie'
+
+commit cf1712880f8df9a5fac7132bf907b8baf92a62e6
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Mon Sep 14 20:10:53 2026 -0400
+
+    Polish
+
+commit 22ddcd00e80796209607ffae7c7d50f3fe4f9f1b
+Merge: 47579ab 389eb8d
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Mon Sep 14 19:46:28 2026 -0400
+
+    Merge branch 'ai' into arraybolt3/trixie
+
+commit 389eb8dcdf5e985633faed4bb60972814a4294fb
+Author: claude (dev569 b7a38c93-a083-44a4-bb5a-00b9e6095fdc) <noreply@anthropic.com>
+Date:   Mon Sep 14 11:11:00 2026 -0400
+
+    make-helper-one: symlink, DESTDIR, orig-tarball fixes
+
+    - install: die loud on an escaping symlink (dropped by rsync --safe-links)
+      and skip an in-tree link, instead of stat-crashing on a missing target
+    - installcheck/installsim: readlink --canonicalize-missing, so a DESTDIR
+      that lacks the tree no longer aborts on absent parent dirs
+    - deb-cleanup: orig-tarball glob required a '-' though orig tarballs carry
+      no Debian revision, so every prior version's tarball accumulated
+
+commit 64e5be0ee76ac8a3ece4543660daa0fcd0e9dc95
+Author: claude (dev569 b7a38c93-a083-44a4-bb5a-00b9e6095fdc) <noreply@anthropic.com>
+Date:   Mon Sep 14 10:14:31 2026 -0400
+
+    make-helper-one: init source package name once
+
+    - git-only targets (git-push, git-tag-push) skip make_get_variables, so
+      make_git_tag_shared read make_source_package_name unset under nounset
+      (line 2315 unbound-variable abort)
+    - one shared make_source_package_name_init replaces 6 inline
+      ${make_source_package_name:-${PWD##*/}} label defaults
+
+commit 2e278b45b0aef924c4c0571a337605a95caf4f24
+Merge: fb67602 47579ab
+Author: assisted-by-ai <assisted-by-ai@users.noreply.github.com>
+Date:   Mon Sep 14 10:01:08 2026 -0400
+
+    Merge master into ai (remaster)
+
+commit 47579abe7c89c29d2ce488b1ce84f9459f83a266
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Sep 14 09:33:52 2026 -0400
+
+    fix
+
+commit 1708ffc50ca67338d99bc2a21cbdb07e7217b847
+Merge: 6c2fdc9 b4a480f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Sep 14 02:18:36 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/ArrayBolt3/arraybolt3/trixie'
+
+commit b4a480f12f5b483a062eb0c4c3f9277c75a45a1b
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Sun Sep 13 13:43:10 2026 -0400
+
+    Polish, rework make_helper changes to be more reliable
+
+commit 470c82eed052298bf36553a2c399a4c407e7b5db
+Merge: 1cb1820 fb67602
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Sun Sep 13 11:12:57 2026 -0400
+
+    Merge branch 'ai' into arraybolt3/trixie
+
+commit 1cb1820439eaed904e42f3e3c1903269344366e0
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Sun Sep 13 11:12:30 2026 -0400
+
+    comments
+
+commit fb676020b8c80bb45e7216d8d81c79af3d4d53b4
+Author: claude (dev547 feaf2403-1c5a-4847-8bf4-02dd83a43dbd) <noreply@anthropic.com>
+Date:   Sun Sep 13 08:08:08 2026 -0400
+
+    make-helper: fix stdout leak and cross-arch miss
+
+    - make_get_destdir: unredirected 'type -t' hook probe leaked
+      'function' onto stdout, corrupting the clean deb-*-dep-echo output
+    - cross-build: matching the whole joined Architecture list as one
+      token missed a multi-arch stanza covering another cross-build leg,
+      silently skipping that leg's build
+
+commit c047d06e0035ad0c7cdad7711c01f3a824e309b6
+Author: claude (dev547 feaf2403-1c5a-4847-8bf4-02dd83a43dbd) <noreply@anthropic.com>
+Date:   Sun Sep 13 07:47:16 2026 -0400
+
+    git-push: skip package-var setup (pure git op)
+
+    - make_git_push_shared reads no version/DISTDIR/DESTDIR variable, so
+      git-push must not run make_get_variables (demands debian/changelog)
+      nor make_get_distdir/destdir; this blocked backup of non-package repos
+    - target-scoped, not the rejected global DISTDIR-optional refactor
+
+commit 8ea2dfde7d7849908bbf3117cdf078f812e8ec8f
+Merge: 63f3934 6c2fdc9
+Author: claude <noreply@anthropic.com>
+Date:   Sun Sep 13 06:01:23 2026 -0400
+
+    Merge branch 'master' into ai
+
+commit 63f3934edbbad823d8006696dc475e7af72e3694
+Author: claude (dev541 abd2cdfa-632f-4eda-bd69-14b67be2017e) <noreply@anthropic.com>
+Date:   Sun Sep 13 05:36:16 2026 -0400
+
+    version-bump-calculate: python3 -Bsu shebang
+
+commit 81f4ed394102a7c40fe5667c2a85123fdb597f83
+Author: claude (dev530 7cb4f46e-1065-4ace-b832-db72aee818fb) <noreply@anthropic.com>
+Date:   Sun Sep 13 05:18:27 2026 -0400
+
+    installcheck/sim modes: do not require a writable DESTDIR
+
+    - only install/uninstall write to DESTDIR; installcheck, uninstallcheck,
+      installsim and uninstallsim are read-only / dry-run. The precondition
+      exempted installcheck alone, so the other three aborted with "DESTDIR is
+      not writeable!" unprivileged against the default DESTDIR=/. Gate on the
+      write modes instead. (surfaced by ai-review)
+
+commit 2360886600a0ec0cf577552b4597b08e4b251ecf
+Author: claude (dev530 7cb4f46e-1065-4ace-b832-db72aee818fb) <noreply@anthropic.com>
+Date:   Sun Sep 13 04:56:26 2026 -0400
+
+    Add deb-*-dep-echo targets; exclude VCS files from install
+
+    - deb-{build,run,all}-dep-echo: echo the declared dependency package names to
+      stdout (one per line), WITHOUT installing, for capturing into a variable to
+      batch-install several packages' deps in one apt-get. Diagnostics route to
+      stderr (make_quiet_stdout, set only for these targets) so stdout stays clean.
+    - exclude .gitignore and .git from install + installcheck (they are already
+      excluded from the built .deb via find_pkgfiles_args). Otherwise deb-icup
+      installcheck diffs a source .gitignore the package never shipped:
+      "diff: /usr/share/<pkg>/.gitignore: No such file or directory".
+
+commit b19b5e45c73978268f2f36547265fe82bbfc7a1e
+Author: claude (dev523 9e89f6dd-03c4-4491-adce-ee67bc776e03) <noreply@anthropic.com>
+Date:   Fri Sep 11 06:00:37 2026 -0400
+
+    genmkfile skill: fix --create recipes (--extrapackages aptitude) + aptcache-partial gotcha
+
+commit be2d30dd2da63421be85445514bcaf7b9a54ef12
+Author: claude (dev497 5326191d-88cb-4f38-a96b-e4d8ae5649d3) <noreply@anthropic.com>
+Date:   Thu Sep 10 05:04:32 2026 -0400
+
+    make-helper-one: keep sq_git_run trust-root/policy-file local
+
+    - Non-local assignments leaked into make_git_verify's shell: the HEAD
+      commit-verify's fallback trust-root then satisfied the tag-verify's preset
+      guard, verifying the tag against HEAD, not its commit. Scope them local;
+      trust-root takes an explicit 2nd arg (env preset still honored).
+    - Document --keep-dirlinks (build-controlled DESTDIR) and the debinstfile
+      '#'-tag known limitation (source folder must be trusted).
+
+commit ba68e362a1198b7ab89aba24b762e04d12e38f2c
+Author: claude (dev497 5326191d-88cb-4f38-a96b-e4d8ae5649d3) <noreply@anthropic.com>
+Date:   Wed Sep 9 22:16:36 2026 -0400
+
+    make-helper-one: skip install mode-fix when the destination is a symlink too
+
+    - The mode-fix already skips a symlink SOURCE; extend it to a symlink
+      DESTINATION. 'stat'/'chmod' dereference, so a destination path that is (or
+      became) a symlink would redirect the chmod onto an unintended file. Skip when
+      either side is a symlink.
+
+commit 4ea3ba3d1aa11d871fde8217185f449b80ebeb8f
+Author: claude (dev497 5326191d-88cb-4f38-a96b-e4d8ae5649d3) <noreply@anthropic.com>
+Date:   Wed Sep 9 13:38:00 2026 -0400
+
+    make-helper-one: skip mode-fix for symlinks; drop dead safe-rm
+
+    - install: never chmod a symlink. Its own mode bits are meaningless on Linux and
+      'stat'/'chmod' on the installed link DEREFERENCE it -- an in-tree symlink into
+      /etc/sudoers.d would drop the real 0440 sudoers file to 644, bypassing
+      folder_permission_skip_list (which only checks the symlink's own path). Add a
+      'test -L' arm that leaves the link as rsync installed it, and move the mode
+      'stat' into the dir/file arms so a dangling symlink no longer trips it.
+    - make_get_variables_parse_stanzas: drop 'safe-rm -- "${stanza_list}"' on the
+      grep-dctrl failure path; stanza_list holds captured stdout, not a temp-file
+      path, so there is nothing to remove.
+
+commit 9ac154ef4c5195aa989a5b9b79f66b4c4b0d20b2
+Author: claude (dev497 5326191d-88cb-4f38-a96b-e4d8ae5649d3) <noreply@anthropic.com>
+Date:   Wed Sep 9 08:15:15 2026 -0400
+
+    make-helper-one: nounset-safe SUDO_TO_ROOT; installcheck reads root-only files via sudo
+
+    - make_init: '[ -n "${SUDO_TO_ROOT}" ]' tripped 'set -o nounset' with
+      'SUDO_TO_ROOT: unbound variable' when genmkfile runs standalone. Guard with
+      '${SUDO_TO_ROOT:-}'.
+    - make_installcheck: a root-owned installed config (e.g. /etc/sudoers.d, 0440)
+      is unreadable to a non-root check, so a bare 'diff' failed "Permission denied"
+      and misreported it as changed. Read it via sudo for the diff; if sudo cannot,
+      emit an honest not-readable notice and skip. No false change, no hard abort.
+    - Silence SC2086 on the existing make_deb_install apt-get SUDO_TO_ROOT prefix.
+
+commit 6c2fdc915d8604f8ce85e9c56f6b081b5eda63f5
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Sep 9 11:04:50 2026 +0000
+
+    bumped changelog version
+
 commit bdc71d842c25b8b1f7e52210417c293db74fe85b
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Sep 9 07:02:25 2026 -0400
 
     fix
+
+commit 2959f89df02d8492a34425e2f3d36fe270c06cd4
+Merge: 9e2a647 e1b32b2
+Author: claude (dev497 5326191d-88cb-4f38-a96b-e4d8ae5649d3) <noreply@anthropic.com>
+Date:   Wed Sep 9 06:06:29 2026 -0400
+
+    Merge branch 'master' into ai
 
 commit e1b32b2b3e299836245c2e1e515a233948728c67
 Author: Patrick Schleizer <adrelanos@whonix.org>
