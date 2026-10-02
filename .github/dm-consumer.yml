@@ -20,5 +20,7 @@
 ## ('make_require debchange bc'); the chl_bumpup_revision suite drives that real
 ## code and FATALs without it (debchange itself is stubbed in the test).
 dist-ai-tests:
-  apt-packages: "python3 safe-rm dpkg-dev debhelper moreutils rsync dctrl-tools bc"
+  ## strip-nondeterminism normalizes the .orig tarball in make_dist
+  ## ('make_require strip-nondeterminism'); the dist_debian_sibling suite drives it.
+  apt-packages: "python3 safe-rm dpkg-dev debhelper moreutils rsync dctrl-tools bc strip-nondeterminism"
   helper-scripts: true
