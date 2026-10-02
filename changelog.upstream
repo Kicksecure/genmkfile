@@ -1,3 +1,40 @@
+commit 238a2c4a9e27d81e7eac6d048299c3865027b873
+Merge: f839786 b99a127
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Oct 2 04:07:33 2026 -0400
+
+    Merge remote-tracking branch 'refs/remotes/ArrayBolt3/arraybolt3/trixie'
+
+commit b99a12788f11afb5788912b1b7da584e135308ef
+Merge: f839786 15218d1
+Author: Aaron Rainbolt <arraybolt3@gmail.com>
+Date:   Thu Oct 1 23:26:28 2026 -0400
+
+    Merge branch 'ai' into arraybolt3/trixie
+
+commit 15218d17b12001e229a531a931a77fee0138ae97
+Author: claude (dev774 5ef9f669-4e6f-4dad-a8ac-ac545ca71d4f) <noreply@anthropic.com>
+Date:   Wed Sep 30 08:19:23 2026 -0400
+
+    dm-consumer: add strip-nondeterminism to dist-ai-tests deps
+
+    - make_dist runs 'make_require strip-nondeterminism' and invokes it on the
+      .orig tarball; the dist_debian_sibling suite drives that path and FATALs
+      without it in the CI container
+
+commit b610d6c2ce4e4833c5bb8a9a48afb373ea26fcb5
+Merge: 389eb8d f839786
+Author: assisted-by-ai <assisted-by-ai@users.noreply.github.com>
+Date:   Tue Sep 15 10:40:50 2026 -0400
+
+    Merge master into ai (remaster)
+
+commit f83978634ac321ea8501f5e90e2854eba819d973
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Sep 15 11:51:56 2026 +0000
+
+    bumped changelog version
+
 commit 6579cbb292b70276c159e0eaeaf9dce3a35da33f
 Merge: 47579ab cf17128
 Author: Patrick Schleizer <adrelanos@whonix.org>
